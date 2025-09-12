@@ -1,0 +1,112 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { render } from "astro:content";
+import PostMeta from "./PostMeta.astro";
+
+interface Props {
+	class?: string;
+	entry: CollectionEntry<"posts">;
+	style?: string;
+}
+
+const { entry, style } = Astro.props;
+const className = Astro.props.class;
+
+const { title, description, tags, categories, date, updated, cover, pinned, slug } = entry.data;
+const url = `/posts/${slug}`;
+
+// 渲染内容获取摘要信息
+const { remarkPluginFrontmatter } = await render(entry);
+
+// 估算字数和阅读时间
+const wordCount = remarkPluginFrontmatter?.words || Math.ceil(entry.body?.length / 5) || 0;
+const readTime = remarkPluginFrontmatter?.minutes || Math.ceil(wordCount / 200) || 1;
+
+const hasCover = cover !== undefined && cover !== null;
+---
+
+{/* 
+  修正：
+  - 当有封面图时，<article> 容器使用 flex 布局。
+  - 内容区域在左，封面图在右。
+  - 内容区域变为 flex-col 布局，以确保底部信息能正确地贴在卡片底部。
+  - 统一了“置顶”徽章的显示逻辑，使其总是出现在标题旁边。
+  - 调整了封面图的宽度和高度，使其适应新的水平布局。
+*/}
+<article class:list={[
+    "bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden border border-gray-200 dark:border-gray-700",
+    { "flex": hasCover },
+    className
+]} style={style}>
+    
+    <!-- 内容区域 -->
+    <div class:list={["p-4 flex flex-col", { "flex-grow": hasCover }]}>
+        <!-- 标题和置顶标识 -->
+        <div class="flex items-start justify-between mb-2">
+            <h3 class="flex-grow">
+                <a href={url} 
+                   class="text-lg font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors line-clamp-2">
+                    {title}
+                </a>
+            </h3>
+            {pinned && (
+                <div class="flex-shrink-0 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium ml-2">
+                    置顶
+                </div>
+            )}
+        </div>
+
+        <!-- 元数据 -->
+        <PostMeta 
+            published={date} 
+            updated={updated} 
+            tags={tags} 
+            categories={categories} 
+            hideTagsForMobile={true} 
+            hideUpdateDate={true} 
+            class="mb-3" 
+        />
+
+        <!-- 描述 -->
+        <p class="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-3 leading-relaxed flex-grow">
+            {description || remarkPluginFrontmatter?.excerpt || "暂无描述..."}
+        </p>
+
+        <!-- 底部信息 -->
+        <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-auto">
+            <span>{wordCount} 字 · {readTime} 分钟</span>
+            <a href={url} 
+               class="text-blue-600 dark:text-blue-400 hover:underline">
+                阅读全文
+            </a>
+        </div>
+    </div>
+
+    <!-- 封面图片 -->
+    {hasCover && (
+        <div class="relative flex-shrink-0 w-1/3 max-w-[200px]">
+            <a href={url} class="block h-full">
+                <img 
+                    src={cover.src} 
+                    alt={title} 
+                    class="w-full h-full object-cover hover:opacity-90 transition-opacity"
+                />
+            </a>
+        </div>
+    )}
+</article>
+
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>

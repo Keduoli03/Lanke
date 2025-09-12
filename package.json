@@ -12,7 +12,16 @@
     "@astrojs/mdx": "^4.3.5",
     "@astrojs/rss": "^4.0.12",
     "@astrojs/sitemap": "^3.5.1",
+    "@astrojs/svelte": "^7.1.1",
+    "@iconify-json/fa6-brands": "^1.2.6",
+    "@iconify-json/fa6-regular": "^1.2.4",
+    "@iconify-json/fa6-solid": "^1.2.4",
+    "@iconify-json/material-symbols": "^1.2.34",
+    "@tailwindcss/vite": "^4.1.13",
     "astro": "^5.13.7",
-    "sharp": "^0.34.3"
+    "astro-icon": "^1.1.5",
+    "sharp": "^0.34.3",
+    "svelte": "^5.38.10",
+    "tailwindcss": "^4.1.13"
   }
 }

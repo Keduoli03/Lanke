@@ -1,0 +1,50 @@
+---
+interface Props {
+	class?: string;
+	published: Date;
+	updated?: Date;
+	tags: string[];
+	categories: string[];
+	hideTagsForMobile?: boolean;
+	hideUpdateDate?: boolean;
+}
+
+const {
+	published,
+	updated,
+	tags,
+	categories,
+	hideTagsForMobile = false,
+	hideUpdateDate = false,
+} = Astro.props;
+const className = Astro.props.class;
+
+function formatDate(date: Date): string {
+	return date.toLocaleDateString('zh-CN', {
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit'
+	}).replace(/\//g, '-');
+}
+---
+
+<div class:list={["flex flex-wrap text-gray-500 dark:text-gray-400 items-center gap-2 text-sm", className]}>
+    <!-- 发布日期 -->
+    <span>{formatDate(published)}</span>
+
+    <!-- 分类 -->
+    {categories && categories.length > 0 && (
+        <>
+            <span>·</span>
+            <span>{categories[0]}</span>
+        </>
+    )}
+
+    <!-- 标签 -->
+    {tags && tags.length > 0 && !hideTagsForMobile && (
+        <>
+            <span>·</span>
+            <span class="text-blue-600 dark:text-blue-400">#{tags[0]}</span>
+        </>
+    )}
+</div>

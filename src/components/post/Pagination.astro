@@ -1,0 +1,26 @@
+---
+import type { Page } from 'astro';
+
+interface Props {
+  page: Page<any>;
+}
+
+const { page } = Astro.props;
+---
+<div class="flex justify-between items-center mt-12 text-lg">
+  {page.url.prev ? (
+    <a href={page.url.prev} class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md px-5 py-2 font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+      &larr; 上一页
+    </a>
+  ) : <div />}
+  
+  <span class="font-medium text-gray-500 dark:text-gray-400">
+    第 {page.currentPage} 页 / 共 {page.lastPage} 页
+  </span>
+
+  {page.url.next ? (
+    <a href={page.url.next} class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md px-5 py-2 font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+      下一页 &rarr;
+    </a>
+  ) : <div />}
+</div>

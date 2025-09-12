@@ -1,0 +1,170 @@
+---
+import { Icon } from "astro-icon/components";
+import { navBarConfig, siteConfig } from "../config";
+import { LinkPresets } from "../constants/link-presets";
+import type { LinkPreset, NavBarLink } from "../types/config";
+import { url } from "../utils/url-utils";
+import HeaderLink from "./HeaderLink.astro";
+// import LightDarkSwitch from "./LightDarkSwitch.svelte";
+
+// 修正：将 links 对象转换为数组
+let links: NavBarLink[] = Object.values(navBarConfig.links);
+
+// 定义样式辅助函数
+function getNavLinkClasses(variant: "sidebar" | "mobile-menu") {
+  const baseClasses = "transition-all group nav-link";
+  const variantClasses = {
+    sidebar: "flex flex-col items-center p-1 w-auto",
+    "mobile-menu":
+      "flex flex-row items-center p-2 w-full rounded-lg hover:bg-[var(--btn-regular-bg-hover)]",
+  };
+  return `${baseClasses} ${variantClasses[variant]}`;
+}
+
+function getIconContainerClasses(variant: "sidebar" | "mobile-menu") {
+  return {
+    sidebar:
+      "w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mb-1 transition-all relative hover:border-2 hover:border-[var(--primary)] hover:scale-110",
+    "mobile-menu":
+      "w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-2 transition-all relative",
+  }[variant];
+}
+
+function getTextClasses(variant: "sidebar" | "mobile-menu") {
+  return {
+    sidebar: "text-xs text-black dark:text-white text-center leading-tight",
+    "mobile-menu":
+      "text-sm text-black dark:text-white text-left flex-1 truncate",
+  }[variant];
+}
+
+function getExternalIconClasses(variant: "sidebar" | "mobile-menu") {
+  return variant === "sidebar"
+    ? "text-xs text-[var(--deep-text)]/70 mt-1"
+    : "text-xs text-[var(--deep-text)]/70 ml-auto flex-shrink-0";
+}
+---
+
+<!-- PC端侧边栏 - 只在大屏幕显示 -->
+<div id="side-navbar" class="fixed left-0 top-0 h-full bg-white dark:bg-[var(--card-bg)] border-r border-[var(--line-divider)] z-50 flex-col lg:flex hidden">
+  <!-- 网站Logo -->
+  <div class="p-2 border-b border-[var(--line-divider)] flex justify-center">
+    <a href={url('/')} class="hover:opacity-80 transition-opacity">
+      <img src="/logo.png" alt={siteConfig.title} class="w-6 h-6" />
+    </a>
+  </div>
+
+  <!-- 导航链接 -->
+  <nav class="flex-1 p-2">
+    <ul class="space-y-3">
+      {links.map((l) => (
+        <li class="flex justify-center">
+          <a
+            href={l.external ? l.url : url(l.url)}
+            target={l.external ? "_blank" : "_self"}
+            rel={l.external ? "noopener noreferrer" : ""}
+            class={getNavLinkClasses('sidebar')}
+          >
+            <div class={getIconContainerClasses('sidebar')}>
+              {l.icon && <Icon name={l.icon} class="text-sm text-black dark:text-white" />}
+            </div>
+            <span class={getTextClasses('sidebar')}>{l.name}</span>
+            {l.external && (
+              <Icon
+                name="fa6-solid:arrow-up-right-from-square"
+                class={getExternalIconClasses('sidebar')}
+              />
+            )}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+
+  <!-- 底部区域，包含设置/主题切换 -->
+  <div class="p-2 border-t border-[var(--line-divider)]">
+    <ul class="space-y-3">
+      <li class="flex justify-center">
+        <!-- <LightDarkSwitch client:load /> -->
+      </li>
+    </ul>
+  </div>
+</div>
+
+<style>
+  #side-navbar {
+    width: var(--sidebar-width);
+  }
+</style>
+
+
+<style>
+  #side-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    overflow-y: auto;
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--line-divider);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    z-index: 10;
+  }
+
+  .navbar-container {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 1rem;
+    height: 100%;
+  }
+
+  .profile-block {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .avatar-link {
+    display: inline-block;
+  }
+
+  .avatar-img {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    border: 2px solid var(--line-divider);
+    transition: transform 0.2s ease;
+  }
+  .avatar-img:hover {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  .profile-name {
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--text-title);
+  }
+
+  .profile-desc {
+    font-size: 0.875rem;
+    color: var(--text-main);
+    margin-top: 0.25rem;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 1023px) {
+    #side-navbar {
+      transform: translateX(-100%);
+      width: 280px; 
+    }
+    #side-navbar.is-open {
+      transform: translateX(0);
+    }
+  }
+</style>

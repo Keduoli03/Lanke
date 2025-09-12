@@ -1,0 +1,109 @@
+---
+import { ClientRouter  } from 'astro:transitions';
+import { siteConfig } from '../config';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Sidebar from '../components/Sidebar.astro';
+
+export interface Props {
+  title: string;
+  description: string;
+  useContentPane?: boolean;
+}
+
+const { title, description, useContentPane = true } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <BaseHead title={title} description={description} />
+    <ClientRouter  />
+  </head>
+  <body style={`--page-width: ${siteConfig.pageWidth}; --sidebar-width: ${siteConfig.sidebarWidth};`}>
+    <div class="layout-container">
+      <Sidebar />
+
+      <main class="main-content">
+        {useContentPane ? (
+          <div class="content-pane">
+            <slot />
+            <Footer />
+          </div>
+        ) : (
+          <div class="content-wrapper">
+            <slot />
+            <Footer />
+          </div>
+        )}
+      </main>
+    </div>
+    
+    <style>
+      .layout-container {
+        display: flex;
+        min-height: 100vh;
+      }
+      
+      .main-content {
+        flex: 1;
+      }
+
+      /* 用于首页列表：居中，无背景 */
+      .content-wrapper {
+        max-width: var(--page-width);
+        margin: 0 auto;
+        padding: 2rem 1rem;
+      }
+
+      /* 用于文章详情页：居中，带白色背景卡片 */
+      .content-pane {
+        background-color: var(--white);
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.08);
+        padding: 2rem;
+        max-width: var(--page-width);
+        margin: 2rem auto; /* 默认居中 */
+      }
+
+      html.dark .content-pane {
+        background-color: var(--card-bg);
+        border: 1px solid var(--line-divider);
+        box-shadow: none;
+      }
+
+      @media (min-width: 1024px) {
+        :global(#side-navbar) {
+          width: var(--sidebar-width);
+        }
+        
+        .main-content {
+          margin-left: var(--sidebar-width);
+        }
+
+        .content-wrapper {
+          padding: 2rem;
+        }
+        .content-pane {
+          /* 修正：保持 'auto' 以实现水平居中 */
+          margin: 2rem auto; 
+        }
+      }
+      
+      @media (max-width: 1023px) {
+        .main-content {
+          margin-left: 0 !important;
+        }
+        .content-wrapper {
+          padding: 1rem;
+        }
+        .content-pane {
+          padding: 1.5rem;
+          border-radius: 0.5rem;
+          /* 修正：保持 'auto' 以实现水平居中 */
+          margin: 1rem auto;
+        }
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,25 @@
+---
+import type { Page, PaginateFunction } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import MainLayout from '../layouts/MainLayout.astro';
+import PostPage from '../components/post/PostPage.astro';
+import { getSortedPosts } from '../utils/content-utils';
+import { PAGE_SIZE } from '../config';
+
+export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
+  const posts = await getSortedPosts();
+  return paginate(posts, { pageSize: PAGE_SIZE });
+}
+
+interface Props {
+  page: Page<CollectionEntry<'posts'>>;
+}
+const { page } = Astro.props;
+---
+<MainLayout 
+  title={`文章列表 - 第 ${page.currentPage} 页`}
+  description="Lanke's blog posts."
+  useContentPane={false}
+>
+  <PostPage page={page} showTitle={false} />
+</MainLayout>
