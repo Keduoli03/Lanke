@@ -1,0 +1,89 @@
+@import "tailwindcss";
+/* 
+  在这里使用 @apply 指令来自定义 .prose 类的样式。
+  这些样式将覆盖 Tailwind Typography 的默认设置。
+*/
+
+
+/* 隐藏所有层级标题的下划线 */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  @apply no-underline; 
+  background-image: none !important; 
+}
+
+/* 自定义链接样式 */
+.prose a {
+  @apply text-teal-600 no-underline transition-all duration-200;
+  /* 修正：使用 var() 函数代替 theme() */
+  background-image: linear-gradient(to right, var(--tw-color-teal-500), var(--tw-color-teal-500));
+  background-size: 0% 2px;
+  background-repeat: no-repeat;
+  background-position: left bottom;
+}
+
+
+.prose a:hover {
+  @apply text-teal-800;
+  background-size: 100% 2px;
+}
+
+/* 暗黑模式下的链接样式 */
+.dark .prose a {
+  @apply text-teal-400;
+  /* 修正：使用 var() 函数代替 theme() */
+  background-image: linear-gradient(to right, var(--tw-color-teal-400), var(--tw-color-teal-400));
+}
+
+.dark .prose a:hover {
+  @apply text-teal-200;
+}
+
+
+/* 自定义引用块样式 */
+.prose blockquote {
+  @apply border-l-4 border-teal-400 bg-teal-50 p-4 text-teal-800 dark:bg-teal-900/20 dark:text-teal-200;
+}
+/* 移除引用块的默认引号 */
+.prose blockquote p:first-of-type::before {
+  content: none;
+}
+
+/* 移除引用块中段落的默认外边距 */
+.prose blockquote p {
+  @apply m-0;
+}
+
+/* --- 段落缩进规则 START --- */
+
+/* 1. 默认所有段落都首行缩进两个字符 */
+.prose p {
+  @apply [text-indent:2em];
+}
+
+/* 2. 但以下情况的段落不缩进： */
+/* .prose h1 + p,
+.prose h2 + p,
+.prose h3 + p,
+.prose h4 + p, */
+.prose li > p,
+.prose blockquote p {
+  @apply [text-indent:0];
+}
+
+/* --- 段落缩进规则 END --- */
+
+
+/* 自定义图片样式 */
+.prose img {
+  @apply rounded-lg shadow-md;
+}
+
+/* 自定义代码块样式 */
+.prose pre {
+  @apply bg-gray-800 text-gray-100 rounded-lg shadow-lg;
+}

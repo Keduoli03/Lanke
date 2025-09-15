@@ -1,60 +1,42 @@
 ---
 import { Icon } from "astro-icon/components";
 import { navBarConfig, siteConfig } from "../config";
-import { LinkPresets } from "../constants/link-presets";
-import type { LinkPreset, NavBarLink } from "../types/config";
+import type { NavBarLink } from "../types/config";
 import { url } from "../utils/url-utils";
-import HeaderLink from "./HeaderLink.astro";
-// import LightDarkSwitch from "./LightDarkSwitch.svelte";
+import LightDarkSwitch from "./util/LightDarkSwitch.svelte";
+import ThemeSwitch from "./util/ThemeSwitch.svelte";
 
-// 修正：将 links 对象转换为数组
 let links: NavBarLink[] = Object.values(navBarConfig.links);
 
-// 定义样式辅助函数
-function getNavLinkClasses(variant: "sidebar" | "mobile-menu") {
-  const baseClasses = "transition-all group nav-link";
-  const variantClasses = {
-    sidebar: "flex flex-col items-center p-1 w-auto",
-    "mobile-menu":
-      "flex flex-row items-center p-2 w-full rounded-lg hover:bg-[var(--btn-regular-bg-hover)]",
-  };
-  return `${baseClasses} ${variantClasses[variant]}`;
+// 样式辅助函数
+function getNavLinkClasses() {
+  return "group flex flex-col items-center p-1 w-auto nav-link";
 }
 
-function getIconContainerClasses(variant: "sidebar" | "mobile-menu") {
-  return {
-    sidebar:
-      "w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mb-1 transition-all relative hover:border-2 hover:border-[var(--primary)] hover:scale-110",
-    "mobile-menu":
-      "w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-2 transition-all relative",
-  }[variant];
+function getIconContainerClasses() {
+  return "icon-container w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all relative group-hover:border-2 group-hover:border-[var(--primary)] group-hover:scale-110";
 }
 
-function getTextClasses(variant: "sidebar" | "mobile-menu") {
-  return {
-    sidebar: "text-xs text-black dark:text-white text-center leading-tight",
-    "mobile-menu":
-      "text-sm text-black dark:text-white text-left flex-1 truncate",
-  }[variant];
+function getTextClasses() {
+  return "text-xs text-center leading-tight text-[var(--text-secondary)]";
 }
 
-function getExternalIconClasses(variant: "sidebar" | "mobile-menu") {
-  return variant === "sidebar"
-    ? "text-xs text-[var(--deep-text)]/70 mt-1"
-    : "text-xs text-[var(--deep-text)]/70 ml-auto flex-shrink-0";
+function getExternalIconClasses() {
+  return "text-xs text-[var(--text-secondary)]/70 mt-1";
 }
 ---
 
-<!-- PC端侧边栏 - 只在大屏幕显示 -->
-<div id="side-navbar" class="fixed left-0 top-0 h-full bg-white dark:bg-[var(--card-bg)] border-r border-[var(--line-divider)] z-50 flex-col lg:flex hidden">
+<div
+  id="sidebar"
+  class="relative h-full bg-[var(--sidebar-bg)] w-16 flex-col transition-colors lg:flex hidden"
+>
   <!-- 网站Logo -->
   <div class="p-2 border-b border-[var(--line-divider)] flex justify-center">
-    <a href={url('/')} class="hover:opacity-80 transition-opacity">
+    <a href={url("/")} class="hover:opacity-80 transition-opacity">
       <img src="/logo.png" alt={siteConfig.title} class="w-6 h-6" />
     </a>
   </div>
 
-  <!-- 导航链接 -->
   <nav class="flex-1 p-2">
     <ul class="space-y-3">
       {links.map((l) => (
@@ -63,16 +45,16 @@ function getExternalIconClasses(variant: "sidebar" | "mobile-menu") {
             href={l.external ? l.url : url(l.url)}
             target={l.external ? "_blank" : "_self"}
             rel={l.external ? "noopener noreferrer" : ""}
-            class={getNavLinkClasses('sidebar')}
+            class={getNavLinkClasses()}
           >
-            <div class={getIconContainerClasses('sidebar')}>
-              {l.icon && <Icon name={l.icon} class="text-sm text-black dark:text-white" />}
+            <div class={getIconContainerClasses()}>
+              {l.icon && <Icon name={l.icon} class="icon text-sm" />}
             </div>
-            <span class={getTextClasses('sidebar')}>{l.name}</span>
+            <span class={getTextClasses()}>{l.name}</span>
             {l.external && (
               <Icon
                 name="fa6-solid:arrow-up-right-from-square"
-                class={getExternalIconClasses('sidebar')}
+                class={getExternalIconClasses()}
               />
             )}
           </a>
@@ -81,90 +63,58 @@ function getExternalIconClasses(variant: "sidebar" | "mobile-menu") {
     </ul>
   </nav>
 
-  <!-- 底部区域，包含设置/主题切换 -->
+  <!-- 底部区域 -->
   <div class="p-2 border-t border-[var(--line-divider)]">
-    <ul class="space-y-3">
+    <ul class="space-y-2">
       <li class="flex justify-center">
-        <!-- <LightDarkSwitch client:load /> -->
+        <LightDarkSwitch client:load>
+          <Icon slot="dark-icon" name="material-symbols:dark-mode-outline" class="bottom-bar-icon h-5 w-5 cursor-pointer" />
+          <Icon slot="light-icon" name="material-symbols:light-mode-outline" class="bottom-bar-icon h-5 w-5 cursor-pointer" />
+        </LightDarkSwitch>
+      </li>
+      <li class="flex justify-center">
+        <ThemeSwitch client:load>
+          <Icon slot="palette-icon" name="material-symbols:palette-outline" class="bottom-bar-icon h-5 w-5 cursor-pointer" />
+          <Icon slot="reset-icon" name="fa6-solid:arrow-rotate-left" class="text-xs" />
+        </ThemeSwitch>
       </li>
     </ul>
   </div>
 </div>
 
 <style>
-  #side-navbar {
+  #sidebar {
     width: var(--sidebar-width);
-  }
-</style>
-
-
-<style>
-  #side-navbar {
     position: fixed;
     top: 0;
     left: 0;
     height: 100%;
-    overflow-y: auto;
-    background-color: var(--sidebar-bg);
-    border-right: 1px solid var(--line-divider);
-    transition: transform 0.3s ease, background-color 0.3s ease;
     z-index: 10;
+    box-shadow: 2px 0 10px -5px rgba(0, 0, 0, 0.05);
   }
 
-  .navbar-container {
-    display: flex;
-    flex-direction: column;
-    padding: 1.5rem 1rem;
-    height: 100%;
+  html.dark #sidebar {
+    box-shadow: 2px 0 12px -5px rgba(0, 0, 0, 0.2);
   }
 
-  .profile-block {
-    text-align: center;
-    margin-bottom: 2rem;
+  .icon-container {
+    background-color: var(--sidebar-icon-bg);
   }
 
-  .avatar-link {
-    display: inline-block;
+  .icon, .bottom-bar-icon {
+    color: var(--sidebar-icon-symbol);
   }
 
-  .avatar-img {
-    width: 5rem;
-    height: 5rem;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 1rem;
-    border: 2px solid var(--line-divider);
-    transition: transform 0.2s ease;
-  }
-  .avatar-img:hover {
-    transform: scale(1.1) rotate(5deg);
+  /* 修复导航链接下划线问题 */
+  .nav-link {
+    text-decoration: none !important; /* 强制移除下划线 */
+    color: inherit; /* 继承父元素颜色 */
   }
 
-  .profile-name {
-    font-weight: 700;
-    font-size: 1.125rem;
-    color: var(--text-title);
+  .nav-link:hover,
+  .nav-link:focus {
+    text-decoration: none !important; /* 确保hover/focus状态也无下划线 */
+    outline: none; /* 移除焦点轮廓（可选） */
   }
 
-  .profile-desc {
-    font-size: 0.875rem;
-    color: var(--text-main);
-    margin-top: 0.25rem;
-  }
-
-  .nav-links {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  @media (max-width: 1023px) {
-    #side-navbar {
-      transform: translateX(-100%);
-      width: 280px; 
-    }
-    #side-navbar.is-open {
-      transform: translateX(0);
-    }
-  }
 </style>

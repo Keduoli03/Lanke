@@ -17,11 +17,20 @@
     "@iconify-json/fa6-regular": "^1.2.4",
     "@iconify-json/fa6-solid": "^1.2.4",
     "@iconify-json/material-symbols": "^1.2.34",
+    "@jcayzac/astro-rehype-frontmatter-reading-stats": "^0.1.0",
     "@tailwindcss/vite": "^4.1.13",
     "astro": "^5.13.7",
     "astro-icon": "^1.1.5",
+    "mdast-util-to-string": "^4.0.0",
+    "reading-time": "^1.5.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-slug": "^6.0.0",
+    "remark-toc": "^9.0.0",
     "sharp": "^0.34.3",
     "svelte": "^5.38.10",
     "tailwindcss": "^4.1.13"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.16"
   }
 }

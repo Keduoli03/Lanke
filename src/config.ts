@@ -18,8 +18,8 @@ export const siteConfig: SiteConfig = {
     fixed: false,
   },
   
-  pageWidth: "82rem", // 内容区域最大宽度
-  sidebarWidth: "4rem", // 侧边栏宽度，暂时没用，去src\layouts\MainLayout.astro自行修改
+  pageWidth: "76rem", // 内容区域最大宽度
+  sidebarWidth: "4rem", // 侧边栏宽度
 };
 
 export const navBarConfig: NavBarConfig = {

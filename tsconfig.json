@@ -7,7 +7,8 @@
       "@/*": [
         "src/*"
       ]
-    }
+    },
+    "moduleResolution": "bundler"
   },
   "include": [
     ".astro/types.d.ts",

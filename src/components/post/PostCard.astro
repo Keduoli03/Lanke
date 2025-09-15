@@ -1,112 +1,201 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import { render } from "astro:content";
-import PostMeta from "./PostMeta.astro";
+import { Icon } from 'astro-icon/components';
 
 interface Props {
-	class?: string;
-	entry: CollectionEntry<"posts">;
-	style?: string;
+  class?: string;
+  entry: CollectionEntry<"posts">;
+  style?: string;
 }
 
 const { entry, style } = Astro.props;
 const className = Astro.props.class;
 
-const { title, description, tags, categories, date, updated, cover, pinned, slug } = entry.data;
-const url = `/posts/${slug}`;
-
-// 渲染内容获取摘要信息
+const { title, description, categories, tags, date, cover, pinned, slug } = entry.data;
 const { remarkPluginFrontmatter } = await render(entry);
+const url = `/posts/${slug}`;
+const { wordCount, readingTime } = remarkPluginFrontmatter || { wordCount: 0, readingTime: 0 };
+const minutes = Math.ceil(readingTime) || 1;
 
-// 估算字数和阅读时间
-const wordCount = remarkPluginFrontmatter?.words || Math.ceil(entry.body?.length / 5) || 0;
-const readTime = remarkPluginFrontmatter?.minutes || Math.ceil(wordCount / 200) || 1;
+const coverUrl = typeof cover === 'string' ? cover : '';
+const hasCover = typeof coverUrl === 'string' && coverUrl.startsWith('http');
+const firstCategory = categories && categories.length > 0 ? categories[0] : '文章';
 
-const hasCover = cover !== undefined && cover !== null;
+// --- 动态分类样式 ---
+const colorGradients = [
+  'from-red-100 to-red-200', 'from-orange-100 to-orange-200', 'from-amber-100 to-amber-200',
+  'from-yellow-100 to-yellow-200', 'from-lime-100 to-lime-200', 'from-green-100 to-green-200',
+  'from-emerald-100 to-emerald-200', 'from-teal-100 to-teal-200', 'from-cyan-100 to-cyan-200',
+  'from-sky-100 to-sky-200', 'from-blue-100 to-blue-200', 'from-indigo-100 to-indigo-200',
+  'from-violet-100 to-violet-200', 'from-purple-100 to-purple-200', 'from-fuchsia-100 to-fuchsia-200',
+  'from-pink-100 to-pink-200', 'from-rose-100 to-rose-200',
+];
+
+const materialIcons = [
+  'article', 'code', 'home', 'lightbulb', 'map', 'book', 'camera', 'music_note', 
+  'palette', 'anchor', 'work', 'build', 'explore', 'favorite', 'rocket_launch', 
+  'star', 'psychology', 'eco', 'pets', 'movie', 'school', 'science', 'biotech'
+];
+
+function simpleHash(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+const getCategoryStyle = (category: string) => {
+  if (category === '文章') {
+    return { color: 'from-gray-100 to-gray-200', icon: 'article' };
+  }
+  
+  const hash = simpleHash(category);
+  const color = colorGradients[hash % colorGradients.length];
+  const icon = materialIcons[hash % materialIcons.length];
+  
+  return { color, icon };
+};
+
+const categoryStyle = getCategoryStyle(firstCategory);
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).replace(/\//g, '-');
+}
 ---
-
-{/* 
-  修正：
-  - 当有封面图时，<article> 容器使用 flex 布局。
-  - 内容区域在左，封面图在右。
-  - 内容区域变为 flex-col 布局，以确保底部信息能正确地贴在卡片底部。
-  - 统一了“置顶”徽章的显示逻辑，使其总是出现在标题旁边。
-  - 调整了封面图的宽度和高度，使其适应新的水平布局。
-*/}
 <article class:list={[
-    "bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden border border-gray-200 dark:border-gray-700",
-    { "flex": hasCover },
-    className
+  "group overflow-hidden rounded-lg bg-[var(--content-pane-bg)] shadow-sm hover:shadow-lg transition-all duration-300",
+  className
 ]} style={style}>
-    
-    <!-- 内容区域 -->
-    <div class:list={["p-4 flex flex-col", { "flex-grow": hasCover }]}>
-        <!-- 标题和置顶标识 -->
-        <div class="flex items-start justify-between mb-2">
-            <h3 class="flex-grow">
-                <a href={url} 
-                   class="text-lg font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors line-clamp-2">
-                    {title}
-                </a>
-            </h3>
-            {pinned && (
-                <div class="flex-shrink-0 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium ml-2">
-                    置顶
-                </div>
-            )}
-        </div>
+  
+  <div class="flex flex-col md:flex-row h-full">
+    {/* ================================= */}
+    {/*  1. 封面区域                     */}
+    {/* ================================= */}
+    <div class="w-full md:w-1/3 flex-shrink-0 p-3">
+      <a href={url} class="block relative overflow-hidden rounded-lg shadow-inner transition-all duration-500 hover:shadow-md">
+        
+        <div class="pt-[56.25%] bg-gray-100 dark:bg-gray-700"></div>
 
-        <!-- 元数据 -->
-        <PostMeta 
-            published={date} 
-            updated={updated} 
-            tags={tags} 
-            categories={categories} 
-            hideTagsForMobile={true} 
-            hideUpdateDate={true} 
-            class="mb-3" 
-        />
-
-        <!-- 描述 -->
-        <p class="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-3 leading-relaxed flex-grow">
-            {description || remarkPluginFrontmatter?.excerpt || "暂无描述..."}
-        </p>
-
-        <!-- 底部信息 -->
-        <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-auto">
-            <span>{wordCount} 字 · {readTime} 分钟</span>
-            <a href={url} 
-               class="text-blue-600 dark:text-blue-400 hover:underline">
-                阅读全文
-            </a>
-        </div>
+        {hasCover ? (
+          <img 
+            src={coverUrl} 
+            alt={title || "文章封面"} 
+            class="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
+            loading="lazy"
+            onerror="this.onerror=null; this.src='/assets/blog-placeholder-1.jpg';"
+          />
+        ) : (
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <div class={`absolute inset-0 bg-gradient-to-br ${categoryStyle.color} opacity-60 dark:opacity-40`}></div>
+            <div class="absolute inset-0 bg-black/40 hidden dark:block"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.4)_0%,transparent_50%)] dark:bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.1)_0%,transparent_50%)]"></div>
+            <div class="absolute w-24 h-24 rounded-full bg-white/30 dark:bg-white/5 backdrop-blur-sm 
+              transition-transform duration-1000 group-hover:scale-125"></div>
+            <div class="relative z-10 text-center p-6 w-full">
+              <div class="inline-flex items-center justify-center w-16 h-16 rounded-full 
+                bg-white/50 dark:bg-white/10 backdrop-blur-sm mb-4
+                transition-all duration-500 group-hover:bg-white/70 dark:group-hover:bg-white/20">
+                <Icon 
+                  name={`material-symbols:${categoryStyle.icon}`} 
+                  class="h-8 w-8 text-gray-700 dark:text-gray-300 transition-transform duration-500 group-hover:scale-110" 
+                />
+              </div>
+              <span class="inline-block text-gray-800 dark:text-gray-200 font-bold tracking-wide drop-shadow-sm
+                text-lg sm:text-xl md:text-2xl max-w-[80%] truncate
+                transition-all duration-500 group-hover:scale-105">
+                {firstCategory}
+              </span>
+              <div class="w-10 h-0.5 bg-gray-300 dark:bg-gray-600 mt-3 rounded-full
+                transition-all duration-500 group-hover:w-16"></div>
+            </div>
+          </div>
+        )}
+      </a>
     </div>
 
-    <!-- 封面图片 -->
-    {hasCover && (
-        <div class="relative flex-shrink-0 w-1/3 max-w-[200px]">
-            <a href={url} class="block h-full">
-                <img 
-                    src={cover.src} 
-                    alt={title} 
-                    class="w-full h-full object-cover hover:opacity-90 transition-opacity"
-                />
-            </a>
+    {/* ================================= */}
+    {/*  2. 内容区域 (新版信息布局)       */}
+    {/* ================================= */}
+    <div class="flex flex-col p-4 md:p-6 w-full md:w-2/3">
+      <div class="flex items-start justify-between mb-3">
+        <h3 class="flex-grow text-2xl font-bold">
+          <a href={url} 
+             class="text-gray-900 dark:text-gray-100 transition-colors duration-300 hover:text-blue-600 dark:hover:text-blue-400">
+            {title}
+          </a>
+        </h3>
+        {pinned && (
+          <div class="ml-4 flex-shrink-0 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium
+            transition-transform duration-300 group-hover:scale-105">
+            置顶
+          </div>
+        )}
+      </div>
+
+      {/* --- 新版元信息布局 --- */}
+      <div class="flex flex-col gap-y-2 text-sm text-secondary mb-4">
+        {/* 第一行：日期、时长、字数 */}
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <div class="inline-flex items-center gap-1.5">
+            <Icon name="material-symbols:calendar-month-outline" class="h-5 w-5 flex-shrink-0" />
+            <span>{formatDate(date)}</span>
+          </div>
+          <div class="inline-flex items-center gap-1.5">
+            <Icon name="material-symbols:timer-outline" class="h-5 w-5 flex-shrink-0" />
+            <span>{minutes} 分钟阅读</span>
+          </div>
+          <div class="inline-flex items-center gap-1.5">
+            <Icon name="material-symbols:summarize-outline" class="h-5 w-5 flex-shrink-0" />
+            <span>约 {wordCount.toLocaleString()} 字</span>
+          </div>
         </div>
-    )}
+        {/* 第二行：分类和标签 */}
+        {(categories && categories.length > 0 || tags && tags.length > 0) && (
+          <div class="flex flex-wrap items-center gap-2">
+            {categories && categories.map(category => (
+              <div class="inline-flex items-center gap-1 bg-tag text-primary px-2 py-0.5 rounded">
+                <Icon name="material-symbols:folder-open-outline" class="h-4 w-4 flex-shrink-0" />
+                <span class="text-xs font-medium">{category}</span>
+              </div>
+            ))}
+            {tags && tags.map(tag => (
+              <div class="inline-flex items-center gap-1 bg-tag text-secondary dark:text-gray-400 px-2 py-0.5 rounded-full">
+                <Icon name="material-symbols:label-outline" class="h-4 w-4 flex-shrink-0" />
+                <span class="text-xs font-medium">{tag}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <p class="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2 leading-relaxed flex-grow">
+        {description || "暂无描述..."}
+      </p>
+
+      <div class="mt-auto flex justify-end">
+        <a href={url} class="group text-sm font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1
+          hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-300">
+          <span>阅读全文</span>
+          <Icon name="material-symbols:arrow-right-alt" class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+        </a>
+      </div>
+    </div>
+  </div>
 </article>
 
 <style>
-.line-clamp-2 {
+  .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-}
-.line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
+  }
 </style>

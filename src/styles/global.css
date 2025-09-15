@@ -1,43 +1,168 @@
 
 @import "tailwindcss";
-:root {
-  --black: #1d1d1f;
-  --white: #ffffff;
-  --gray: #f5f5f7; /* 为背景等元素提供更柔和的灰色 */
-
-  /* 为侧边栏和组件添加的变量 */
-  --primary: #007aff; /* 主题色 (Apple 蓝) */
-  --line-divider: #e5e5e5; /* 分割线颜色 */
-  --card-bg: #1c1c1e; /* 深色模式下的卡片背景 */
-  --btn-regular-bg-hover: #f5f5f7; /* 按钮悬停背景色 */
-  --deep-text: #1d1d1f; /* 主要文字颜色 */
-  --accent: var(--primary);
-}
+@plugin '@tailwindcss/typography';
 
 :root {
-  font-family: "Atkinson Hyperlegible", sans-serif;
-  background-color: var(--gray); /* 将全局背景设为灰色 */
+	/* 
+		--primary-hue is injected by MainLayout.astro
+	*/
+
+	/* 浅色模式 */
+	--page-bg: hsl(var(--primary-hue), 45%, 96%); 
+	--sidebar-bg: hsl(var(--primary-hue), 30%, 98.5%); 
+	--content-pane-bg: hsl(0, 0%, 100%);
+	--text-primary: hsl(var(--primary-hue), 20%, 18%); 
+	--text-secondary: hsl(var(--primary-hue), 12%, 42%);
+	--text-link: hsl(var(--primary-hue), 75%, 44%);
+	--line-divider: hsl(var(--primary-hue), 20%, 88%);
+	--tag-bg: hsl(var(--primary-hue), 40%, 92%);
+
+	/* 浮动面板和主题选择器相关颜色 */
+	--float-panel-bg: hsl(0, 0%, 100%);
+	--color-selection-bar: linear-gradient(to right, oklch(0.80 0.10 0), oklch(0.80 0.10 30), oklch(0.80 0.10 60), oklch(0.80 0.10 90), oklch(0.80 0.10 120), oklch(0.80 0.10 150), oklch(0.80 0.10 180), oklch(0.80 0.10 210), oklch(0.80 0.10 240), oklch(0.80 0.10 270), oklch(0.80 0.10 300), oklch(0.80 0.10 330), oklch(0.80 0.10 360));
+	
+	/* 侧边栏图标颜色 */
+	--sidebar-icon-bg: hsl(var(--primary-hue), 25%, 94%);
+	--sidebar-icon-symbol: hsl(var(--primary-hue), 12%, 35%);
 }
 
-/* 深色模式下的颜色覆盖 */
 html.dark {
-  --line-divider: #3a3a3c;
-  --btn-regular-bg-hover: #2c2c2e;
-  --deep-text: #f5f5f7;
-  background-color: #000000; /* 深色模式下使用纯黑背景 */
+	/* 深色模式 - 微调 */
+	--page-bg: hsl(var(--primary-hue), 18%, 12%); /* S: 20%->18%, L: 10%->12% */
+	--sidebar-bg: hsl(var(--primary-hue), 16%, 16%); /* S: 18%->16%, L: 14%->16% */
+	--content-pane-bg: hsl(var(--primary-hue), 15%, 20%);
+	--text-primary: hsl(var(--primary-hue), 18%, 88%);
+	--text-secondary: hsl(var(--primary-hue), 12%, 65%);
+	--text-link: hsl(var(--primary-hue), 80%, 75%);
+	--line-divider: hsl(var(--primary-hue), 15%, 28%);
+	--tag-bg: hsl(var(--primary-hue), 22%, 26%);
+
+	/* 浮动面板和主题选择器相关颜色 */
+	--float-panel-bg: hsl(var(--primary-hue), 15%, 20%);
+	--color-selection-bar: linear-gradient(to right, oklch(0.70 0.10 0), oklch(0.70 0.10 30), oklch(0.70 0.10 60), oklch(0.70 0.10 90), oklch(0.70 0.10 120), oklch(0.70 0.10 150), oklch(0.70 0.10 180), oklch(0.70 0.10 210), oklch(0.70 0.10 240), oklch(0.70 0.10 270), oklch(0.70 0.10 300), oklch(0.70 0.10 330), oklch(0.70 0.10 360));
+	
+	/* 侧边栏图标颜色 */
+	--sidebar-icon-bg: hsl(var(--primary-hue), 15%, 24%);
+	--sidebar-icon-symbol: hsl(var(--primary-hue), 18%, 88%);
 }
 
 
-/* 移除链接下划线 */
+/* --- Base Styles --- */
+html {
+	font-family: "Atkinson Hyperlegible", sans-serif;
+	scroll-behavior: smooth;
+	-webkit-tap-highlight-color: transparent; 
+}
+
+body {
+	margin: 0;
+	background-color: var(--page-bg);
+	color: var(--text-primary);
+	font-size: 16px;
+	line-height: 1.7;
+	transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
 a {
-  color: var(--accent);
-  text-decoration: none;
+	color: var(--text-link);
+	text-decoration: none; /* 保持无下划线 */
+	transition: color 0.2s ease-in-out;
 }
 
+a:hover {
+	color: var(--text-link);
+	text-decoration: none; /* 悬停时也无下划线 */
+}
 
-/* 移除列表项目符号 */
-ul,
-ol {
-  list-style: none;
-  padding: 0;
+h1, h2, h3, h4, h5, h6 {
+	color: var(--text-title);
+	font-weight: 700;
+	line-height: 1.3;
+}
+
+/* --- Utility --- */
+.flex-center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: hsl(var(--primary-hue), 10%, 75%);
+	border-radius: 4px;
+}
+html.dark ::-webkit-scrollbar-thumb {
+	background-color: hsl(var(--primary-hue), 10%, 35%);
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background-color: hsl(var(--primary-hue), 15%, 65%);
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+	background-color: hsl(var(--primary-hue), 15%, 45%);
+}
+
+::-webkit-scrollbar-corner {
+	background-color: transparent;
+}
+/* === Scrollbar Styles === */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: rgba(156, 163, 175, 0.5);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.7);
+}
+
+/* === Theme Color Variables === */
+:root {
+  --color-text-primary: 26 26 26;
+  --color-text-secondary: 102 102 102;
+  --color-bg-page: 243 244 246;
+  --color-bg-content-pane: 255 255 255;
+  --color-bg-sidebar: 250 250 250;
+  --color-bg-tag: 239 239 239;
+  --color-bg-sidebar-icon: 230 230 230;
+  --color-border-color: 224 224 224;
+  --color-theme: 59 130 246;
+  --color-theme-secondary: 34 197 94;
+}
+
+html.dark {
+  --color-text-primary: 231 231 231;
+  --color-text-secondary: 165 165 165;
+  --color-bg-page: 17 24 39;
+  --color-bg-content-pane: 31 41 55;
+  --color-bg-sidebar: 23 31 46;
+  --color-bg-tag: 55 65 81;
+  --color-bg-sidebar-icon: 42 52 70;
+  --color-border-color: 75 85 99;
+  --color-theme: 96 165 250;
+  --color-theme-secondary: 74 222 128;
+}
+
+/* === Base Styles === */
+body {
+  font-family: 'Atkinson Hyperlegible', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
