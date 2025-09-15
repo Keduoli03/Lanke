@@ -21,14 +21,16 @@ const { Content, headings, remarkPluginFrontmatter } = await render(entry);
 ---
 <MainLayout 
     title={entry.data.title} 
-    description={entry.data.description}>
+    description={entry.data.description}
+    
+    >
   {/* 容器保持居中 */}
   <div class="w-full flex justify-center px-4 py-8">
     <div class="w-full max-w-7xl flex flex-col lg:flex-row gap-x-12 gap-y-8" style={`--toc-width: ${siteConfig.tocWidth}`}>
       {/* 文章区域 */}
       <article class="min-w-0 flex-1">
         {entry.data.cover && (
-          <div class="hero-image mb-8">
+          <div class="hero-image mb-8" transition:name={`hero-${entry.data.slug}`}>
             <Image 
               width={1020} 
               height={510} 
@@ -39,7 +41,7 @@ const { Content, headings, remarkPluginFrontmatter } = await render(entry);
           </div>
         )}
         
-        <PostHeader post={entry} />
+        <PostHeader post={entry} transition:name={`title-${entry.data.slug}`} />
       
         <Markdown>
           <Content />

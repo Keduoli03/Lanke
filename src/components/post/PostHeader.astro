@@ -42,15 +42,19 @@ const minutes = Math.ceil(readingTime) || 0;
     )}
     {pinned && (
       <div class="flex items-center text-sm text-secondary">
-        <Icon name="material-symbols:push_pin" class="w-4 h-4" />
+        <Icon name="material-symbols:push-pin" class="h-4 w-4 flex-shrink-0" />
         <span class="ml-1">置顶</span>
       </div>
     )}
   </div>
   
   <div class="flex flex-wrap gap-3 mb-6">
-    {categories && categories.map(category => (
-      <a href={`/categories/${category}`} class="category-badge">
+    {categories && categories.map((category, index) => (
+      <a 
+        href={`/categories/${category}`} 
+        class="category-badge"
+        transition:name={index === 0 ? `category-${post.data.slug}` : ''}
+      >
         <Icon name="material-symbols:folder-open-outline" class="w-4 h-4" />
         {category}
       </a>

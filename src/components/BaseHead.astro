@@ -17,6 +17,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 <!-- Global Metadata -->
 <meta charset="utf-8" />
+<!-- 尝试修复保存阅读进度不及时 -->
+<script>
+  window.history.scrollRestoration = 'manual';
+</script>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="sitemap" href="/sitemap-index.xml" />
@@ -39,4 +43,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
 

@@ -20,13 +20,15 @@ const { title, description = SITE_DESCRIPTION, useContentPane = true } = Astro.p
 	<head>
 		<BaseHead title={title} description={description} />
 		<script is:inline set:html={themeScript} />
+		<ClientRouter />
 	</head>
 	<body class="bg-page text-primary" style={`
 		--primary-hue: ${siteConfig.themeColor.hue};
 		--page-width: ${siteConfig.pageWidth}; 
 		--sidebar-width: ${siteConfig.sidebarWidth};
 	`}>
-		<ClientRouter />
+	
+		
 		<div class="layout-container">
 			<Sidebar />
 
@@ -44,8 +46,10 @@ const { title, description = SITE_DESCRIPTION, useContentPane = true } = Astro.p
 				)}
 			</main>
 		</div>
-		
-		
+		<!-- 尝试解决刷新问题，失败 -->
+		<!-- <script>
+			import '../utils/scroll-restoration.ts';
+		</script> -->
 		<style>
 			* {
 				box-sizing: border-box;

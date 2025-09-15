@@ -11,7 +11,7 @@ interface Props {
 }
 
 const { items = [], title = "目录" } = Astro.props;
-const filteredItems = items.filter(item => item.depth <= siteConfig.tocMaxDepth);
+const filteredItems = items.filter(item => item.depth >= 2 && item.depth <= siteConfig.tocMaxDepth);
 ---
 
 <div class="toc-container sticky top-6 p-4 bg-content-pane dark:bg-content-pane rounded-lg border border-border shadow-sm">
@@ -29,21 +29,20 @@ const filteredItems = items.filter(item => item.depth <= siteConfig.tocMaxDepth)
   {filteredItems.length > 0 ? (
     <ul class="toc-list space-y-1">
       {filteredItems.map((item) => (
-        <li class="toc-item">
+        <li class="toc-item" data-depth={item.depth}>
           <a 
             href={`#${item.slug}`} 
             class:list={[
               "toc-link",
-              { 
-                'depth-1': item.depth === 1,
-                'depth-2': item.depth === 2,
-                'depth-3': item.depth === 3,
-                'depth-deep': item.depth >= 4,
-              }
+              `depth-${item.depth}`
             ]}
             aria-label={`跳转到 ${item.text}`}
           >
             <span>{item.text}</span>
+            {/* 将 V 形图标添加到二级标题 */}
+            {item.depth === 2 && (
+              <svg class="toc-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            )}
           </a>
         </li>
       ))}
@@ -56,13 +55,14 @@ const filteredItems = items.filter(item => item.depth <= siteConfig.tocMaxDepth)
 <style>
   .toc-link {
     display: block;
-    padding-top: 0.375rem; /* 6px */
-    padding-bottom: 0.375rem; /* 6px */
-    border-radius: 0.375rem; /* 6px */
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+    border-radius: 0.375rem;
     transition: all 0.2s ease-in-out;
     color: var(--text-secondary);
     position: relative;
-    line-height: 1.4;
+    line-height: 1.3;
+    font-size: 0.9rem; /* 统一调小基础字体 */
   }
 
   .toc-link:hover {
@@ -70,42 +70,40 @@ const filteredItems = items.filter(item => item.depth <= siteConfig.tocMaxDepth)
     background-color: var(--tag-bg);
   }
 
-  /* --- 层级样式 --- */
-  .toc-link::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: var(--text-secondary);
-    opacity: 0.5;
-    transition: all 0.2s ease-in-out;
-  }
-
-  .toc-link.depth-1 {
-    padding-left: 0.5rem; /* 8px */
-    font-weight: 500;
-    color: var(--text-primary);
-  }
-  .toc-link.depth-1::before {
-    display: none; /* 顶层无标记 */
-  }
-
+  /* --- 新的层级样式 --- */
+  /* 二级标题是新的可折叠根节点 */
   .toc-link.depth-2 {
-    padding-left: 1.5rem; /* 24px */
+    padding-left: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   .toc-link.depth-2::before {
-    left: 0.75rem; /* 12px */
+    display: none; /* 根节点不需要前置标记 */
+  }
+
+  /* 三级标题是第一级子节点 */
+  .toc-link.depth-3 {
+    padding-left: 1.5rem;
+    font-size: 0.85rem;
+  }
+  .toc-link.depth-3::before {
+    left: 0.75rem;
     width: 5px;
     height: 5px;
     border-radius: 9999px;
   }
 
-  .toc-link.depth-3 {
-    padding-left: 2.5rem; /* 40px */
-    font-size: 0.8125rem; /* 13px */
+  /* 四级标题是第二级子节点 */
+  .toc-link.depth-4 {
+    padding-left: 2.5rem;
+    font-size: 0.8rem;
   }
-  .toc-link.depth-3::before {
-    left: 1.75rem; /* 28px */
+  .toc-link.depth-4::before {
+    left: 1.75rem;
     width: 5px;
     height: 5px;
     border-radius: 9999px;
@@ -113,12 +111,13 @@ const filteredItems = items.filter(item => item.depth <= siteConfig.tocMaxDepth)
     border: 1px solid var(--text-secondary);
   }
 
-  .toc-link.depth-deep {
-    padding-left: 3.5rem; /* 56px */
-    font-size: 0.75rem; /* text-xs */
+  /* 更深层级的样式 */
+  .toc-link.depth-5, .toc-link.depth-6 {
+    padding-left: 3.5rem;
+    font-size: 0.8rem;
   }
-  .toc-link.depth-deep::before {
-    left: 2.75rem; /* 44px */
+  .toc-link.depth-5::before, .toc-link.depth-6::before {
+    left: 2.75rem;
     top: 52%;
     width: 6px;
     height: 1px;
@@ -136,6 +135,20 @@ const filteredItems = items.filter(item => item.depth <= siteConfig.tocMaxDepth)
     opacity: 1;
   }
 
+  /* --- 折叠样式 --- */
+  .toc-chevron {
+    flex-shrink: 0;
+    margin-left: 0.5rem;
+    width: 0.9em;
+    height: 0.9em;
+    transition: transform 0.2s ease-in-out;
+    transform: rotate(-90deg); /* 默认折叠 */
+  }
+
+  .toc-item.is-expanded > .toc-link .toc-chevron {
+    transform: rotate(0deg); /* 展开 */
+  }
+
   /* 响应式调整 */
   @media (max-width: 640px) {
     .toc-container {
@@ -144,3 +157,55 @@ const filteredItems = items.filter(item => item.depth <= siteConfig.tocMaxDepth)
     }
   }
 </style>
+
+<script is:inline>
+  function setupTocCollapsible() {
+    const tocContainer = document.querySelector('.toc-container');
+    if (!tocContainer) return;
+
+    const allItems = Array.from(tocContainer.querySelectorAll('.toc-item'));
+
+    allItems.forEach((item, index) => {
+      const depth = parseInt(item.dataset.depth, 10);
+
+      // 核心改动：只针对二级标题（depth: 2）设置折叠逻辑
+      if (depth === 2) {
+        const children = [];
+        // 寻找该二级标题下的所有子标题
+        for (let i = index + 1; i < allItems.length; i++) {
+          const nextItem = allItems[i];
+          if (parseInt(nextItem.dataset.depth, 10) > depth) {
+            children.push(nextItem);
+          } else {
+            break; // 遇到下一个同级（二级）或更高级别的标题时停止
+          }
+        }
+
+        const link = item.querySelector('.toc-link');
+        const chevron = item.querySelector('.toc-chevron');
+
+        if (children.length > 0) {
+          // 默认折叠所有子项
+          children.forEach(child => (child.style.display = 'none'));
+
+          link.addEventListener('click', (e) => {
+            // 阻止点击标题时页面跳转，只处理折叠
+            e.preventDefault();
+            const isExpanded = item.classList.toggle('is-expanded');
+            children.forEach(child => {
+              child.style.display = isExpanded ? 'list-item' : 'none';
+              if (!isExpanded) {
+                child.classList.remove('is-expanded');
+              }
+            });
+          });
+        } else {
+          // 如果没有子项，隐藏V形图标
+          if (chevron) chevron.style.display = 'none';
+        }
+      }
+    });
+  }
+
+  document.addEventListener('astro:page-load', setupTocCollapsible);
+</script>

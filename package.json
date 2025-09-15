@@ -19,6 +19,7 @@
     "@iconify-json/fa6-regular": "^1.2.4",
     "@iconify-json/fa6-solid": "^1.2.4",
     "@iconify-json/material-symbols": "^1.2.34",
+    "@iconify-json/mdi": "^1.2.3",
     "@jcayzac/astro-rehype-frontmatter-reading-stats": "^0.1.0",
     "@tailwindcss/vite": "^4.1.13",
     "@xt0rted/expressive-code-file-icons": "^1.0.0",
