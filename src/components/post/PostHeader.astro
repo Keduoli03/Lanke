@@ -1,0 +1,117 @@
+---
+import { formatDateToYYYYMMDD } from '@/utils/date-utils';
+import { Icon } from 'astro-icon/components';
+import type { CollectionEntry } from 'astro:content';
+import { render } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+
+const { post } = Astro.props;
+const { title, date, updated, categories, tags, pinned } = post.data;
+const { remarkPluginFrontmatter } = await render(post);
+const { wordCount, readingTime } = remarkPluginFrontmatter || { wordCount: 0, readingTime: 0 };
+const minutes = Math.ceil(readingTime) || 0;
+---
+<header class="mb-8">
+  <h1 class="text-4xl font-bold mb-4 text-primary">{title}</h1>
+  <div class="text-secondary mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+    <div class="flex items-center gap-x-1.5">
+      <Icon name="material-symbols:calendar-today-outline-rounded" class="w-4 h-4" />
+      <span>发布于 {formatDateToYYYYMMDD(date)}</span>
+    </div>
+    {updated && (
+      <div class="flex items-center gap-x-1.5">
+        <Icon name="material-symbols:update-rounded" class="w-4 h-4" />
+        <span>更新于 {formatDateToYYYYMMDD(updated)}</span>
+      </div>
+    )}
+    
+    {wordCount > 0 && (
+      <div class="flex items-center gap-x-1.5">
+        <Icon name="material-symbols:menu-book-outline" class="w-4 h-4" />
+        <span>约 {wordCount.toLocaleString()} 字</span>
+      </div>
+    )}
+    {minutes > 0 && (
+      <div class="flex items-center gap-x-1.5">
+        <Icon name="material-symbols:timer-outline" class="h-4 w-4 flex-shrink-0" />
+        <span>{minutes} 分钟阅读</span>
+      </div>
+    )}
+    {pinned && (
+      <div class="flex items-center text-sm text-secondary">
+        <Icon name="material-symbols:push_pin" class="w-4 h-4" />
+        <span class="ml-1">置顶</span>
+      </div>
+    )}
+  </div>
+  
+  <div class="flex flex-wrap gap-3 mb-6">
+    {categories && categories.map(category => (
+      <a href={`/categories/${category}`} class="category-badge">
+        <Icon name="material-symbols:folder-open-outline" class="w-4 h-4" />
+        {category}
+      </a>
+    ))}
+    {tags && tags.map(tag => (
+      <a href={`/tags/${tag}`} class="tag-badge">
+        #{tag}
+      </a>
+    ))}
+  </div>
+</header>
+<style>
+  .category-badge, .tag-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid transparent;
+  }
+
+  .category-badge {
+    background-color: hsl(var(--primary-hue), 80%, 92%);
+    color: hsl(var(--primary-hue), 60%, 35%);
+  }
+  .category-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px -1px hsl(var(--primary-hue) 50% 50% / 0.2);
+  }
+  html.dark .category-badge {
+    background-color: hsl(var(--primary-hue), 40%, 25%);
+    color: hsl(var(--primary-hue), 60%, 85%);
+  }
+
+  .tag-badge {
+    background-color: var(--tag-bg);
+    color: var(--text-secondary);
+  }
+  .tag-badge:hover {
+    color: var(--text-primary);
+    background-color: hsl(var(--primary-hue), 20%, 88%);
+  }
+  html.dark .tag-badge:hover {
+    background-color: hsl(var(--primary-hue), 15%, 35%);
+  }
+
+  .pinned-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background-color: hsl(50, 100%, 90%);
+    color: hsl(50, 70%, 30%);
+    font-weight: 500;
+  }
+  html.dark .pinned-badge {
+    background-color: hsl(50, 40%, 20%);
+    color: hsl(50, 90%, 80%);
+  }
+</style>

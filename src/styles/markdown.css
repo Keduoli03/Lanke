@@ -1,89 +1,140 @@
 @import "tailwindcss";
-/* 
-  在这里使用 @apply 指令来自定义 .prose 类的样式。
-  这些样式将覆盖 Tailwind Typography 的默认设置。
+@plugin "@tailwindcss/typography";
+
+/*
+  ==========================================================================
+  Markdown 全局样式定制 (最终清理版)
+  ==========================================================================
+  说明：
+  - 此文件用于覆盖和扩展 @tailwindcss/typography 插件的默认样式。
+  - 标题和链接的颜色已在 tailwind.config.mjs 中通过 CSS 变量全局设置，
+    此处不再定义任何颜色相关的样式，以避免冲突。
 */
 
+/*
+  全局链接样式美化
+  ==========================================================================
+*/
+.prose a {
+  @apply underline decoration-dashed decoration-2 decoration-black/50 transition-all duration-200 dark:decoration-white/50;
+  text-underline-offset: 3px;
+}
 
-/* 隐藏所有层级标题的下划线 */
+.prose a:hover {
+  @apply decoration-solid decoration-black dark:decoration-white;
+}
+.dark .prose a {
+  text-decoration-color: rgba(255, 255, 255, 0.5); /* 暗色模式: 半透明白 */
+}
+
+.dark .prose a:hover {
+  text-decoration-color: white; /* 暗色模式悬停: 纯白 */
+}
+
+/*
+  深色模式正文和粗体文本颜色
+  ==========================================================================
+*/
+.dark .prose {
+  color: white;
+}
+
+.dark .prose strong {
+  color: white;
+}
+
+/*
+  1. 标题内锚点链接样式重置
+  ==========================================================================
+  目标：让标题内的链接看起来就像普通标题，继承父级颜色，并移除下划线。
+*/
+.prose h1 a,
+.prose h2 a,
+.prose h3 a,
+.prose h4 a,
+.prose h5 a,
+.prose h6 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/*
+  2. 标题悬浮提示
+  ==========================================================================
+  目标：鼠标悬停在标题上时，在左侧显示其等级（H1, H2, ...）。
+*/
 .prose h1,
 .prose h2,
 .prose h3,
 .prose h4,
 .prose h5,
 .prose h6 {
-  @apply no-underline; 
-  background-image: none !important; 
+  @apply relative;
 }
 
-/* 自定义链接样式 */
-.prose a {
-  @apply text-teal-600 no-underline transition-all duration-200;
-  /* 修正：使用 var() 函数代替 theme() */
-  background-image: linear-gradient(to right, var(--tw-color-teal-500), var(--tw-color-teal-500));
-  background-size: 0% 2px;
-  background-repeat: no-repeat;
-  background-position: left bottom;
+.prose h1::before,
+.prose h2::before,
+.prose h3::before,
+.prose h4::before,
+.prose h5::before,
+.prose h6::before {
+  @apply absolute right-full top-1/2 -translate-y-1/2 mr-2 text-sm font-normal text-gray-400 opacity-0 transition-opacity duration-200 dark:text-gray-500;
 }
 
-
-.prose a:hover {
-  @apply text-teal-800;
-  background-size: 100% 2px;
+.prose h1:hover::before,
+.prose h2:hover::before,
+.prose h3:hover::before,
+.prose h4:hover::before,
+.prose h5:hover::before,
+.prose h6:hover::before {
+  @apply opacity-100;
 }
 
-/* 暗黑模式下的链接样式 */
-.dark .prose a {
-  @apply text-teal-400;
-  /* 修正：使用 var() 函数代替 theme() */
-  background-image: linear-gradient(to right, var(--tw-color-teal-400), var(--tw-color-teal-400));
-}
+.prose h1::before { content: 'H1'; }
+.prose h2::before { content: 'H2'; }
+.prose h3::before { content: 'H3'; }
+.prose h4::before { content: 'H4'; }
+.prose h5::before { content: 'H5'; }
+.prose h6::before { content: 'H6'; }
 
-.dark .prose a:hover {
-  @apply text-teal-200;
-}
-
-
-/* 自定义引用块样式 */
+/*
+  3. 引用块 (Blockquote) 样式
+  ==========================================================================
+  注意：这里的颜色是独立于正文的，可以保留。
+*/
 .prose blockquote {
   @apply border-l-4 border-teal-400 bg-teal-50 p-4 text-teal-800 dark:bg-teal-900/20 dark:text-teal-200;
 }
-/* 移除引用块的默认引号 */
+
 .prose blockquote p:first-of-type::before {
   content: none;
 }
 
-/* 移除引用块中段落的默认外边距 */
 .prose blockquote p {
   @apply m-0;
 }
 
-/* --- 段落缩进规则 START --- */
-
-/* 1. 默认所有段落都首行缩进两个字符 */
+/*
+  4. 段落与列表样式
+  ==========================================================================
+*/
 .prose p {
   @apply [text-indent:2em];
 }
 
-/* 2. 但以下情况的段落不缩进： */
-/* .prose h1 + p,
-.prose h2 + p,
-.prose h3 + p,
-.prose h4 + p, */
 .prose li > p,
 .prose blockquote p {
   @apply [text-indent:0];
 }
 
-/* --- 段落缩进规则 END --- */
-
-
-/* 自定义图片样式 */
+/*
+  5. 媒体与代码块样式
+  ==========================================================================
+*/
 .prose img {
   @apply rounded-lg shadow-md;
 }
 
-/* 自定义代码块样式 */
 .prose pre {
   @apply bg-gray-800 text-gray-100 rounded-lg shadow-lg;
 }

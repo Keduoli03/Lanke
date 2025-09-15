@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { siteConfig } from "../config";
+import { siteConfig, expressiveCodeConfig } from "../config";
 
 // --- 色调 (Hue) 管理 ---
 
@@ -49,14 +49,23 @@ export function getTheme(): 'light' | 'dark' {
 }
 
 /**
- * 设置主题，并更新文档 class 和 localStorage。
+ * 设置主题，并更新文档 class, data-theme 和 localStorage。
  * @param {'light' | 'dark'} theme - 要设置的主题。
  */
 export function setTheme(theme: 'light' | 'dark'): void {
   if (typeof window === 'undefined') return;
   
   localStorage.setItem('theme', theme);
+  
+  // 为 TailwindCSS 更新 class
   document.documentElement.classList.toggle('dark', theme === 'dark');
+
+  // 为 expressive-code 更新 data-theme 属性
+  if (theme === 'dark') {
+    document.documentElement.setAttribute("data-theme", expressiveCodeConfig.themes[1]);
+  } else {
+    document.documentElement.setAttribute("data-theme", expressiveCodeConfig.themes[0]);
+  }
 }
 
 /**
@@ -74,9 +83,9 @@ export function toggleTheme(): void {
 export function applyThemeAndHue(): void {
   if (typeof window === 'undefined') return;
   
-  // 应用亮暗模式
+  // 应用亮暗模式和 data-theme
   const theme = getTheme();
-  document.documentElement.classList.toggle('dark', theme === 'dark');
+  setTheme(theme);
 
   // 应用主题色
   const hue = getHue();

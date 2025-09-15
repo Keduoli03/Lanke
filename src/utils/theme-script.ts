@@ -18,8 +18,10 @@ function applyThemeAndHue() {
 
   if (theme === 'light') {
     document.documentElement.classList.remove('dark');
+    document.documentElement.setAttribute('data-theme', 'light-plus');
   } else {
     document.documentElement.classList.add('dark');
+    document.documentElement.setAttribute('data-theme', 'catppuccin-frappe');
   }
 
   // --- 应用主题色 (Hue) ---

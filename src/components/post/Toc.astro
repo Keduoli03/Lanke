@@ -1,40 +1,146 @@
 ---
-import type { MarkdownHeading } from 'astro';
+import { siteConfig } from "@/config";
 
-export interface Props {
-  headings: MarkdownHeading[];
+interface Props {
+  items: {
+    depth: number;
+    slug: string;
+    text: string;
+  }[];
+  title?: string; // 目录标题，默认"目录"
 }
 
-const { headings } = Astro.props;
-
-// 为了保持目录的简洁，我们只显示 h2 和 h3 标题
-const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
+const { items = [], title = "目录" } = Astro.props;
+const filteredItems = items.filter(item => item.depth <= siteConfig.tocMaxDepth);
 ---
 
-{filteredHeadings.length > 0 && (
-  <aside class="hidden lg:block w-36 flex-shrink-0 sticky top-24">
-    <nav>
-      <h2 class="text-lg font-bold mb-4 tracking-wider uppercase text-gray-700 dark:text-gray-300">
-        目录
-      </h2>
-      <ul class="space-y-2">
-        {filteredHeadings.map(heading => (
-          <li class:list={[
-            "text-sm",
-            {
-              'pl-4': heading.depth === 3, // h3 标题缩进
-              'font-semibold': heading.depth === 2, // h2 标题加粗
-            }
-          ]}>
-            <a 
-              class="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-100"
-              href={`#${heading.slug}`}
-            >
-              {heading.text}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  </aside>
-)}
+<div class="toc-container sticky top-6 p-4 bg-content-pane dark:bg-content-pane rounded-lg border border-border shadow-sm">
+  {/* 目录标题样式 */}
+  <div class="toc-title flex items-center gap-3 mb-5 pb-3 border-b border-border">
+    <div class="flex items-center justify-center w-7 h-7 rounded-full bg-theme/10">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-theme" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+      </svg>
+    </div>
+    <h3 class="text-lg font-bold text-primary">{title}</h3>
+  </div>
+
+  <!-- 目录列表 -->
+  {filteredItems.length > 0 ? (
+    <ul class="toc-list space-y-1">
+      {filteredItems.map((item) => (
+        <li class="toc-item">
+          <a 
+            href={`#${item.slug}`} 
+            class:list={[
+              "toc-link",
+              { 
+                'depth-1': item.depth === 1,
+                'depth-2': item.depth === 2,
+                'depth-3': item.depth === 3,
+                'depth-deep': item.depth >= 4,
+              }
+            ]}
+            aria-label={`跳转到 ${item.text}`}
+          >
+            <span>{item.text}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p class="text-secondary text-sm italic">暂无目录</p>
+  )}
+</div>
+
+<style>
+  .toc-link {
+    display: block;
+    padding-top: 0.375rem; /* 6px */
+    padding-bottom: 0.375rem; /* 6px */
+    border-radius: 0.375rem; /* 6px */
+    transition: all 0.2s ease-in-out;
+    color: var(--text-secondary);
+    position: relative;
+    line-height: 1.4;
+  }
+
+  .toc-link:hover {
+    color: var(--text-primary);
+    background-color: var(--tag-bg);
+  }
+
+  /* --- 层级样式 --- */
+  .toc-link::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: var(--text-secondary);
+    opacity: 0.5;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .toc-link.depth-1 {
+    padding-left: 0.5rem; /* 8px */
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  .toc-link.depth-1::before {
+    display: none; /* 顶层无标记 */
+  }
+
+  .toc-link.depth-2 {
+    padding-left: 1.5rem; /* 24px */
+  }
+  .toc-link.depth-2::before {
+    left: 0.75rem; /* 12px */
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+  }
+
+  .toc-link.depth-3 {
+    padding-left: 2.5rem; /* 40px */
+    font-size: 0.8125rem; /* 13px */
+  }
+  .toc-link.depth-3::before {
+    left: 1.75rem; /* 28px */
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    background-color: transparent;
+    border: 1px solid var(--text-secondary);
+  }
+
+  .toc-link.depth-deep {
+    padding-left: 3.5rem; /* 56px */
+    font-size: 0.75rem; /* text-xs */
+  }
+  .toc-link.depth-deep::before {
+    left: 2.75rem; /* 44px */
+    top: 52%;
+    width: 6px;
+    height: 1px;
+  }
+
+  /* --- 激活状态 --- */
+  .toc-link.active {
+    color: var(--color-theme) !important;
+    font-weight: 600;
+  }
+  
+  .toc-link.active::before {
+    background-color: var(--color-theme);
+    border-color: var(--color-theme);
+    opacity: 1;
+  }
+
+  /* 响应式调整 */
+  @media (max-width: 640px) {
+    .toc-container {
+      max-width: none;
+      margin-bottom: 1.5rem;
+    }
+  }
+</style>

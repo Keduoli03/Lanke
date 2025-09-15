@@ -18,16 +18,20 @@ export interface SiteConfig {
 	};
 	logo: string;
 	themeColor: {
-		fixed: boolean;
 		hue: number;
+		fixed: boolean;
 	};
-	pageWidth: string; // 改为必需
-	sidebarWidth: string; // 改为必需
+	pageWidth: string;
+	sidebarWidth: string;
+	tocWidth: string; // 新增：目录宽度
+	tocMaxDepth: number; // 新增：目录最大深度
 }
 
-// 修改NavBarConfig接口，支持对象格式的links
 export interface NavBarConfig {
 	links: {
 		[key: string]: NavBarLink;
 	};
 }
+export type ExpressiveCodeConfig = {
+	themes: string[];
+};

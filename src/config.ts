@@ -1,5 +1,6 @@
 import { LinkPresets } from "./constants/link-presets";
-import type { NavBarConfig, SiteConfig } from "./types/config";
+import type { NavBarConfig, SiteConfig,ExpressiveCodeConfig } from "./types/config";
+import type { AstroExpressiveCodeOptions } from 'astro-expressive-code';
 
 export const SITE_TITLE = 'Astro Blog';
 export const SITE_DESCRIPTION = 'Welcome to my website!';
@@ -18,8 +19,10 @@ export const siteConfig: SiteConfig = {
     fixed: false,
   },
   
-  pageWidth: "76rem", // 内容区域最大宽度
+  pageWidth: "80rem", // 内容区域最大宽度
   sidebarWidth: "4rem", // 侧边栏宽度
+  tocWidth: "12rem", // 目录宽度 (224px)
+  tocMaxDepth: 3, // 目录最大显示深度
 };
 
 export const navBarConfig: NavBarConfig = {
@@ -44,3 +47,9 @@ export const navBarConfig: NavBarConfig = {
 
 // 首页文章数量
 export const PAGE_SIZE = 6;
+
+// 代码块配置
+//由于内联脚本无法使用变量，所以修改完此处需要手动去src\utils\theme-script.ts修改代码块样式
+export const expressiveCodeConfig: AstroExpressiveCodeOptions = {
+	themes: ["light-plus", "catppuccin-frappe"],
+};
