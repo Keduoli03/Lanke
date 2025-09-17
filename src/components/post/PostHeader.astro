@@ -15,7 +15,7 @@ const { wordCount, readingTime } = remarkPluginFrontmatter || { wordCount: 0, re
 const minutes = Math.ceil(readingTime) || 0;
 ---
 <header class="mb-8">
-  <h1 class="text-4xl font-bold mb-4 text-primary">{title}</h1>
+  <h1 class="text-2xl font-bold mb-4 text-primary md:text-4xl">{title}</h1>
   <div class="text-secondary mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
     <div class="flex items-center gap-x-1.5">
       <Icon name="material-symbols:calendar-today-outline-rounded" class="w-4 h-4" />

@@ -39,7 +39,7 @@
   };
 </script>
 
-<div>
+<div class="relative">
   <!-- 主题色切换按钮 -->
   <button 
     aria-label="主题色设置"
@@ -52,7 +52,7 @@
   
   <!-- 主题色面板 -->
   <div 
-    class="bg-[var(--float-panel-bg)] rounded-[var(--radius-large)] shadow-xl transition-all duration-200 z-50 absolute {showPanel ? 'opacity-100' : 'opacity-0 pointer-events-none'} {isMobile ? '-right-8 top-full mt-2 w-52 p-3' : 'left-full bottom-0 ml-2 w-80 p-4'}"
+    class="bg-[var(--float-panel-bg)] rounded-[var(--radius-large)] shadow-xl transition-all duration-200 z-50 absolute {showPanel ? 'opacity-100' : 'opacity-0 pointer-events-none'} {isMobile ? 'right-0 top-full mt-2 w-52 p-3' : 'left-full bottom-0 ml-2 w-80 p-4'}"
     bind:this={panelRef}
   >
     <div class="flex flex-row gap-2 items-center justify-between mb-3">

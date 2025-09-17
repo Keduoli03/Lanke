@@ -1,0 +1,30 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { items as friends } from '../page_data/friend';
+
+const title = "友链";
+const description = "一些朋友们的网站";
+
+---
+<MainLayout title={title} description={description}>
+  <div class="px-4">
+    <h1 class="text-3xl font-bold mb-6">{title}</h1>
+    <p class="mb-8">{description}</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {friends.map(friend => (
+        <a href={friend.siteurl} target="_blank" rel="noopener noreferrer" class="block p-6 bg-[var(--page-bg)] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+          <div class="flex items-center mb-4">
+            {friend.imgurl && <img src={friend.imgurl} alt={friend.title} class="w-12 h-12 rounded-full mr-4 object-cover" />}
+            <h2 class="text-xl font-semibold">{friend.title}</h2>
+          </div>
+          <p class="text-[var(--text-secondary)] mb-4">{friend.desc}</p>
+          <div class="flex flex-wrap gap-2">
+            {friend.tags.map(tag => (
+              <span class="px-2 py-1 bg-[var(--tag-bg)] text-sm rounded-md">{tag}</span>
+            ))}
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</MainLayout>

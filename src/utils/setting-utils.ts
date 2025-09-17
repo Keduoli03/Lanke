@@ -71,9 +71,33 @@ export function setTheme(theme: 'light' | 'dark'): void {
 /**
  * 切换当前主题。
  */
-export function toggleTheme(): void {
-  const newTheme = getTheme() === 'light' ? 'dark' : 'light';
-  setTheme(newTheme);
+export function toggleTheme(event?: MouseEvent): void {
+  const currentTheme = getTheme();
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+  if (!document.startViewTransition) {
+    setTheme(newTheme);
+    return;
+  }
+
+  const x = event?.clientX ?? window.innerWidth / 2;
+  const y = event?.clientY ?? window.innerHeight / 2;
+  document.documentElement.style.setProperty('--x', `${x}px`);
+  document.documentElement.style.setProperty('--y', `${y}px`);
+
+  // 移除上一次的临时 class (以防万一)
+  document.documentElement.classList.remove('to-dark', 'to-light');
+  // 添加表示切换方向的临时 class
+  document.documentElement.classList.add(`to-${newTheme}`);
+
+  const transition = document.startViewTransition(() => {
+    setTheme(newTheme);
+  });
+
+  transition.finished.then(() => {
+    // 动画结束后移除临时 class
+    document.documentElement.classList.remove(`to-${newTheme}`);
+  });
 }
 
 /**

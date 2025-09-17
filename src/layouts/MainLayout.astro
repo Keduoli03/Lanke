@@ -1,9 +1,10 @@
 ---
 import { ClientRouter } from 'astro:transitions';
-import { SITE_DESCRIPTION, siteConfig } from '../config';
+import { siteConfig } from '../config';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Sidebar from '../components/Sidebar.astro';
+import MobileNav from '../components/MobileNav.astro'; // 1. 引入新组件
 import themeScript from '../utils/theme-script.ts?raw';
 
 export interface Props {
@@ -12,7 +13,7 @@ export interface Props {
   useContentPane?: boolean;
 }
 
-const { title, description = SITE_DESCRIPTION, useContentPane = true } = Astro.props;
+const { title=siteConfig.title, description = siteConfig.description, useContentPane = true } = Astro.props;
 ---
 
 <!doctype html>
@@ -20,7 +21,7 @@ const { title, description = SITE_DESCRIPTION, useContentPane = true } = Astro.p
 	<head>
 		<BaseHead title={title} description={description} />
 		<script is:inline set:html={themeScript} />
-		<ClientRouter />
+		
 	</head>
 	<body class="bg-page text-primary" style={`
 		--primary-hue: ${siteConfig.themeColor.hue};
@@ -28,24 +29,24 @@ const { title, description = SITE_DESCRIPTION, useContentPane = true } = Astro.p
 		--sidebar-width: ${siteConfig.sidebarWidth};
 	`}>
 	
-		
+		<ClientRouter />
 		<div class="layout-container">
 			<Sidebar />
-
+            <MobileNav /> 
 			<main class="main-content">
 				{useContentPane ? (
 					<div class="content-pane">
 						<slot />
-						<Footer />
 					</div>
 				) : (
 					<div class="content-wrapper">
 						<slot />
-						<Footer />
 					</div>
 				)}
 			</main>
 		</div>
+
+		<Footer />
 		<!-- 尝试解决刷新问题，失败 -->
 		<!-- <script>
 			import '../utils/scroll-restoration.ts';
@@ -114,6 +115,7 @@ const { title, description = SITE_DESCRIPTION, useContentPane = true } = Astro.p
 			@media (max-width: 1023px) {
 				.main-content {
 					margin-left: 0 !important;
+                    padding-top: 3.5rem; /* 关键：为移动端顶栏留出空间 (3.5rem = 56px) */
 				}
 
 				.content-wrapper {

@@ -2,6 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import { render } from "astro:content";
 import { Icon } from 'astro-icon/components';
+import { formatFullDate } from '../../utils/date-utils';
 
 interface Props {
   class?: string;
@@ -62,13 +63,6 @@ const getCategoryStyle = (category: string) => {
 
 const categoryStyle = getCategoryStyle(firstCategory);
 
-function formatDate(date: Date): string {
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).replace(/\//g, '-');
-}
 ---
 
 <article class:list={[
@@ -156,7 +150,7 @@ function formatDate(date: Date): string {
         <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
           <div class="inline-flex items-center gap-1.5">
             <Icon name="material-symbols:calendar-month-outline" class="h-5 w-5 flex-shrink-0" />
-            <span>{formatDate(date)}</span>
+            <span>{formatFullDate(new Date(date))}</span>
           </div>
           <div class="inline-flex items-center gap-1.5">
             <Icon name="material-symbols:timer-outline" class="h-5 w-5 flex-shrink-0" />

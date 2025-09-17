@@ -1,0 +1,46 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { getCollection } from 'astro:content';
+import { getAllTags } from '../../utils/content-utils';
+import TimelineArchive from '../../components/archive/TimelineArchive.astro';
+
+export async function getStaticPaths() {
+  const allTags = await getAllTags();
+  
+  return allTags.map(tagInfo => ({
+    params: { tag: tagInfo.name },
+    props: { 
+      tagName: tagInfo.name,
+      posts: tagInfo.posts
+    }
+  }));
+}
+
+interface Props {
+  tagName: string;
+  posts: any[];
+}
+
+const { tagName, posts } = Astro.props;
+const totalPosts = posts.length;
+---
+
+<MainLayout 
+  title={`标签：${tagName}`}
+  description={`查看标签 "${tagName}" 下的所有文章，共 ${totalPosts} 篇`}
+>
+  <div class="tag-container">
+    <!-- 主要内容区域：左侧时间线 + 右侧分类标签 -->
+    <div class="tag-main">
+      <!-- 左侧：时间线归档 -->
+      <div class="timeline-section">
+        <TimelineArchive 
+          posts={posts}
+          title={`标签：#${tagName}`}
+          subtitle={`共 ${totalPosts} 篇文章`}
+          icon="material-symbols:label-outline"
+          showCategory={true}
+          baseUrl="/posts"
+        />
+      </div>
+</MainLayout>

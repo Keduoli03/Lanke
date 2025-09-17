@@ -1,6 +1,4 @@
-import type { LinkPresets } from "../constants/link-presets";
 
-export type LinkPreset = (typeof LinkPresets)[keyof typeof LinkPresets];
 
 export interface NavBarLink {
 	name: string;
@@ -12,6 +10,7 @@ export interface NavBarLink {
 export interface SiteConfig {
 	title: string;
 	description: string;
+	url: string;
 	image: {
 		src: string;
 		alt: string;

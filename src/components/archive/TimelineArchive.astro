@@ -1,0 +1,598 @@
+---
+import { formatFullDate } from '../../utils/date-utils';
+import { Icon } from 'astro-icon/components';
+import type { CollectionEntry } from 'astro:content';
+import CategoryList from './CategoryList.astro';
+import TagCloud from './TagCloud.astro';
+
+interface Props {
+  posts: CollectionEntry<'posts'>[];
+  title: string;
+  subtitle: string;
+  icon: string;
+  showCategory?: boolean;
+  showTags?: boolean;
+  baseUrl?: string; // 用于生成链接的基础URL
+  showSidebar?: boolean; // 新增：是否显示侧边栏
+}
+
+const { 
+  posts, 
+  title, 
+  subtitle, 
+  icon, 
+  showCategory = true, 
+  showTags = false, 
+  baseUrl = '/posts',
+  showSidebar = true 
+} = Astro.props;
+
+// 按年份分组
+type GroupedPosts = {
+  [year: number]: CollectionEntry<'posts'>[];
+};
+const groupedPosts: GroupedPosts = posts.reduce((acc: GroupedPosts, post) => {
+  const year = new Date(post.data.date).getFullYear();
+  if (!acc[year]) acc[year] = [];
+  acc[year].push(post);
+  return acc;
+}, {});
+
+// 年份倒序（最新在前）
+const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
+---
+
+<div class="timeline-archive-container">
+  <!-- 页面标题 - 独占一行 -->
+  <header class="archive-header">
+    <h1 class="archive-title">
+      <Icon name={icon} class="w-11 h-11" />
+      {title}
+    </h1>
+    <p class="archive-subtitle">{subtitle}</p>
+  </header>
+
+  <!-- 主要内容区域 - 时间线和侧边栏的两列布局 -->
+  <div class={showSidebar ? "main-content-with-sidebar" : "main-content-full-width"}>
+    <!-- 左侧：时间线内容 -->
+    <div class="timeline-section">
+      <!-- 时间线内容 -->
+      <div class="timeline-archive">
+        <!-- 左侧垂直时间线 -->
+        <div class="timeline-line"></div>
+
+        <!-- 右侧年份+文章内容 -->
+        <div class="timeline-content">
+          {years.map(year => {
+            const yearPosts = groupedPosts[year];
+            return (
+              <div class="year-section">
+                <!-- 年份节点 -->
+                <div class="year-marker">
+                  <div class="year-dot"></div>
+                  <h2 class="year-title">{year}</h2>
+                  <span class="year-count">{yearPosts.length} 篇</span>
+                </div>
+
+                <!-- 该年份的文章列表 -->
+                <ul class="posts-list">
+                  {yearPosts.map(post => {
+                    const firstCategory = post.data.categories?.[0] || '未分类';
+                    const tags = post.data.tags || [];
+                    return (
+                      <li class="post-item">
+                        <div class="post-connector"></div>
+                        <time class="post-date">{formatFullDate(new Date(post.data.date))}</time>
+                        
+                        {showCategory && (
+                          <span class="post-category">{firstCategory}</span>
+                        )}
+                        
+                        <a href={`${baseUrl}/${post.data.slug}/`} class="post-link">
+                          {post.data.title}
+                        </a>
+                        
+                        {showTags && tags.length > 0 && (
+                          <div class="post-tags">
+                            {tags.slice(0, 3).map(tag => (
+                              <span class="post-tag">#{tag}</span>
+                            ))}
+                            {tags.length > 3 && <span class="post-tag-more">+{tags.length - 3}</span>}
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧：分类和标签侧边栏（可选） -->
+    {showSidebar && (
+      <aside class="archive-sidebar">
+
+          <CategoryList/>
+
+          <TagCloud />
+      </aside>
+    )}
+  </div>
+</div>
+
+<style>
+  :root {
+    /* 可根据你的网站主题色调整 */
+    --timeline-color: var(--color-theme);
+    --timeline-light: var(--line-divider);
+    --hover-bg: rgba(0, 0, 0, 0.02);
+    --dark-hover-bg: rgba(255, 255, 255, 0.02);
+    --connector-gap: 4px;
+    --category-bg: rgba(0, 0, 0, 0.05);
+    --dark-category-bg: rgba(255, 255, 255, 0.08);
+  }
+
+  .timeline-archive-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  /* 页面标题 - 独占一行 */
+  .archive-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--line-divider);
+    width: 100%;
+  }
+
+  .archive-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    line-height: 1; /* 添加行高控制 */
+  }
+
+  /* 确保图标与文字完美对齐 */
+  .archive-title :global(svg) {
+    flex-shrink: 0; /* 防止图标被压缩 */
+    vertical-align: middle; /* 垂直居中对齐 */
+  }
+
+  .archive-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+    margin: 0;
+  }
+
+  /* 主要内容区域 - 时间线和侧边栏的两列布局 */
+  .main-content-with-sidebar {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  .main-content-full-width {
+    width: 100%;
+  }
+
+  .timeline-section {
+    min-width: 0;
+  }
+
+  /* 时间线核心容器 */
+  .timeline-archive {
+    display: flex;
+    position: relative;
+    margin-left: 1.5rem;
+  }
+
+  /* 左侧垂直时间线 */
+  .timeline-line {
+    position: absolute;
+    left: -1.5rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(
+      to bottom,
+      var(--timeline-color) 10%,
+      var(--timeline-light) 100%
+    );
+    z-index: 1;
+  }
+
+  /* 右侧内容区（年份+文章） */
+  .timeline-content {
+    flex: 1;
+  }
+
+  /* 年份区块 */
+  .year-section {
+    margin-bottom: 3.5rem;
+    position: relative;
+  }
+
+  /* 年份节点 */
+  .year-marker {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* 时间线上的圆形节点 */
+  .year-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--timeline-color);
+    border: 4px solid var(--content-pane-bg);
+    box-shadow: 0 0 0 1px var(--timeline-light), 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .year-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--timeline-color);
+    margin: 0;
+  }
+
+  .year-count {
+    background: var(--tag-bg);
+    color: var(--text-secondary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  /* 文章列表 */
+  .posts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-left: calc(1.5rem - var(--connector-gap));
+  }
+
+  .post-item {
+    display: flex;
+    align-items: center;
+    padding: 0.9rem 0;
+    transition: all 0.25s ease;
+    position: relative;
+    gap: 1rem;
+  }
+
+  .post-item:not(:last-child) {
+    margin-bottom: 0.3rem;
+  }
+
+  .post-item:hover {
+    background-color: var(--hover-bg);
+    transform: translateX(5px);
+  }
+
+  /* 文章连接线 */
+  .post-connector {
+    position: absolute;
+    left: calc(-1.5rem + var(--connector-gap));
+    top: 50%;
+    width: 12px;
+    height: 1.5px;
+    background: var(--timeline-light);
+    transform: translateY(-50%);
+    transition: all 0.25s ease;
+    border-radius: 1px;
+  }
+
+  .post-connector::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--timeline-light);
+    transform: translate(-50%, -50%);
+    transition: all 0.25s ease;
+    box-shadow: 0 0 0 2px var(--content-pane-bg);
+  }
+
+  .post-item:hover .post-connector {
+    background: var(--timeline-color);
+    width: 16px;
+  }
+
+  .post-item:hover .post-connector::before {
+    background: var(--timeline-color);
+    width: 7px;
+    height: 7px;
+    box-shadow: 0 0 0 2px var(--content-pane-bg), 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  /* 文章日期 */
+  .post-date {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    min-width: 60px;
+    text-align: right;
+    font-family: monospace;
+    transition: color 0.25s ease;
+  }
+
+  .post-item:hover .post-date {
+    color: var(--timeline-color);
+  }
+
+  /* 文章标题链接 */
+  .post-link {
+    color: var(--text-primary);
+    text-decoration: none;
+    flex: 1;
+    transition: color 0.25s ease;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .post-link:hover {
+    color: var(--timeline-color);
+    text-decoration: none;
+  }
+
+  /* 分类标签 */
+  .post-category {
+    background: var(--category-bg);
+    color: var(--text-secondary);
+    padding: 0.2rem 0.6rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.25s ease;
+    margin-left: auto;
+    margin-right: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .post-item:hover .post-category {
+    background: var(--timeline-color);
+    color: #fff;
+  }
+
+  /* 标签样式 */
+  .post-tags {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+  }
+
+  .post-tag {
+    background: var(--tag-bg);
+    color: var(--text-secondary);
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+
+  .post-tag-more {
+    background: var(--tag-bg);
+    color: var(--text-tertiary);
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-style: italic;
+  }
+
+  /* 侧边栏样式 */
+  .archive-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    position: sticky;
+    top: 2rem;
+  }
+
+  .sidebar-widget {
+    background: var(--color-bg-secondary);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+    transition: all 0.3s ease;
+  }
+
+  .sidebar-widget:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-primary);
+  }
+
+  .widget-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  /* 响应式调整 */
+  @media (max-width: 1024px) {
+    .main-content-with-sidebar {
+      grid-template-columns: 1fr 250px;
+      gap: 2rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .timeline-archive-container {
+      padding: 1rem 0.5rem;
+    }
+
+    .main-content-with-sidebar {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .archive-sidebar {
+      position: static;
+      order: -1;
+    }
+
+    .sidebar-widget {
+      padding: 1rem;
+    }
+
+    .archive-title {
+      font-size: 2rem;
+    }
+
+    .timeline-archive {
+      margin-left: 1rem;
+    }
+
+    .timeline-line {
+      left: -1rem;
+      width: 1.5px;
+    }
+
+    .year-dot {
+      width: 14px;
+      height: 14px;
+      border-width: 3px;
+    }
+
+    .year-title {
+      font-size: 1.5rem;
+    }
+
+    .posts-list {
+      margin-left: calc(1rem - var(--connector-gap));
+    }
+
+    .post-connector {
+      left: calc(-1rem + var(--connector-gap));
+      width: 10px;
+    }
+
+    .post-connector::before {
+      width: 4px;
+      height: 4px;
+    }
+
+    .post-item:hover .post-connector {
+      width: 14px;
+    }
+
+    .post-item:hover .post-connector::before {
+      width: 6px;
+      height: 6px;
+    }
+
+    .post-date {
+      min-width: 55px;
+      font-size: 0.8rem;
+    }
+
+    .post-category {
+      padding: 0.15rem 0.4rem;
+      font-size: 0.7rem;
+      margin-right: 0;
+    }
+
+    .post-link {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
+    }
+
+    .post-item {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .post-date {
+      order: 3;
+      width: 100%;
+      margin-left: 1.5rem;
+    }
+
+    .post-category {
+      order: 1;
+    }
+
+    .post-link {
+      order: 2;
+      width: 100%;
+      margin-left: 1.5rem;
+    }
+
+    .post-tags {
+      order: 4;
+      width: 100%;
+      margin-left: 1.5rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .archive-title {
+      font-size: 1.8rem;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .timeline-line {
+      left: -0.8rem;
+    }
+
+    .timeline-archive {
+      margin-left: 0.8rem;
+    }
+
+    .posts-list {
+      margin-left: calc(0.8rem - var(--connector-gap));
+    }
+
+    .post-connector {
+      left: calc(-0.8rem + var(--connector-gap));
+    }
+  }
+
+  /* 深色模式适配 */
+  html.dark {
+    --hover-bg: var(--dark-hover-bg);
+    --category-bg: var(--dark-category-bg);
+  }
+
+  html.dark .year-dot {
+    border-color: var(--content-pane-bg);
+  }
+
+  html.dark .post-connector::before {
+    box-shadow: 0 0 0 2px var(--content-pane-bg);
+  }
+
+  html.dark .post-item:hover .post-connector::before {
+    box-shadow: 0 0 0 2px var(--content-pane-bg), 0 0 0 3px rgba(0,0,0,0.05);
+  }
+
+  html.dark .post-item:hover {
+    background-color: var(--dark-hover-bg);
+  }
+</style>

@@ -12,6 +12,33 @@
 */
 
 /*
+  移动端基础字体大小调整
+  ==========================================================================
+*/
+.prose {
+  @apply text-base; /* 默认大小 */
+}
+
+@media (max-width: 768px) {
+  .prose {
+    @apply text-sm; /* 移动端调小 */
+  }
+  
+  /* 移动端段落缩进调整 */
+  .prose p {
+    text-indent: 1.5em;
+  }
+  
+  /* 移动端标题大小调整 */
+  .prose h1 { @apply text-2xl; }
+  .prose h2 { @apply text-xl; }
+  .prose h3 { @apply text-lg; }
+  .prose h4 { @apply text-base; }
+  .prose h5 { @apply text-sm; }
+  .prose h6 { @apply text-xs; }
+}
+
+/*
   全局链接样式美化
   ==========================================================================
 */
@@ -100,10 +127,42 @@
 /*
   3. 引用块 (Blockquote) 样式
   ==========================================================================
-  注意：这里的颜色是独立于正文的，可以保留。
 */
 .prose blockquote {
-  @apply border-l-4 border-teal-400 bg-teal-50 p-4 text-teal-800 dark:bg-teal-900/20 dark:text-teal-200;
+  @apply relative border-l-4 p-5 my-6 rounded-r-lg shadow-sm 
+         transition-all duration-300 hover:shadow-md;
+  border-left-color: hsl(var(--primary-hue), 60%, 60%);
+  background-color: hsl(var(--primary-hue), 80%, 95%);
+  color: hsl(var(--primary-hue), 70%, 25%);
+}
+
+/* 移动端引用块调整 */
+@media (max-width: 768px) {
+  .prose blockquote {
+    @apply p-3 my-4 text-sm;
+  }
+  
+  .prose blockquote::before {
+    @apply -top-1 -left-1 text-4xl;
+  }
+}
+
+/* 深色模式下的引用块样式 */
+html.dark .prose blockquote {
+  background-color: hsl(var(--primary-hue), 40%, 8%);
+  color: hsl(var(--primary-hue), 60%, 80%);
+  border-left-color: hsl(var(--primary-hue), 50%, 50%);
+}
+
+/* 装饰性引用符号 */
+.prose blockquote::before {
+  content: '"';
+  @apply absolute -top-2 -left-2 text-5xl opacity-30;
+  color: hsl(var(--primary-hue), 50%, 60%);
+}
+
+html.dark .prose blockquote::before {
+  color: hsl(var(--primary-hue), 40%, 40%);
 }
 
 .prose blockquote p:first-of-type::before {
@@ -111,7 +170,20 @@
 }
 
 .prose blockquote p {
-  @apply m-0;
+  @apply m-0 pl-2 relative z-10;
+}
+
+/* 引用来源样式 */
+.prose blockquote cite {
+  @apply block mt-3 text-sm text-blue-600 italic
+         dark:text-blue-400;
+}
+
+/* 移动端引用来源调整 */
+@media (max-width: 768px) {
+  .prose blockquote cite {
+    @apply mt-2 text-xs;
+  }
 }
 
 /*
@@ -127,6 +199,17 @@
   @apply [text-indent:0];
 }
 
+/* 移动端列表调整 */
+@media (max-width: 768px) {
+  .prose ul, .prose ol {
+    @apply pl-4;
+  }
+  
+  .prose li {
+    @apply text-sm;
+  }
+}
+
 /*
   5. 媒体与代码块样式
   ==========================================================================
@@ -137,4 +220,31 @@
 
 .prose pre {
   @apply bg-gray-800 text-gray-100 rounded-lg shadow-lg;
+}
+
+/* 移动端代码块调整 */
+@media (max-width: 768px) {
+  .prose pre {
+    @apply text-xs p-3;
+  }
+  
+  .prose code {
+    @apply text-xs;
+  }
+  
+  /* 行内代码调整 */
+  .prose :not(pre) > code {
+    @apply text-xs px-1 py-0.5;
+  }
+}
+
+/* 表格移动端调整 */
+@media (max-width: 768px) {
+  .prose table {
+    @apply text-xs;
+  }
+  
+  .prose th, .prose td {
+    @apply px-2 py-1;
+  }
 }

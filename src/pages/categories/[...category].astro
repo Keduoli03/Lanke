@@ -1,0 +1,43 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import MainLayout from '../../layouts/MainLayout.astro';
+import { getAllCategories } from '../../utils/content-utils';
+import TimelineArchive from '../../components/archive/TimelineArchive.astro';
+
+export async function getStaticPaths() {
+  const categories = await getAllCategories();
+  
+  return categories.map(category => ({
+    params: { category: category.name },
+    props: { 
+      posts: category.posts,
+      categoryName: category.name, 
+      totalPosts: category.count 
+    }
+  }));
+}
+
+interface Props {
+  posts: CollectionEntry<'posts'>[];
+  categoryName: string;
+  totalPosts: number;
+}
+
+const { posts, categoryName, totalPosts } = Astro.props;
+---
+
+<MainLayout 
+  title={`分类：${categoryName}`}
+  description={`${categoryName} 分类下的所有文章`}
+>
+  <TimelineArchive 
+    posts={posts}
+    title={`分类：${categoryName}`}
+    subtitle={`共 ${totalPosts} 篇文章`}
+    icon="material-symbols:category-outline"
+    baseUrl="/posts"
+    showCategory={false}
+    showTags={true}
+    showSidebar={true}
+  />
+</MainLayout>

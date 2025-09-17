@@ -107,3 +107,35 @@ html.dark ::-webkit-scrollbar-thumb {
 html.dark ::-webkit-scrollbar-thumb:hover {
 	background-color: hsl(var(--primary-hue), 15%, 45%);
 }
+
+/* --- 主题切换动画 --- */
+/* 基础设置：禁用默认动画，确保混合模式正常 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* 向外扩散动画（出现） */
+@keyframes reveal {
+  from { clip-path: circle(0 at var(--x) var(--y)); }
+  to { clip-path: circle(150vmax at var(--x) var(--y)); }
+}
+
+/* 向内收缩动画（消失） */
+@keyframes conceal {
+  from { clip-path: circle(150vmax at var(--x) var(--y)); }
+  to { clip-path: circle(0 at var(--x) var(--y)); }
+}
+
+/* 切换到深色模式时：新视图(深色)执行“展开”动画 */
+html.to-dark::view-transition-new(root) {
+  animation: reveal 0.5s ease-out forwards; /* 关键：保持动画结束状态 */
+  z-index: 1;
+}
+
+/* 切换到浅色模式时：旧视图(深色)执行“收缩”动画 */
+html.to-light::view-transition-old(root) {
+  animation: conceal 0.5s ease-in forwards; /* 关键：保持动画结束状态 */
+  z-index: 1;
+}

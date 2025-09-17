@@ -1,0 +1,113 @@
+---
+import { Icon } from "astro-icon/components";
+import { navBarConfig, siteConfig } from "../config";
+import type { NavBarLink } from "../types/config";
+import { url } from "../utils/url-utils";
+import LightDarkSwitch from "./util/LightDarkSwitch.svelte";
+import ThemeSwitch from "./util/ThemeSwitch.svelte";
+
+let links: NavBarLink[] = Object.values(navBarConfig.links);
+---
+<div id="mobile-nav-container" class="lg:hidden">
+    <!-- 手机端顶部导航栏 -->
+    <div id="mobile-navbar" class="fixed top-0 left-0 right-0 h-14 bg-[var(--sidebar-bg)]/80 border-b border-[var(--line-divider)] z-40 flex items-center px-4 backdrop-blur-md">
+        <a href={url('/')} class="hover:opacity-80 transition-opacity">
+            <img src="/logo.png" alt={siteConfig.title} class="w-6 h-6" />
+        </a>
+        <span class="text-lg font-semibold ml-2 text-[var(--text-primary)]">{siteConfig.title}</span>
+        <div class="ml-auto flex items-center space-x-2">
+            <LightDarkSwitch client:load >
+                <Icon slot="dark-icon" name="material-symbols:dark-mode-outline" class="h-5 w-5 cursor-pointer" />
+                <Icon slot="light-icon" name="material-symbols:light-mode-outline" class="h-5 w-5 cursor-pointer" />
+            </LightDarkSwitch>
+             <ThemeSwitch client:load isMobile={true}>
+          <Icon slot="palette-icon" name="material-symbols:palette-outline" class="bottom-bar-icon h-5 w-5 cursor-pointer" />
+          <Icon slot="reset-icon" name="fa6-solid:arrow-rotate-left" class="text-xs" />
+        </ThemeSwitch>
+            <button aria-label="Menu" class="btn-plain scale-animation rounded-lg h-9 w-9 active:scale-90 text-[var(--deep-text)] flex items-center justify-center" id="mobile-menu-toggle">
+                <Icon name="material-symbols:menu" class="h-5 w-5" id="mobile-menu-icon-open" />
+                <Icon name="material-symbols:close" class="h-5 w-5 hidden" id="mobile-menu-icon-close" />
+            </button>
+        </div>
+    </div>
+
+    <!-- 手机端导航菜单面板 -->
+    <div id="mobile-nav-panel" class="fixed top-14 right-0 w-48 bg-[var(--sidebar-bg)]/80 border border-[var(--line-divider)] z-30 transform translate-x-full opacity-0 transition-all duration-300 shadow-xl rounded-l-xl backdrop-blur-md">
+        <nav class="p-2">
+            <ul class="space-y-1">
+                {links.map((l) => {
+                const linkPath = url(l.url);
+                return (
+                    <li transition:name={`mobile-link-${l.url}`}>
+                    <a
+                        href={l.external ? l.url : linkPath}
+                        target={l.external ? '_blank' : '_self'}
+                        rel={l.external ? 'noopener noreferrer' : ''}
+                        class="transition-all group nav-link flex flex-row items-center p-2 w-full rounded-lg"
+                        data-navigation-link
+                    >
+                        <div class="w-6 h-6 rounded-full bg-[var(--sidebar-icon-bg)] flex items-center justify-center mr-2 transition-all relative">
+                        {l.icon && <Icon name={l.icon} class="text-sm text-[var(--sidebar-icon-symbol)]" />}
+                        </div>
+                        <span class="text-sm text-[var(--text-secondary)] text-left flex-1 truncate font-bold">
+                        {l.name}
+                        </span>
+                        {l.external && (
+                        <Icon
+                            name="fa6-solid:arrow-up-right-from-square"
+                            class="text-xs text-[var(--deep-text)]/70 ml-auto flex-shrink-0"
+                        />
+                        )}
+                    </a>
+                    </li>
+                )
+                })}
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<script>
+    function initMobileNavScripts() {
+        const menuToggle = document.getElementById('mobile-menu-toggle');
+        const panel = document.getElementById('mobile-nav-panel');
+        const iconOpen = document.getElementById('mobile-menu-icon-open');
+        const iconClose = document.getElementById('mobile-menu-icon-close');
+
+        if (!menuToggle || !panel || !iconOpen || !iconClose) {
+            return;
+        }
+
+        const openPanel = () => {
+            panel.classList.remove('translate-x-full', 'opacity-0');
+            panel.classList.add('translate-x-0', 'opacity-100');
+            iconOpen.classList.add('hidden');
+            iconClose.classList.remove('hidden');
+            menuToggle.setAttribute('aria-expanded', 'true');
+        };
+
+        const closePanel = () => {
+            panel.classList.add('translate-x-full', 'opacity-0');
+            panel.classList.remove('translate-x-0', 'opacity-100');
+            iconOpen.classList.remove('hidden');
+            iconClose.classList.add('hidden');
+            menuToggle.setAttribute('aria-expanded', 'false');
+        };
+
+        menuToggle.addEventListener('click', () => {
+            const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+            if (isExpanded) {
+                closePanel();
+            } else {
+                openPanel();
+            }
+        });
+
+        // 在页面切换前，确保菜单是关闭的
+        document.addEventListener('astro:before-swap', closePanel);
+    }
+
+    // 使用 astro:page-load 事件来确保每次页面加载（包括首次和后续切换）
+    // 都会重新运行我们的初始化脚本，为新的 DOM 元素绑定事件。
+    document.addEventListener('astro:page-load', initMobileNavScripts);
+</script>

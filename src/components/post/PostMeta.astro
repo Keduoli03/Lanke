@@ -19,18 +19,12 @@ const {
 } = Astro.props;
 const className = Astro.props.class;
 
-function formatDate(date: Date): string {
-	return date.toLocaleDateString('zh-CN', {
-		year: 'numeric',
-		month: '2-digit',
-		day: '2-digit'
-	}).replace(/\//g, '-');
-}
+import { formatFullDate } from '../../utils/date-utils';
 ---
 
 <div class:list={["flex flex-wrap text-gray-500 dark:text-gray-400 items-center gap-2 text-sm", className]}>
     <!-- 发布日期 -->
-    <span>{formatDate(published)}</span>
+    <span>{formatFullDate(new Date(published))}</span>
 
     <!-- 分类 -->
     {categories && categories.length > 0 && (

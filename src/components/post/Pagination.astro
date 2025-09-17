@@ -3,9 +3,10 @@ import type { Page } from 'astro';
 
 interface Props {
   page: Page<any>;
+  baseUrl?: string; // 新增：基础URL参数
 }
 
-const { page } = Astro.props;
+const { page, baseUrl } = Astro.props;
 
 // 生成页码数组（处理大量页码时显示省略号）
 const generatePageNumbers = (current: number, total: number) => {
@@ -36,6 +37,17 @@ const generatePageNumbers = (current: number, total: number) => {
 };
 
 const pageNumbers = generatePageNumbers(page.currentPage, page.lastPage);
+
+// 生成正确的页面URL
+const generatePageUrl = (pageNum: number) => {
+  if (baseUrl) {
+    // 如果提供了baseUrl（如分类页面），使用它
+    return pageNum === 1 ? baseUrl : `${baseUrl}/${pageNum}`;
+  } else {
+    // 默认首页分页
+    return pageNum === 1 ? '/' : `/${pageNum}`;
+  }
+};
 ---
 <div class="flex justify-center items-center mt-12 gap-1 sm:gap-2">
   <nav class="inline-flex items-center">
@@ -63,7 +75,7 @@ const pageNumbers = generatePageNumbers(page.currentPage, page.lastPage);
       }
       
       const isCurrent = pageNum === page.currentPage;
-      const pageUrl = pageNum === 1 ? '/' : `/${pageNum}`;
+      const pageUrl = generatePageUrl(pageNum as number);
       return (
         <a
           href={pageUrl}

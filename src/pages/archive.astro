@@ -1,0 +1,21 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { getSortedPosts } from '../utils/content-utils';
+import TimelineArchive from '../components/archive/TimelineArchive.astro';
+
+// 获取所有文章并按时间排序
+const posts = await getSortedPosts();
+---
+
+<MainLayout title="归档">
+  <TimelineArchive 
+    posts={posts}
+    title="文章归档"
+    subtitle={`共 ${posts.length} 篇文章`}
+    icon="material-symbols:archive-outline"
+    showCategory={true}
+    showTags={false}
+    baseUrl="/posts"
+    showSidebar={true}
+  />
+</MainLayout>

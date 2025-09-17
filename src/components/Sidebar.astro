@@ -7,23 +7,6 @@ import LightDarkSwitch from "./util/LightDarkSwitch.svelte";
 import ThemeSwitch from "./util/ThemeSwitch.svelte";
 
 let links: NavBarLink[] = Object.values(navBarConfig.links);
-
-// 样式辅助函数
-function getNavLinkClasses() {
-  return "group flex flex-col items-center p-1 w-auto nav-link";
-}
-
-function getIconContainerClasses() {
-  return "icon-container w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all relative group-hover:border-2 group-hover:border-[var(--primary)] group-hover:scale-110";
-}
-
-function getTextClasses() {
-  return "text-xs text-center leading-tight text-[var(--text-secondary)]";
-}
-
-function getExternalIconClasses() {
-  return "text-xs text-[var(--text-secondary)]/70 mt-1";
-}
 ---
 
 <div
@@ -31,7 +14,7 @@ function getExternalIconClasses() {
   class="relative h-full bg-[var(--sidebar-bg)] w-16 flex-col transition-colors lg:flex hidden"
 >
   <!-- 网站Logo -->
-  <div class="p-2 border-b border-[var(--line-divider)] flex justify-center">
+  <div class="p-2 border-b border-[var(--line-divider)] flex justify-center" transition:persist="sidebar-logo">
     <a href={url("/")} class="hover:opacity-80 transition-opacity">
       <img src="/logo.png" alt={siteConfig.title} class="w-6 h-6" />
     </a>
@@ -45,16 +28,18 @@ function getExternalIconClasses() {
             href={l.external ? l.url : url(l.url)}
             target={l.external ? "_blank" : "_self"}
             rel={l.external ? "noopener noreferrer" : ""}
-            class={getNavLinkClasses()}
+            class="group flex flex-col items-center p-1 w-auto nav-link"
           >
-            <div class={getIconContainerClasses()}>
+            <div class="icon-container w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all relative group-hover:border-2 group-hover:border-[var(--primary)] group-hover:scale-110">
               {l.icon && <Icon name={l.icon} class="icon text-sm" />}
             </div>
-            <span class={getTextClasses()}>{l.name}</span>
+            <span class="text-xs text-center leading-tight text-[var(--text-secondary)] font-medium">
+              {l.name}
+            </span>
             {l.external && (
               <Icon
                 name="fa6-solid:arrow-up-right-from-square"
-                class={getExternalIconClasses()}
+                class="text-xs text-[var(--text-secondary)]/70 mt-1"
               />
             )}
           </a>
@@ -64,22 +49,18 @@ function getExternalIconClasses() {
   </nav>
 
   <!-- 底部区域 -->
-  <div class="p-2 border-t border-[var(--line-divider)]">
-    <ul class="space-y-2">
-      <li class="flex justify-center">
-        <LightDarkSwitch client:load>
-          <Icon slot="dark-icon" name="material-symbols:dark-mode-outline" class="bottom-bar-icon h-5 w-5 cursor-pointer" />
-          <Icon slot="light-icon" name="material-symbols:light-mode-outline" class="bottom-bar-icon h-5 w-5 cursor-pointer" />
-        </LightDarkSwitch>
-      </li>
-      <li class="flex justify-center">
-        <ThemeSwitch client:load>
-          <Icon slot="palette-icon" name="material-symbols:palette-outline" class="bottom-bar-icon h-5 w-5 cursor-pointer" />
-          <Icon slot="reset-icon" name="fa6-solid:arrow-rotate-left" class="text-xs" />
-        </ThemeSwitch>
-      </li>
-    </ul>
-  </div>
+  <aside class="p-2 border-t border-[var(--line-divider)]">
+    <div class="flex flex-col items-center gap-2">
+      <LightDarkSwitch client:load transition:persist>
+        <Icon slot="dark-icon" name="material-symbols:dark-mode-outline" class="h-5 w-5 cursor-pointer" />
+        <Icon slot="light-icon" name="material-symbols:light-mode-outline" class="h-5 w-5 cursor-pointer" />
+      </LightDarkSwitch>
+      <ThemeSwitch client:load transition:persist isMobile={false}>
+        <Icon slot="palette-icon" name="material-symbols:palette-outline" class="bottom-bar-icon h-5 w-5 cursor-pointer" />
+        <Icon slot="reset-icon" name="fa6-solid:arrow-rotate-left" class="text-xs" />
+      </ThemeSwitch>
+    </div>
+  </aside>
 </div>
 
 <style>
@@ -107,14 +88,13 @@ function getExternalIconClasses() {
 
   /* 修复导航链接下划线问题 */
   .nav-link {
-    text-decoration: none !important; /* 强制移除下划线 */
-    color: inherit; /* 继承父元素颜色 */
+    text-decoration: none !important;
+    color: inherit;
   }
 
   .nav-link:hover,
   .nav-link:focus {
-    text-decoration: none !important; /* 确保hover/focus状态也无下划线 */
-    outline: none; /* 移除焦点轮廓（可选） */
+    text-decoration: none !important;
+    outline: none;
   }
-
 </style>

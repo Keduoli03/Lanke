@@ -16,14 +16,13 @@ const posts = defineCollection({
 			cover: z.union([image(), z.null()]).optional(),
 			pinned: z.boolean().default(false),
 			aiSummary: z.boolean().optional(),
+			status: z.string().optional(),
 		}),
 });
 
-// 新增的pages集合
+
 const pages = defineCollection({
-	// 指向page文件夹
 	loader: glob({ base: './src/content/pages', pattern: '**/*.{md,mdx}' }),
-	// 可以根据页面需求调整schema
 	schema: ({ image }) =>
 		z.object({
 			title: z.string(),
@@ -31,7 +30,6 @@ const pages = defineCollection({
 			date: z.coerce.date().optional(),
 			updated: z.coerce.date().optional(),
 			slug: z.string(), // 用于生成页面URL
-			// 可以根据需要添加其他字段
 		}),
 });
 

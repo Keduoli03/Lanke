@@ -3,15 +3,14 @@
 // all pages through the use of the <BaseHead /> component.
 // 此组件专门用来提供信息，便于seo优化
 import '../styles/global.css';
-import type { ImageMetadata } from 'astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../config';
+import { siteConfig } from '../config';
 
 interface Props {
 	title: string;
 	description: string;
 }
 
-const { title, description } = Astro.props;
+const { title = siteConfig.title, description = siteConfig.description } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
@@ -27,7 +26,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <link
 	rel="alternate"
 	type="application/rss+xml"
-	title={SITE_TITLE}
+	title={siteConfig.title}
 	href={new URL('rss.xml', Astro.site)}
 />
 <meta name="generator" content={Astro.generator} />
