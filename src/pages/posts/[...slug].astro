@@ -53,9 +53,11 @@ const fullPostUrl = Astro.url.href;
       
       {/* 目录区域 */}
       <aside class="hidden lg:block w-60 flex-shrink-0">
-        <div class="sticky top-20 flex flex-col gap-6">
-          <Toc items={headings} />
-          <div class="flex justify-center">
+        <div class="sticky top-20 flex flex-col" style="height: calc(100vh - 20rem);">
+          <div class="overflow-y-auto pr-4">
+            <Toc items={headings} />
+          </div>
+          <div class="mt-auto flex-shrink-0 flex justify-center py-4">
             <ScrollToTop />
           </div>
         </div>
