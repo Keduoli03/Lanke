@@ -11,11 +11,12 @@ export interface SiteConfig {
 	title: string;
 	description: string;
 	url: string;
+	favicon: string;
+	logo: string;
 	image: {
 		src: string;
 		alt: string;
 	};
-	logo: string;
 	themeColor: {
 		hue: number;
 		fixed: boolean;

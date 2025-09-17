@@ -7,11 +7,11 @@ interface Props {
   defaultExpanded?: boolean;
 }
 
-const { class: className, defaultExpanded = true } = Astro.props;
+const { class: className, defaultExpanded = false } = Astro.props;
 const categories = await getAllCategories();
 ---
 
-<div class:list={["category-list-container", className]}>
+<div class:list={["category-list-container", className]} data-expanded={defaultExpanded}>
   <div class="widget-header">
     <div class="widget-header-left">
       <Icon name="material-symbols:folder-open-outline" class="w-5 h-5" />
@@ -20,7 +20,7 @@ const categories = await getAllCategories();
     <div class="widget-header-right">
       <span class="widget-count">{categories.length}</span>
       <button class="toggle-btn" type="button" data-expanded={defaultExpanded}>
-        <Icon name={defaultExpanded ? "material-symbols:expand-more" : "material-symbols:expand-less"} class="w-5 h-5 toggle-icon" />
+        <Icon name="material-symbols:expand-more" class="w-5 h-5 toggle-icon" />
       </button>
     </div>
   </div>
@@ -41,284 +41,221 @@ const categories = await getAllCategories();
 </div>
 
 <script>
-  function initCategoryToggle() {
-    const containers = document.querySelectorAll('.category-list-container');
-    
-    containers.forEach(container => {
+  function initializeCategoryWidget() {
+    document.querySelectorAll('.category-list-container').forEach(container => {
       const toggleBtn = container.querySelector('.toggle-btn');
-      const categoryList = container.querySelector('.category-list') as HTMLElement;
-      const toggleIcon = container.querySelector('.toggle-icon') as HTMLElement;
+      const content = container.querySelector('.category-list');
       
-      if (!toggleBtn || !categoryList || !toggleIcon) return;
-      
-      // 移除已有的事件监听器（避免重复绑定）
-      const existingHandler = (toggleBtn as any)._categoryToggleHandler;
+      if (!toggleBtn || !content) return;
+
+      const existingHandler = (toggleBtn as any)._toggleHandler;
       if (existingHandler) {
         toggleBtn.removeEventListener('click', existingHandler);
       }
-      
-      // 设置初始状态
-      const isExpanded = toggleBtn.getAttribute('data-expanded') === 'true';
-      updateState(categoryList, toggleIcon, isExpanded);
-      
-      // 创建新的事件处理器
-      const clickHandler = (e: Event) => {
-        e.preventDefault();
-        const currentExpanded = toggleBtn.getAttribute('data-expanded') === 'true';
-        const newExpanded = !currentExpanded;
-        
-        toggleBtn.setAttribute('data-expanded', newExpanded.toString());
-        updateState(categoryList, toggleIcon, newExpanded);
+
+      const clickHandler = () => {
+        const isExpanded = toggleBtn.getAttribute('data-expanded') === 'true';
+        const newExpanded = !isExpanded;
+
+        container.setAttribute('data-expanded', String(newExpanded));
+        toggleBtn.setAttribute('data-expanded', String(newExpanded));
+        content.setAttribute('data-expanded', String(newExpanded));
       };
-      
-      // 保存处理器引用并添加事件监听
-      (toggleBtn as any)._categoryToggleHandler = clickHandler;
+
+      (toggleBtn as any)._toggleHandler = clickHandler;
       toggleBtn.addEventListener('click', clickHandler);
     });
   }
-  
-  function updateState(list: HTMLElement, icon: HTMLElement, expanded: boolean) {
-    if (expanded) {
-      list.style.maxHeight = list.scrollHeight + 'px';
-      list.style.opacity = '1';
-      icon.style.transform = 'rotate(180deg)';
-      (list.parentElement as HTMLElement).setAttribute('data-expanded', 'true');
-    } else {
-      list.style.maxHeight = '0';
-      list.style.opacity = '0';
-      icon.style.transform = 'rotate(0deg)';
-      (list.parentElement as HTMLElement).setAttribute('data-expanded', 'false');
-    }
-  }
-  
-  // 初始化函数
-  function initialize() {
-    initCategoryToggle();
-  }
-  
-  // DOM加载完成后执行
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initialize);
-  } else {
-    initialize();
-  }
-  
-  // 监听Astro的页面切换事件
-  document.addEventListener('astro:page-load', initialize);
-  
-  // 兼容性：也监听其他可能的路由事件
-  document.addEventListener('astro:after-swap', initialize);
+  document.addEventListener('astro:page-load', initializeCategoryWidget);
 </script>
 
 <style>
-  .category-list-container {
-    background: var(--content-pane-bg);
-    border-radius: 0.75rem;
-    padding: 1.5rem;
-    box-shadow: 0 2px 8px 0 rgb(0 0 0 / 0.1);
-    border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
-    max-width: 100%;
-  }
+  .category-list-container { 
+    background: var(--content-pane-bg); 
+    border-radius: 0.75rem; 
+    padding: 1.5rem; 
+    box-shadow: 0 2px 8px 0 rgb(0 0 0 / 0.1); 
+    border: 1px solid var(--border-color); 
+    transition: all 0.3s ease; 
+    max-width: 100%; 
+  } 
   
-  .widget-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* 修改布局方式 */
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--border-color);
-    transition: margin-bottom 0.3s ease;
-  }
+  .widget-header { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    gap: 0.5rem; 
+    margin-bottom: 1rem; 
+    padding-bottom: 0.75rem; 
+    border-bottom: 1px solid var(--border-color); 
+    transition: margin-bottom 0.3s ease; 
+  } 
 
-  /* 新增样式 */
-  .widget-header-left,
-  .widget-header-right {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
+  .widget-header-left, 
+  .widget-header-right { 
+    display: flex; 
+    align-items: center; 
+    gap: 0.5rem; 
+  } 
 
-  /* 当列表折叠时，移除标题的下外边距以减小高度 */
-  .category-list-container[data-expanded="false"] .widget-header {
-    margin-bottom: 0;
-  }
+  /* 当列表折叠时，移除标题的下外边距以减小高度 */ 
+  .category-list-container[data-expanded="false"] .widget-header { 
+    margin-bottom: 0; 
+    border-bottom-color: transparent; /* 折叠时也隐藏边框 */
+  } 
   
-  .widget-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
-    /* flex: 1; 已移除 */
-  }
+  .widget-title { 
+    font-size: 1.125rem; 
+    font-weight: 600; 
+    color: var(--text-primary); 
+    margin: 0; 
+  } 
   
-  /* 美化角标样式，使其更柔和、更有层次感 */
-  .widget-count {
-    background: var(--tag-bg);
-    color: var(--text-on-theme);
-    font-size: 0.75rem;
-    padding: 0.375rem 0.75rem;
-    border-radius: 9999px;
-    font-weight: 600;
-    box-shadow: 0 3px 8px -2px color-mix(in srgb, var(--color-theme) 30%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-theme) 10%, transparent);
-    transition: all 0.3s ease;
-  }
-  
-  .toggle-btn {
-    background: transparent;
-    border: none;
+  .widget-count { 
+    background: var(--tag-bg); 
     color: var(--text-secondary);
-    cursor: pointer;
-    padding: 0.5rem; /* 从 0.25rem 增加到 0.5rem，以统一尺寸 */
-    border-radius: 0.5rem; /* 从 0.25rem 增加到 0.5rem，以统一圆角 */
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+    font-size: 0.75rem; 
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px; 
+    font-weight: 600; 
+    transition: all 0.3s ease; 
+  } 
   
-  .toggle-btn:hover {
-    color: var(--theme-color);
-    background: var(--hover-bg);
-  }
-  
-  .category-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 0.75rem;
-    overflow: hidden;
-    transition: max-height 0.3s ease-in-out, opacity 0.3s ease;
-    max-height: 0;
-    opacity: 0;
-  }
-  
-  .category-list[data-expanded="true"] {
-    max-height: 1000px;
-    opacity: 1;
-  }
-  
-  .category-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.875rem 1rem;
+  .toggle-btn { 
+    background: transparent; 
+    border: none; 
+    color: var(--text-secondary); 
+    cursor: pointer; 
+    padding: 0.5rem;
     border-radius: 0.5rem;
-    transition: all 0.2s ease;
-    color: var(--text-secondary);
-    text-decoration: none;
-    border: 1px solid var(--border-color);
-    background: var(--card-bg, var(--content-pane-bg));
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
-    min-height: 3rem;
-    position: relative;
-    overflow: hidden;
+    transition: all 0.2s ease; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+  } 
+  
+  .toggle-btn:hover { 
+    color: var(--theme-color); 
+    background: var(--sidebar-icon-bg);
+    box-shadow: 0 0 12px 0 color-mix(in srgb, var(--theme-color) 40%, transparent);
+  } 
+
+  .toggle-icon {
+    transition: transform 0.3s ease;
+  }
+
+  .toggle-btn[data-expanded="true"] .toggle-icon {
+    transform: rotate(180deg);
   }
   
-  .category-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--theme-color);
-    transform: scaleY(0);
-    transition: transform 0.2s ease;
-  }
+  .category-list { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 0.75rem; 
+    overflow: hidden; 
+    transition: max-height 0.4s ease, opacity 0.3s ease, padding-top 0.3s ease; 
+    max-height: 0; 
+    opacity: 0;
+    padding-top: 0;
+  } 
   
-  .category-item:hover {
-    background: var(--hover-bg);
-    color: var(--text-primary);
-    border-color: var(--theme-color);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px 0 rgb(0 0 0 / 0.15);
-  }
+  .category-list[data-expanded="true"] { 
+    max-height: 1000px; /* 足够大的高度 */
+    opacity: 1; 
+    padding-top: 1rem;
+  } 
   
-  .category-item:hover::before {
-    transform: scaleY(1);
-  }
+  .category-item { 
+    display: flex; 
+    align-items: center; 
+    gap: 0.75rem; 
+    padding: 0.875rem 1rem; 
+    border-radius: 0.5rem; 
+    transition: all 0.2s ease; 
+    color: var(--text-secondary); 
+    text-decoration: none; 
+    border: 1px solid var(--line-divider); 
+    background: var(--content-pane-bg);
+    position: relative; 
+    overflow: hidden; 
+  } 
   
-  .category-icon {
-    width: 1.125rem;
-    height: 1.125rem;
-    flex-shrink: 0;
-    color: var(--theme-color);
-    transition: transform 0.2s ease;
-  }
+  .category-item::before { 
+    content: ''; 
+    position: absolute; 
+    left: 0; 
+    top: 0; 
+    bottom: 0; 
+    width: 3px; 
+    background: var(--theme-color); 
+    transform: scaleY(0); 
+    transition: transform 0.2s ease; 
+  } 
   
-  .category-item:hover .category-icon {
-    transform: scale(1.1);
-  }
+  .category-item:hover { 
+    background: var(--sidebar-icon-bg); 
+    color: var(--text-primary); 
+    border-color: var(--theme-color); 
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 12px 0 rgb(0 0 0 / 0.08); 
+  } 
   
-  .category-name {
-    flex: 1;
-    font-size: 0.875rem;
-    font-weight: 500;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 120px;
-  }
+  .category-item:hover::before { 
+    transform: scaleY(1); 
+  } 
   
-  .category-count {
-    background: var(--tag-bg);
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 9999px;
-    font-weight: 600;
-    min-width: 1.75rem;
-    text-align: center;
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
-  }
+  .category-icon { 
+    width: 1.125rem; 
+    height: 1.125rem; 
+    flex-shrink: 0; 
+    color: var(--theme-color); 
+    transition: transform 0.2s ease; 
+  } 
   
-  .category-item:hover .category-count {
-    background: var(--theme-color);
-    color: var(--text-on-theme);
-    border-color: var(--theme-color);
-    transform: scale(1.05);
-  }
+  .category-item:hover .category-icon { 
+    transform: scale(1.1); 
+  } 
   
-  /* 响应式设计 */
-  @media (max-width: 768px) {
-    .category-list {
-      grid-template-columns: 1fr;
-    }
-    
-    .category-name {
-      max-width: 150px;
-    }
-  }
+  .category-name { 
+    flex: 1; 
+    font-size: 0.875rem; 
+    font-weight: 500; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap; 
+    max-width: 120px; 
+  } 
   
-  @media (max-width: 480px) {
-    .category-list-container {
-      padding: 1rem;
-    }
-    
-    .category-item {
-      padding: 0.75rem;
-    }
-    
-    .category-name {
-      max-width: 100px;
-    }
-  }
+  .category-count { 
+    background: var(--tag-bg); 
+    color: var(--text-secondary); 
+    font-size: 0.75rem; 
+    padding: 0.25rem 0.5rem; 
+    border-radius: 9999px; 
+    font-weight: 600; 
+    min-width: 1.75rem; 
+    text-align: center; 
+    transition: all 0.2s ease; 
+    border: 1px solid transparent; 
+  } 
   
-  /* 深色模式适配 */
-  html.dark .category-item {
-    background: var(--dark-card-bg, var(--content-pane-bg));
-    border-color: var(--dark-border-color, var(--border-color));
-  }
+  .category-item:hover .category-count { 
+    background: var(--theme-color); 
+    color: var(--text-on-theme, white); 
+    transform: scale(1.05); 
+  } 
   
-  html.dark .category-item:hover {
-    background: var(--dark-hover-bg);
-    border-color: var(--theme-color);
-  }
+  @media (max-width: 768px) { 
+    .category-list { 
+      grid-template-columns: 1fr; 
+    } 
+  } 
   
-  html.dark .toggle-btn:hover {
-    background: var(--dark-hover-bg);
+  html.dark .category-list-container {
+    box-shadow: none;
+  }
+
+  html.dark .category-item:hover { 
+    box-shadow: none;
   }
 </style>

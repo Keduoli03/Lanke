@@ -4,7 +4,7 @@ import { siteConfig } from '../config';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Sidebar from '../components/Sidebar.astro';
-import MobileNav from '../components/MobileNav.astro'; // 1. 引入新组件
+import MobileNav from '../components/MobileNav.astro';
 import themeScript from '../utils/theme-script.ts?raw';
 
 export interface Props {
@@ -21,7 +21,6 @@ const { title=siteConfig.title, description = siteConfig.description, useContent
 	<head>
 		<BaseHead title={title} description={description} />
 		<script is:inline set:html={themeScript} />
-		
 	</head>
 	<body class="bg-page text-primary" style={`
 		--primary-hue: ${siteConfig.themeColor.hue};
@@ -31,8 +30,9 @@ const { title=siteConfig.title, description = siteConfig.description, useContent
 	
 		<ClientRouter />
 		<div class="layout-container">
-			<Sidebar />
+			<Sidebar transition:persist />
             <MobileNav /> 
+			<!-- 添加导航切换动画类 -->
 			<main class="main-content">
 				{useContentPane ? (
 					<div class="content-pane">
@@ -47,11 +47,8 @@ const { title=siteConfig.title, description = siteConfig.description, useContent
 		</div>
 
 		<Footer />
-		<!-- 尝试解决刷新问题，失败 -->
-		<!-- <script>
-			import '../utils/scroll-restoration.ts';
-		</script> -->
-		<style>
+		
+		<style is:global>
 			* {
 				box-sizing: border-box;
 			}
@@ -65,6 +62,7 @@ const { title=siteConfig.title, description = siteConfig.description, useContent
 				flex: 1;
 				background-color: var(--page-bg);
 				min-height: 100vh;
+				/* 仅保留 margin-left 过渡，用于侧边栏响应式变化 */
 				transition: margin-left 0.3s ease;
 				padding: 0 1rem;
 			}
@@ -88,7 +86,7 @@ const { title=siteConfig.title, description = siteConfig.description, useContent
 				box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.08);
 			}
 
-			/* 深色模式调整 - 仅针对 content-pane */
+			/* 深色模式调整 */
 			html.dark .content-pane {
 				background-color: var(--content-pane-bg);
 				border: 1px solid var(--line-divider);
@@ -115,7 +113,7 @@ const { title=siteConfig.title, description = siteConfig.description, useContent
 			@media (max-width: 1023px) {
 				.main-content {
 					margin-left: 0 !important;
-                    padding-top: 3.5rem; /* 关键：为移动端顶栏留出空间 (3.5rem = 56px) */
+					padding-top: 3.5rem;
 				}
 
 				.content-wrapper {
@@ -129,6 +127,6 @@ const { title=siteConfig.title, description = siteConfig.description, useContent
 					max-width: calc(100vw - 2rem);
 				}
 			}
-		</style>
+			</style>
 	</body>
 </html>

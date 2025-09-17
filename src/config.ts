@@ -13,6 +13,7 @@ export const siteConfig: SiteConfig = {
     alt: "Lanke's blog",
   },
   logo: "./logo.png",
+  favicon: "/favicon.ico",
   // 主题颜色配置，对于引用块有影响
   themeColor: {
     hue: 210,

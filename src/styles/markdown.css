@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+@import "rehype-callouts/theme/github";
+
 
 /*
   ==========================================================================
@@ -37,25 +39,60 @@
   .prose h5 { @apply text-sm; }
   .prose h6 { @apply text-xs; }
 }
+/* 
+  干掉一些样式
+  =============================================================================
+*/
+/* 移除 code 标签的装饰性反引号 */
+code::before,
+code::after {
+  content: none !important;
+}
+
+/* 或者更具体地针对您的使用场景 */
+.prose code::before,
+.prose code::after {
+  content: "" !important;
+}
+
+
+
+/* 
+  行内代码块
+  ==========================================================================
+*/
+.prose :not(pre) > code {
+  @apply rounded px-1.5 py-1 font-mono;
+  background-color: hsl(var(--primary-hue), 60%, 95%);
+  color: hsl(var(--primary-hue), 70%, 40%);
+  font-size: 0.9em; /* 微调字体大小以匹配周围文本 */
+}
+
+.dark .prose :not(pre) > code {
+  background-color: hsl(var(--primary-hue), 40%, 15%);
+  color: hsl(var(--primary-hue), 60%, 70%);
+}
+
+
 
 /*
   全局链接样式美化
   ==========================================================================
 */
 .prose a {
-  @apply underline decoration-dashed decoration-2 decoration-black/50 transition-all duration-200 dark:decoration-white/50;
+  @apply underline decoration-dashed decoration-1 decoration-black/30 transition-all duration-200 dark:decoration-white/30;
   text-underline-offset: 3px;
 }
 
 .prose a:hover {
-  @apply decoration-solid decoration-black dark:decoration-white;
+  @apply decoration-solid decoration-1 decoration-black/70 dark:decoration-white/70;
 }
 .dark .prose a {
-  text-decoration-color: rgba(255, 255, 255, 0.5); /* 暗色模式: 半透明白 */
+  text-decoration-color: rgba(255, 255, 255, 0.3); /* 暗色模式: 更淡的半透明白 */
 }
 
 .dark .prose a:hover {
-  text-decoration-color: white; /* 暗色模式悬停: 纯白 */
+  text-decoration-color: rgba(255, 255, 255, 0.7); /* 暗色模式悬停: 稍微透明的白 */
 }
 
 /*
@@ -124,8 +161,46 @@
 .prose h5::before { content: 'H5'; }
 .prose h6::before { content: 'H6'; }
 
+/* 
+  表格样式
+  ==================================================================
+*/
+.prose table {
+  @apply w-full border-collapse mx-auto;
+}
+
+.prose th {
+  @apply font-semibold text-center;
+  color: var(--text-primary) !important;
+}
+
+.prose td {
+  @apply text-center;
+  color: var(--text-primary) !important;
+}
+
+/* 深色模式下的表格样式 */
+.dark .prose th {
+  color: var(--text-primary) !important;
+}
+
+.dark .prose td {
+  color: var(--text-primary) !important;
+}
+
+/* 表格边框样式 */
+.prose th,
+.prose td {
+  @apply border border-gray-400 px-3 py-2;
+}
+
+.dark .prose th,
+.dark .prose td {
+  @apply border-gray-500;
+}
+
 /*
-  3. 引用块 (Blockquote) 样式
+  引用块 (Blockquote) 样式
   ==========================================================================
 */
 .prose blockquote {

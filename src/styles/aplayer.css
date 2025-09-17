@@ -1,0 +1,82 @@
+.aplayer-wrapper {
+  display: block;
+  margin: 1rem auto; /* 改为 auto 实现居中 */
+  border-radius: var(--radius-large);
+  overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid var(--line-divider);
+  max-width: 500px; /* 添加最大宽度限制 */
+  width: 100%; /* 保持响应式 */
+}
+
+/* 在小屏幕上保持全宽 */
+@media (max-width: 640px) {
+  .aplayer-wrapper {
+    max-width: none;
+    margin: 1rem 0;
+  }
+}
+
+.aplayer-wrapper .aplayer-container {
+  min-height: 66px;
+}
+
+/* 自定义 APlayer 主题以匹配网站样式 */
+.aplayer-wrapper .aplayer {
+  background: var(--card-bg);
+  color: var(--tw-prose-body);
+  box-shadow: none;
+  border-radius: 0;
+  margin: 0;
+}
+
+.aplayer-wrapper .aplayer .aplayer-info {
+  background: var(--card-bg);
+}
+
+.aplayer-wrapper .aplayer .aplayer-music .aplayer-title {
+  color: var(--tw-prose-headings);
+}
+
+.aplayer-wrapper .aplayer .aplayer-music .aplayer-author {
+  color: var(--tw-prose-body);
+}
+
+.aplayer-wrapper .aplayer .aplayer-controller .aplayer-bar-wrap .aplayer-bar {
+  background: var(--btn-regular-bg);
+}
+
+.aplayer-wrapper .aplayer .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-loaded {
+  background: var(--btn-regular-bg-hover);
+}
+
+.aplayer-wrapper .aplayer .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played {
+  background: var(--primary);
+}
+
+.aplayer-wrapper .aplayer .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played .aplayer-thumb {
+  background: var(--primary);
+}
+
+.aplayer-wrapper .aplayer .aplayer-controller .aplayer-time {
+  color: var(--tw-prose-body);
+}
+
+.aplayer-wrapper .aplayer .aplayer-list {
+  background: var(--card-bg);
+  border-top: 1px solid var(--line-divider);
+}
+
+.aplayer-wrapper .aplayer .aplayer-list li {
+  background: var(--card-bg);
+  color: var(--tw-prose-body);
+  border-bottom: 1px solid var(--line-divider);
+}
+
+.aplayer-wrapper .aplayer .aplayer-list li:hover {
+  background: var(--btn-regular-bg-hover);
+}
+
+.aplayer-wrapper .aplayer .aplayer-list li.aplayer-list-light {
+  background: var(--btn-regular-bg-active);
+}

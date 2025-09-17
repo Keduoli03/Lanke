@@ -30,7 +30,7 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
             rel={l.external ? "noopener noreferrer" : ""}
             class="group flex flex-col items-center p-1 w-auto nav-link"
           >
-            <div class="icon-container w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all relative group-hover:border-2 group-hover:border-[var(--primary)] group-hover:scale-110">
+            <div class="icon-container w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all relative group-hover:border-2 group-hover:border-[var(--primary)] group-hover:scale-110 shadow-md bg-[var(--content-bg)] group-hover:shadow-lg">
               {l.icon && <Icon name={l.icon} class="icon text-sm" />}
             </div>
             <span class="text-xs text-center leading-tight text-[var(--text-secondary)] font-medium">

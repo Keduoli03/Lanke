@@ -1,0 +1,77 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<button id="scroll-to-top" title="回到顶部">
+  <Icon name="material-symbols:arrow-upward" />
+</button>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const scrollToTopBtn = document.getElementById('scroll-to-top');
+
+    if (scrollToTopBtn) {
+      // 滚动时检查按钮的可见性
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 400) {
+          scrollToTopBtn.classList.add('visible');
+        } else {
+          scrollToTopBtn.classList.remove('visible');
+        }
+      });
+
+      // 点击按钮平滑滚动到顶部
+      scrollToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
+  });
+</script>
+
+<style>
+  #scroll-to-top {
+    /* 外观 */
+    background: color-mix(in srgb, var(--theme-color) 25%, transparent);
+    color: var(--theme-color);
+    border: 1px solid color-mix(in srgb, var(--theme-color) 40%, transparent);
+    border-radius: 0.75rem; /* 方形圆角 */
+    width: 3.25rem; /* 微调尺寸 */
+    height: 3.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-top: 16rem; /* 增加与目录的间距 */
+    
+    /* 初始状态和过渡 */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    
+    /* 图标大小 */
+    & > [data-icon] {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+  }
+
+  #scroll-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  #scroll-to-top:hover {
+    transform: scale(1.05);
+    background: color-mix(in srgb, var(--theme-color) 80%, var(--color-bg));
+    color: var(--text-on-theme);
+    box-shadow: 0 8px 20px -5px color-mix(in srgb, var(--theme-color) 50%, transparent);
+  }
+
+  #scroll-to-top:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+</style>

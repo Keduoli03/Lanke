@@ -1,13 +1,16 @@
 
 @import "tailwindcss";
 @plugin '@tailwindcss/typography';
+@import "./callout.css";
+@import "./gcard.css";
+@import "./aplayer.css";	
 
 :root {
 	/* --primary-hue 由 MainLayout.astro 注入 */
 
 	/* 浅色模式 */
 	--page-bg: hsl(var(--primary-hue), 45%, 96%); 
-	--sidebar-bg: hsl(var(--primary-hue), 30%, 98.5%); 
+	--sidebar-bg: hsl(var(--primary-hue), 15%, 99.5%); 
 	--content-pane-bg: hsl(0, 0%, 100%);
 	--text-primary: hsl(var(--primary-hue), 20%, 18%); 
 	--text-secondary: hsl(var(--primary-hue), 12%, 42%);
@@ -16,8 +19,8 @@
 	--tag-bg: hsl(var(--primary-hue), 40%, 92%);
 
 	/* 主题色 */
-	--color-theme: hsl(var(--primary-hue), 75%, 44%);
-	--color-theme-rgb: var(--primary-hue), 75%, 44%;
+	--theme-color: hsl(var(--primary-hue), 75%, 44%);
+	--theme-color-rgb: var(--primary-hue), 75%, 44%;
 
 	/* 浮动面板和主题选择器相关颜色 */
 	--float-panel-bg: hsl(0, 0%, 100%);
@@ -40,8 +43,8 @@ html.dark {
 	--tag-bg: hsl(var(--primary-hue), 22%, 26%);
 
 	/* 主题色 */
-	--color-theme: hsl(var(--primary-hue), 80%, 75%);
-	--color-theme-rgb: var(--primary-hue), 80%, 75%;
+	--theme-color: hsl(var(--primary-hue), 80%, 75%);
+	--theme-color-rgb: var(--primary-hue), 80%, 75%;
 
 	/* 浮动面板和主题选择器相关颜色 */
 	--float-panel-bg: hsl(var(--primary-hue), 15%, 20%);
@@ -139,3 +142,5 @@ html.to-light::view-transition-old(root) {
   animation: conceal 0.5s ease-in forwards; /* 关键：保持动画结束状态 */
   z-index: 1;
 }
+
+

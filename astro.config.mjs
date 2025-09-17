@@ -1,6 +1,9 @@
 // @ts-check
 import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
+import remarkDirective from 'remark-directive';
+import { remarkGithubCard } from './src/plugins/rehype-component-github-card.mjs';
+import rehypeAplayer from './src/plugins/rehype-component-aplayer.mjs';
 import icon from "astro-icon";
 import svelte from "@astrojs/svelte";
 import tailwindcss from "@tailwindcss/vite";
@@ -13,12 +16,27 @@ import expressiveCode from "astro-expressive-code";
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
 import { pluginFileIcons } from "@xt0rted/expressive-code-file-icons";
 import { expressiveCodeConfig } from './src/config';
+import rehypeCallouts from "rehype-callouts";
+import remarkAplayer from './src/plugins/rehype-component-aplayer.mjs';
+
+import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://example.com', // <--- 在这里添加您的网站域名
+  site: 'https://example.com',
+
   markdown: {
+    remarkPlugins: [
+      remarkDirective,
+      remarkGithubCard,
+      remarkAplayer
+    ],
     rehypePlugins: [
+      
+      [rehypeCallouts, {
+        theme: "github",
+      }],
+      rehypeAplayer,
       readingStats,
       rehypeSlug,
       [
@@ -36,6 +54,7 @@ export default defineConfig({
       wrap: true,
     },
   },
+
   integrations: [icon({
     include: {
       'material-symbols': ['*'],
@@ -44,25 +63,26 @@ export default defineConfig({
   }), 
   svelte(), 
   // In astro-expressive-code config
-		expressiveCode({
-			themes: expressiveCodeConfig.themes,
-			plugins: [
-				pluginLineNumbers(),
-				pluginCollapsibleSections(),
-				pluginFileIcons({
-					iconClass: "text-4 w-5 inline mr-1 mb-1",
-					titleClass: "",
-				}),
-			],
-			defaultProps: {
-				wrap: false,
-				showLineNumbers: true,
-			},
-			frames: {
-				showCopyToClipboardButton: true,
-			},
-		}),
+        expressiveCode({
+            themes: expressiveCodeConfig.themes,
+            plugins: [
+                pluginLineNumbers(),
+                pluginCollapsibleSections(),
+                pluginFileIcons({
+                    iconClass: "text-4 w-5 inline mr-1 mb-1",
+                    titleClass: "",
+                }),
+            ],
+            defaultProps: {
+                wrap: false,
+                showLineNumbers: true,
+            },
+            frames: {
+                showCopyToClipboardButton: true,
+            },
+        }),
 ],
+
   vite: {
     plugins: [tailwindcss()],
     resolve: {
@@ -71,4 +91,6 @@ export default defineConfig({
       },
     },
   },
+
+  adapter: vercel(),
 });
