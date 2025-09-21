@@ -269,7 +269,7 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
 
   .post-item {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     padding: 0.9rem 0;
     transition: all 0.25s ease;
     position: relative;
@@ -489,11 +489,8 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
     .post-connector {
       left: calc(-1rem + var(--connector-gap));
       width: 10px;
-    }
-
-    .post-connector::before {
-      width: 4px;
-      height: 4px;
+      top: 1.3rem;
+      transform: none;
     }
 
     .post-item:hover .post-connector {
@@ -520,17 +517,20 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
       white-space: normal;
       overflow: visible;
       text-overflow: unset;
+      font-size: 0.9rem;
+      line-height: 1.4;
     }
 
     .post-item {
       flex-wrap: wrap;
       gap: 0.5rem;
+      padding: 0.7rem 0;
+      padding-left: 1.5rem;
     }
 
     .post-date {
       order: 3;
       width: 100%;
-      margin-left: 1.5rem;
     }
 
     .post-category {
@@ -539,14 +539,11 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
 
     .post-link {
       order: 2;
-      width: 100%;
-      margin-left: 1.5rem;
     }
 
     .post-tags {
       order: 4;
       width: 100%;
-      margin-left: 1.5rem;
     }
   }
 

@@ -10,7 +10,7 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
 ---
 <div id="mobile-nav-container" class="lg:hidden">
     <!-- 手机端顶部导航栏 -->
-    <div id="mobile-navbar" class="fixed top-0 left-0 right-0 h-14 bg-[var(--sidebar-bg)]/80 border-b border-[var(--line-divider)] z-40 flex items-center px-4 backdrop-blur-md">
+    <div id="mobile-navbar" class="fixed top-0 left-0 right-0 h-14 bg-[var(--sidebar-bg)] border-b border-[var(--line-divider)] z-40 flex items-center px-4 rounded-b-lg">
         <a href={url('/')} class="hover:opacity-80 transition-opacity">
             <img src="/logo.png" alt={siteConfig.title} class="w-6 h-6" />
         </a>
@@ -32,7 +32,7 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
     </div>
 
     <!-- 手机端导航菜单面板 -->
-    <div id="mobile-nav-panel" class="fixed top-14 right-0 w-48 bg-[var(--sidebar-bg)]/80 border border-[var(--line-divider)] z-30 transform translate-x-full opacity-0 transition-all duration-300 shadow-xl rounded-l-xl backdrop-blur-md">
+    <div id="mobile-nav-panel" class="fixed top-14 right-0 w-28 bg-[var(--sidebar-bg)] border border-[var(--line-divider)] z-30 transform translate-x-full opacity-0 transition-all duration-300 shadow-xl rounded-bl-lg">
         <nav class="p-2">
             <ul class="space-y-1">
                 {links.map((l) => {
