@@ -1,4 +1,16 @@
 
+---
+// 在服务器端获取规范路径，这比在客户端更可靠
+let canonicalPath = Astro.url.pathname;
+
+// 规范化路径：移除末尾的斜杠（根路径“/”除外）以保证一致性
+// 注意：如果您发现现有评论无法加载，可能是因为数据库中的 pageKey 是带斜杠的。
+// 如果是这种情况，请将这里的逻辑反转为确保路径始终以斜杠结尾。
+if (canonicalPath.length > 1 && canonicalPath.endsWith('/')) {
+  canonicalPath = canonicalPath.slice(0, -1);
+}
+---
+
 <!-- 1. 先静态显示阅读量/评论数的骨架屏 -->
 <div class="flex justify-between items-center text-75 mb-4">
   <div class="flex items-center">
@@ -9,17 +21,22 @@
   </div>
 </div>
 
-<div id="Comments"></div>
+<!-- 将服务器端生成的规范 pageKey 通过 data-* 属性传递给客户端 -->
+<div id="Comments" data-page-key={canonicalPath}></div>
 
 <script is:inline>
-  async function initArtalk() {
+  function initArtalk() {
     const container = document.getElementById('Comments');
     if (!container) return;
-    
-    // To prevent re-initialization issues, clear the container.
-    container.innerHTML = '';
 
-    // Load CSS if not already present
+    // 从 data-* 属性读取权威的 pageKey
+    const pageKey = container.getAttribute('data-page-key');
+    if (!pageKey) return;
+
+    // 确保每次都重新创建 Artalk 实例
+    container.innerHTML = '';
+    
+    // 如果 CSS 未加载，则动态加载
     if (!document.querySelector('link[href="https://unpkg.com/artalk@2.9.1/dist/Artalk.css"]')) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
@@ -27,40 +44,35 @@
       document.head.appendChild(link);
     }
 
-    const ArtalkModule = await import('https://esm.sh/artalk@2.9.1');
-    const Artalk = ArtalkModule.default || ArtalkModule;
-
-    // Normalize the path to ensure consistency
-    let path = window.location.pathname;
-    if (path.length > 1 && path.endsWith('/')) {
-      path = path.slice(0, -1);
-    }
-
-    Artalk.init({
-      el: '#Comments',
-      server: 'https://artalk.blueke.top/',
-      site: "Lanke",
-      pageKey: path,
-      pageTitle: document.title,
-      locale: 'zh-CN',
-      noComment: '快来评论吧！',
-      darkMode: document.documentElement.classList.contains('dark'),
-      avatar: {
-        default: '/favicon.ico', // 使用你现有的logo作为默认头像
-        gravatar: {
-          mirror: 'https://cravatar.cn/avatar/'
+    // 动态导入并初始化 Artalk
+    import('https://esm.sh/artalk@2.9.1').then(ArtalkModule => {
+      const Artalk = ArtalkModule.default || ArtalkModule;
+      Artalk.init({
+        el: '#Comments',
+        server: 'https://artalk.blueke.top/',
+        site: "Lanke",
+        pageKey: pageKey, // 使用从服务器传递的规范 Key
+        pageTitle: document.title,
+        locale: 'zh-CN',
+        noComment: '快来评论吧！',
+        darkMode: document.documentElement.classList.contains('dark'),
+        avatar: {
+          default: '/favicon.ico',
+          gravatar: {
+            mirror: 'https://cravatar.cn/avatar/'
+          }
         }
-      }
+      });
     });
   }
 
-  // Initialize on page load and view transitions
+  // astro:page-load 事件会在页面首次加载和后续的客户端导航时触发
   document.addEventListener('astro:page-load', initArtalk);
 
-  // Set up a theme change observer only once
+  // 仅设置一次主题切换的监听器
   if (!window.artalkThemeObserver) {
     const observer = new MutationObserver(() => {
-      // Re-initialize Artalk on theme change
+      // 当 class 变化时，重新初始化 Artalk 以应用新的主题
       initArtalk();
     });
     
