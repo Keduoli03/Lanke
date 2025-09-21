@@ -92,6 +92,7 @@ export default defineConfig({
       },
     },
   },
+  trailingSlash: 'always', // 始终以“/”结尾
   output: 'server',
   adapter: vercel(),
 });

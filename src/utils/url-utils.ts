@@ -1,5 +1,11 @@
+/**
+ * 构造一个以 BASE_URL 为前缀的完整 URL，并确保其以斜杠结尾。
+ * @param path 相对路径，例如 "/about"
+ * @returns {string} 完整的、规范化的 URL
+ */
 export function url(path: string = "/"): string {
-  return import.meta.env.BASE_URL + path.substring(1);
+  const constructedPath = import.meta.env.BASE_URL + (path.startsWith('/') ? path.substring(1) : path);
+  return normalizeUrl(constructedPath);
 }
 
 /**
@@ -11,10 +17,10 @@ export function getRelativeLocaleUrl(locale: string, path: string): string {
   
   // 如果是默认语言，直接返回路径
   if (locale === 'zh' || !locale) {
-    return `/${cleanPath}`;
+    return normalizeUrl(`/${cleanPath}`);
   }
   
-  return `/${locale}/${cleanPath}`;
+  return normalizeUrl(`/${locale}/${cleanPath}`);
 }
 
 /**
@@ -29,13 +35,26 @@ export function isExternalUrl(url: string): boolean {
 }
 
 /**
- * 规范化 URL 路径
+ * 规范化 URL 路径，确保以斜杠结尾
+ * @param {string} url - 需要规范化的 URL
+ * @returns {string} - 规范化后的 URL
  */
 export function normalizeUrl(url: string): string {
-  // 移除末尾的斜杠，除非是根路径
-  if (url.length > 1 && url.endsWith('/')) {
-    return url.slice(0, -1);
+  // 分离路径、查询参数和哈希
+  const hashIndex = url.indexOf('#');
+  const hash = hashIndex !== -1 ? url.substring(hashIndex) : '';
+  const urlWithoutHash = hashIndex !== -1 ? url.substring(0, hashIndex) : url;
+
+  const queryIndex = urlWithoutHash.indexOf('?');
+  const query = queryIndex !== -1 ? urlWithoutHash.substring(queryIndex) : '';
+  const path = queryIndex !== -1 ? urlWithoutHash.substring(0, queryIndex) : urlWithoutHash;
+
+  // 如果路径不是根路径“/”且不以“/”结尾，则添加它
+  if (path.length > 1 && !path.endsWith('/')) {
+    return `${path}/${query}${hash}`;
   }
+  
+  // 否则，原样返回
   return url;
 }
 

@@ -15,7 +15,7 @@ const className = Astro.props.class;
 
 const { title, description, categories, tags, date, cover, pinned, slug } = entry.data;
 const { remarkPluginFrontmatter } = await render(entry);
-const url = `/posts/${slug}`;
+const url = `/posts/${slug}/`;
 const { wordCount, readingTime } = remarkPluginFrontmatter;
 const minutes = Math.ceil(readingTime) || 1;
 

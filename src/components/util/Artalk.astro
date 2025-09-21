@@ -1,14 +1,6 @@
 
 ---
-// 在服务器端获取规范路径，这比在客户端更可靠
 let canonicalPath = Astro.url.pathname;
-
-// 规范化路径：移除末尾的斜杠（根路径“/”除外）以保证一致性
-// 注意：如果您发现现有评论无法加载，可能是因为数据库中的 pageKey 是带斜杠的。
-// 如果是这种情况，请将这里的逻辑反转为确保路径始终以斜杠结尾。
-if (canonicalPath.length > 1 && canonicalPath.endsWith('/')) {
-  canonicalPath = canonicalPath.slice(0, -1);
-}
 ---
 
 <!-- 1. 先静态显示阅读量/评论数的骨架屏 -->
