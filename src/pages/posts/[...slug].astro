@@ -11,6 +11,8 @@ import { siteConfig } from '@/config';
 import ScrollToTop from '@/components/util/ScrollToTop.astro';
 import Artalk from '@/components/util/Artalk.astro';
 
+export const prerender = true; // <--- 添加此行
+
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
   return posts.map(entry => ({

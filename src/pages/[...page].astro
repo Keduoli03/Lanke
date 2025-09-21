@@ -6,6 +6,8 @@ import PostPage from '../components/post/PostPage.astro';
 import { getSortedPosts } from '../utils/content-utils';
 import { PAGE_SIZE } from '../config';
 
+export const prerender = true; // <--- 添加此行
+
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
   const posts = await getSortedPosts();
   return paginate(posts, { pageSize: PAGE_SIZE });
