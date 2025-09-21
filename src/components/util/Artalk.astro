@@ -12,60 +12,63 @@
 <div id="Comments"></div>
 
 <script is:inline>
-  (async () => {
-    // 加载 CSS
-    const loadCSS = () => {
+  async function initArtalk() {
+    const container = document.getElementById('Comments');
+    if (!container) return;
+    
+    // To prevent re-initialization issues, clear the container.
+    container.innerHTML = '';
+
+    // Load CSS if not already present
+    if (!document.querySelector('link[href="https://unpkg.com/artalk@2.9.1/dist/Artalk.css"]')) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = 'https://unpkg.com/artalk@2.9.1/dist/Artalk.css';
       document.head.appendChild(link);
-    };
-    
-    // 使用 ES 模块方式导入 Artalk
+    }
+
     const ArtalkModule = await import('https://esm.sh/artalk@2.9.1');
     const Artalk = ArtalkModule.default || ArtalkModule;
 
-    const initArtalk = () => {
-      const isDark = document.documentElement.classList.contains('dark');
-      Artalk.init({
-        el: '#Comments',
-        server: 'https://artalk.blueke.top/',
-        site: "Lanke",
-        pageKey: window.location.pathname,
-        pageTitle: document.title,
-        locale: 'zh-CN',
-        noComment: '快来评论吧！',
-        darkMode: isDark,
-        // 添加默认头像配置
-        avatar: {
-          default: '/favicon/logo.png', // 使用你现有的logo作为默认头像
-          gravatar: {
-            mirror: 'https://cravatar.cn/avatar/'
-          }
-        }
-      });
-    };
+    // Normalize the path to ensure consistency
+    let path = window.location.pathname;
+    if (path.length > 1 && path.endsWith('/')) {
+      path = path.slice(0, -1);
+    }
 
-    // 并行加载资源
-    loadCSS();
-    initArtalk();
-  
-    // 监听主题变化并重新初始化
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-          const container = document.getElementById('Comments');
-          if (container) {
-            container.innerHTML = '';
-            initArtalk();
-          }
+    Artalk.init({
+      el: '#Comments',
+      server: 'https://artalk.blueke.top/',
+      site: "Lanke",
+      pageKey: path,
+      pageTitle: document.title,
+      locale: 'zh-CN',
+      noComment: '快来评论吧！',
+      darkMode: document.documentElement.classList.contains('dark'),
+      avatar: {
+        default: '/favicon.ico', // 使用你现有的logo作为默认头像
+        gravatar: {
+          mirror: 'https://cravatar.cn/avatar/'
         }
-      });
+      }
+    });
+  }
+
+  // Initialize on page load and view transitions
+  document.addEventListener('astro:page-load', initArtalk);
+
+  // Set up a theme change observer only once
+  if (!window.artalkThemeObserver) {
+    const observer = new MutationObserver(() => {
+      // Re-initialize Artalk on theme change
+      initArtalk();
     });
     
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class']
     });
-  })();
+
+    window.artalkThemeObserver = true;
+  }
 </script>
