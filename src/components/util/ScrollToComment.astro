@@ -1,0 +1,62 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<button id="scroll-to-comment" title="跳转到评论">
+  <Icon name="material-symbols:comment" />
+</button>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const scrollToCommentBtn = document.getElementById('scroll-to-comment');
+
+    if (scrollToCommentBtn) {
+      // 点击按钮平滑滚动到评论区域
+      scrollToCommentBtn.addEventListener('click', () => {
+        const commentSection = document.getElementById('comment-section');
+        if (commentSection) {
+          commentSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    }
+  });
+</script>
+
+<style>
+  #scroll-to-comment {
+    background: color-mix(in srgb, var(--theme-color) 25%, transparent);
+    color: var(--theme-color);
+    border: 1px solid color-mix(in srgb, var(--theme-color) 40%, transparent);
+    border-radius: 0.75rem; 
+    width: 3.25rem; 
+    height: 3.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    
+    /* 过渡效果 */
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    
+    /* 图标大小 */
+    & > [data-icon] {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+  }
+
+  #scroll-to-comment:hover {
+    transform: scale(1.05);
+    background: color-mix(in srgb, var(--theme-color) 80%, var(--color-bg));
+    color: var(--text-on-theme);
+    box-shadow: 0 8px 20px -5px color-mix(in srgb, var(--theme-color) 50%, transparent);
+  }
+
+  #scroll-to-comment:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+</style>

@@ -5,6 +5,41 @@
 @import "./gcard.css";
 @import "./aplayer.css";	
 
+/* 禁用移动端不必要的触摸行为 */
+html, body {
+	/* 禁用橡皮筋效果（iOS Safari 中的弹性滚动） */
+	overscroll-behavior: none;
+	/* 禁用触摸时的高亮效果 */
+	-webkit-tap-highlight-color: transparent;
+	/* 禁用文本选择时的放大镜效果 */
+	-webkit-touch-callout: none;
+	/* 禁用双击缩放 */
+	touch-action: manipulation;
+}
+
+/* 禁用所有元素的用户选择和拖拽（可选，根据需要调整） */
+* {
+	/* 禁用长按时的上下文菜单 */
+	-webkit-touch-callout: none;
+	/* 禁用文本选择 */
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+/* 允许文章内容和输入框的文本选择 */
+article, 
+.prose, 
+input, 
+textarea, 
+[contenteditable] {
+	-webkit-user-select: text;
+	-moz-user-select: text;
+	-ms-user-select: text;
+	user-select: text;
+}
+
 :root {
 	/* --primary-hue 由 MainLayout.astro 注入 */
 

@@ -9,6 +9,7 @@ import { render } from 'astro:content';
 import Markdown from '@/components/util/Markdown.astro';
 import { siteConfig } from '@/config';
 import ScrollToTop from '@/components/util/ScrollToTop.astro';
+import ScrollToComment from '@/components/util/ScrollToComment.astro';
 import Artalk from '@/components/util/Artalk.astro';
 
 export const prerender = true; // <--- 添加此行
@@ -60,15 +61,18 @@ const fullPostUrl = Astro.url.href;
           <div class="overflow-y-auto pr-4">
             <Toc items={headings} />
           </div>
-          <div class="mt-auto flex-shrink-0 flex justify-center py-4">
+          <div class="mt-auto flex-shrink-0 flex flex-col items-center gap-3 py-4">
             <ScrollToTop />
+            <ScrollToComment />
           </div>
         </div>
       </aside>
     </div>
   </div>
   <PostInfoCard postUrl={fullPostUrl} />
-  <Artalk />
+  <div id="comment-section">
+    <Artalk />
+  </div>
 </MainLayout>
 
 <style>
