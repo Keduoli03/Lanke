@@ -1,0 +1,71 @@
+
+<!-- 1. 先静态显示阅读量/评论数的骨架屏 -->
+<div class="flex justify-between items-center text-75 mb-4">
+  <div class="flex items-center">
+    阅读量: <span class="artalk-pv-count ml-1">--</span>
+  </div>
+  <div class="flex items-center">
+    评论数：<span class="artalk-comment-count ml-1">--</span>
+  </div>
+</div>
+
+<div id="Comments"></div>
+
+<script is:inline>
+  (async () => {
+    // 加载 CSS
+    const loadCSS = () => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/artalk@2.9.1/dist/Artalk.css';
+      document.head.appendChild(link);
+    };
+    
+    // 使用 ES 模块方式导入 Artalk
+    const ArtalkModule = await import('https://esm.sh/artalk@2.9.1');
+    const Artalk = ArtalkModule.default || ArtalkModule;
+
+    const initArtalk = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      Artalk.init({
+        el: '#Comments',
+        server: 'https://artalk.blueke.top/',
+        site: "Lanke",
+        pageKey: window.location.pathname,
+        pageTitle: document.title,
+        locale: 'zh-CN',
+        noComment: '快来评论吧！',
+        darkMode: isDark,
+        // 添加默认头像配置
+        avatar: {
+          default: '/favicon/logo.png', // 使用你现有的logo作为默认头像
+          gravatar: {
+            mirror: 'https://cravatar.cn/avatar/'
+          }
+        }
+      });
+    };
+
+    // 并行加载资源
+    loadCSS();
+    initArtalk();
+  
+    // 监听主题变化并重新初始化
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          const container = document.getElementById('Comments');
+          if (container) {
+            container.innerHTML = '';
+            initArtalk();
+          }
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+  })();
+</script>
