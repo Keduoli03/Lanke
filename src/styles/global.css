@@ -56,6 +56,7 @@ textarea,
 	/* 主题色 */
 	--theme-color: hsl(var(--primary-hue), 75%, 44%);
 	--theme-color-rgb: var(--primary-hue), 75%, 44%;
+	--theme-color-light: hsl(var(--primary-hue), 75%, 65%);
 
 	/* 浮动面板和主题选择器相关颜色 */
 	--float-panel-bg: hsl(0, 0%, 100%);
@@ -80,6 +81,7 @@ html.dark {
 	/* 主题色 */
 	--theme-color: hsl(var(--primary-hue), 80%, 75%);
 	--theme-color-rgb: var(--primary-hue), 80%, 75%;
+	--theme-color-light: hsl(var(--primary-hue), 80%, 85%);
 
 	/* 浮动面板和主题选择器相关颜色 */
 	--float-panel-bg: hsl(var(--primary-hue), 15%, 20%);

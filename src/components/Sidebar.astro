@@ -7,6 +7,7 @@ import LightDarkSwitch from "./util/LightDarkSwitch.svelte";
 import ThemeSwitch from "./util/ThemeSwitch.svelte";
 
 let links: NavBarLink[] = Object.values(navBarConfig.links);
+const currentPath = Astro.url.pathname;
 ---
 
 <div
@@ -22,15 +23,21 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
 
   <nav class="flex-1 p-2">
     <ul class="space-y-3">
-      {links.map((l) => (
+      {links.map((l) => {
+        const linkPath = l.external ? l.url : url(l.url);
+        const isActive = !l.external && (linkPath === '/' ? currentPath === '/' : currentPath.startsWith(linkPath));
+        return (
         <li class="flex justify-center">
           <a
-            href={l.external ? l.url : url(l.url)}
+            href={linkPath}
             target={l.external ? "_blank" : "_self"}
             rel={l.external ? "noopener noreferrer" : ""}
-            class="group flex flex-col items-center p-1 w-auto nav-link"
+            class:list={[
+                "group flex flex-col items-center p-1 w-auto nav-link",
+                { "is-active": isActive },
+            ]}
           >
-            <div class="icon-container w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all relative group-hover:border-2 group-hover:border-[var(--primary)] group-hover:scale-110 shadow-md bg-[var(--content-bg)] group-hover:shadow-lg">
+            <div class="icon-container w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all relative shadow-md bg-[var(--content-bg)] group-hover:border-2 group-hover:border-[var(--theme-color-light)] group-hover:scale-110 group-hover:shadow-lg">
               {l.icon && <Icon name={l.icon} class="icon text-sm" />}
             </div>
             <span class="text-xs text-center leading-tight text-[var(--text-secondary)] font-medium">
@@ -44,7 +51,7 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
             )}
           </a>
         </li>
-      ))}
+      )})}
     </ul>
   </nav>
 
@@ -80,6 +87,12 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
 
   .icon-container {
     background-color: var(--sidebar-icon-bg);
+  }
+
+  .nav-link.is-active .icon-container {
+    transform: scale(1.1);
+    border: 2px solid var(--theme-color-light);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   }
 
   .icon, .bottom-bar-icon {
