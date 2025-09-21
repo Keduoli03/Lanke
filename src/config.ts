@@ -6,7 +6,7 @@ import type { AstroExpressiveCodeOptions } from 'astro-expressive-code';
 export const siteConfig: SiteConfig = {
   title: "Lanke",
   description: "Lanke's blog",
-  url: "http://localhost:4321",
+  url: "https://blog.blueke.top",
   // SEO和社交分享使用，可以用一样的
   image: {
     src: "/og.png",

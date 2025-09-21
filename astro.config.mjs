@@ -15,7 +15,7 @@ import { pluginCollapsibleSections } from "@expressive-code/plugin-collapsible-s
 import expressiveCode from "astro-expressive-code";
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
 import { pluginFileIcons } from "@xt0rted/expressive-code-file-icons";
-import { expressiveCodeConfig } from './src/config';
+import { expressiveCodeConfig, siteConfig } from './src/config';
 import rehypeCallouts from "rehype-callouts";
 import remarkAplayer from './src/plugins/rehype-component-aplayer.mjs';
 
@@ -23,8 +23,7 @@ import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://example.com',
-
+  site: siteConfig.url,
   markdown: {
     remarkPlugins: [
       remarkDirective,
@@ -55,7 +54,9 @@ export default defineConfig({
     },
   },
 
-  integrations: [icon({
+  integrations: [
+    sitemap(),
+    icon({
     include: {
       'material-symbols': ['*'],
       'fa6-solid': ['*'],
