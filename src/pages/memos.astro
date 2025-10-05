@@ -10,283 +10,210 @@ const title = 'Misskey 动态';
             <p class="archive-subtitle">点击详情可跳转到 Misskey</p>
         </header>
         
-        <div id="timeline-container" class="timeline-container">
-            <!-- 加载状态 -->
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>加载中...</p>
-            </div>
-        </div>
+        <div id="timeline-container"
+             class="timeline-container"
+             data-instance="https://memo.blueke.top"
+             data-user-id="adfztpsih1jc0003"
+             data-limit="20"></div>
     </div>
 
-    <script>
-        const MISSKEY_INSTANCE = 'https://memo.blueke.top';
-        const USER_ID = 'adfztpsih1jc0003';
-        const LIMIT = 20;
+    <script type="module">
+      const absUrl = (base, p) => {
+        if (!p) return '';
+        try { return new URL(p, base).href; } catch { return p; }
+      };
 
-        // Misskey 类型
-        interface MisskeyUser {
-            id: string;
-            username?: string;
-            name?: string;
-            avatarUrl?: string;
-        }
-        interface MisskeyFile { url: string }
-        interface MisskeyNote {
-            id: string;
-            userId: string;
-            createdAt: string;
-            text?: string;
-            files?: MisskeyFile[];
-            renoteId?: string;
-            replyId?: string;
-            user?: MisskeyUser;
-        }
+      const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+        const pad = (num) => num.toString().padStart(2, '0');
+        if (diffDays === 0) return `今天 ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        if (diffDays === 1) return `昨天 ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        if (diffDays < 365) return `${pad(date.getMonth() + 1)}月${pad(date.getDate())}日 ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        return `${date.getFullYear()}年${pad(date.getMonth() + 1)}月${pad(date.getDate())}日`;
+      };
 
-        // 工具函数：获取完整URL（支持空值）
-        const absUrl = (p: string | null | undefined): string => {
-            if (!p) return '';
-            try { return new URL(p, MISSKEY_INSTANCE).href; } catch { return p; }
-        };
-        
-        // 工具函数：格式化日期（显式类型 + getTime）
-        function formatDate(dateString: string): string {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diffMs: number = now.getTime() - date.getTime();
-            const diffDays: number = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-            const pad = (num: number) => num.toString().padStart(2, '0');
+      const getNoteDetailUrl = (instance, noteId) => `${instance}/notes/${noteId}`;
 
-            if (diffDays === 0) return `今天 ${pad(date.getHours())}:${pad(date.getMinutes())}`;
-            if (diffDays === 1) return `昨天 ${pad(date.getHours())}:${pad(date.getMinutes())}`;
-            if (diffDays < 365) return `${pad(date.getMonth() + 1)}月${pad(date.getDate())}日 ${pad(date.getHours())}:${pad(date.getMinutes())}`;
-            return `${date.getFullYear()}年${pad(date.getMonth() + 1)}月${pad(date.getDate())}日`;
-        }
+      const fetchReplies = async (instance, noteId, limit = 5) => {
+        try {
+          const res = await fetch(`${instance}/api/notes/children`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ noteId, limit })
+          });
+          if (!res.ok) return [];
+          return await res.json();
+        } catch { return []; }
+      };
 
-        function getNoteDetailUrl(noteId: string): string {
-            return `${MISSKEY_INSTANCE}/notes/${noteId}`;
-        }
+      const fetchQuotedNote = async (instance, noteId) => {
+        try {
+          const res = await fetch(`${instance}/api/notes/show`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ noteId })
+          });
+          if (!res.ok) return null;
+          return await res.json();
+        } catch { return null; }
+      };
 
-        async function fetchReplies(noteId: string, limit: number = 5): Promise<MisskeyNote[]> {
-            try {
-                const res = await fetch(`${MISSKEY_INSTANCE}/api/notes/children`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ noteId, limit })
-                });
-                if (!res.ok) return [];
-                return await res.json();
-            } catch (err) {
-                console.error('获取回复失败:', err);
-                return [];
-            }
-        }
+      const renderQuotedNote = async (instance, quotedNoteId) => {
+        if (!quotedNoteId) return '';
+        const quotedNote = await fetchQuotedNote(instance, quotedNoteId);
+        if (!quotedNote) return '';
+        const quotedUrl = getNoteDetailUrl(instance, quotedNoteId);
+        const quotedTime = formatDate(quotedNote.createdAt);
+        return `
+          <div class="quoted-note">
+            <div class="quoted-header">
+              <img src="${absUrl(instance, quotedNote.user?.avatarUrl)}" class="quoted-avatar" alt="${quotedNote.user?.name || ''}的头像" loading="lazy" />
+              <div class="quoted-author-info">
+                <span class="quoted-author">${quotedNote.user?.name || quotedNote.user?.username || ''}</span>
+                <span class="quoted-time">${quotedTime}</span>
+              </div>
+            </div>
+            <div class="quoted-content">${quotedNote.text || '[无内容]'}</div>
+            ${quotedNote.files && quotedNote.files.length > 0 ? `<div class="quoted-media"><img src="${absUrl(instance, quotedNote.files[0].url)}" alt="引用内容图片" loading="lazy" /></div>` : ''}
+            <a href="${quotedUrl}" target="_blank" class="quoted-link" rel="noopener noreferrer">查看原文</a>
+          </div>
+        `;
+      };
 
-        async function fetchQuotedNote(noteId: string): Promise<MisskeyNote | null> {
-            try {
-                const res = await fetch(`${MISSKEY_INSTANCE}/api/notes/show`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ noteId })
-                });
-                if (!res.ok) return null;
-                return await res.json();
-            } catch (err) {
-                console.error('获取引用帖子失败:', err);
-                return null;
-            }
-        }
+      const initTimeline = async () => {
+        const container = document.getElementById('timeline-container');
+        if (!container) return;
+        if (container.dataset.init === '1') return; // 防重复
+        container.dataset.init = '1';
 
-        async function renderQuotedNote(quotedNoteId: string | undefined): Promise<string> {
-            if (!quotedNoteId) return '';
-            const quotedNote = await fetchQuotedNote(quotedNoteId);
-            if (!quotedNote) return '';
-            const quotedUrl = getNoteDetailUrl(quotedNoteId);
-            const quotedTime = formatDate(quotedNote.createdAt);
-            
-            return `
-                <div class="quoted-note">
-                    <div class="quoted-header">
-                        <img src="${absUrl(quotedNote.user?.avatarUrl)}" class="quoted-avatar" 
-                             alt="${quotedNote.user?.name}的头像" loading="lazy" />
-                        <div class="quoted-author-info">
-                            <span class="quoted-author">${quotedNote.user?.name || quotedNote.user?.username}</span>
-                            <span class="quoted-time">${quotedTime}</span>
-                        </div>
+        const MISSKEY_INSTANCE = container.dataset.instance;
+        const USER_ID = container.dataset.userId;
+        const LIMIT = Number(container.dataset.limit || '20');
+
+        // 加载态改为 Tailwind
+        container.innerHTML = `
+          <div class="text-center py-16 text-gray-600">
+            <div class="w-10 h-10 mx-auto mb-4 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
+            <p>加载中...</p>
+          </div>
+        `;
+
+        try {
+          // 获取用户，确认当前用户 id
+          const userRes = await fetch(`${MISSKEY_INSTANCE}/api/users/show`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: USER_ID })
+          });
+          const user = await userRes.json();
+          const currentUserId = user.id;
+
+          // 获取时间线
+          const timelineRes = await fetch(`${MISSKEY_INSTANCE}/api/users/notes`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: USER_ID, limit: LIMIT, withReplies: true })
+          });
+          const notes = await timelineRes.json();
+
+          const filteredNotes = notes.filter((note) => !note.replyId || note.userId !== currentUserId);
+          container.innerHTML = '';
+          if (!filteredNotes.length) {
+            container.innerHTML = '<div class="no-posts">暂无内容</div>';
+            return;
+          }
+
+          for (const note of filteredNotes) {
+            const postCard = document.createElement('div');
+            // 卡片设为相对定位并预留底部空间
+            postCard.className = 'relative rounded-xl bg-white p-5 border border-gray-100 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md pb-10';
+            const formattedTime = formatDate(note.createdAt);
+            const isOwnPost = note.userId === currentUserId;
+            const noteUrl = getNoteDetailUrl(MISSKEY_INSTANCE, note.id);
+            const quotedHtml = note.renoteId && note.renoteId !== note.id ? await renderQuotedNote(MISSKEY_INSTANCE, note.renoteId) : '';
+
+            // 头部仅保留时间，将“详情”移动到底部右侧
+            postCard.innerHTML = `
+              <div class="post-header">
+                <img src="${absUrl(MISSKEY_INSTANCE, note.user?.avatarUrl || user.avatarUrl)}" class="avatar" alt="${note.user?.name || user.name}的头像" loading="lazy" />
+                <span class="author-name">
+                  <a href="${absUrl(MISSKEY_INSTANCE, `/@${note.user?.username || user.username}`)}" target="_blank" rel="noopener noreferrer">
+                    ${note.user?.name || note.user?.username || user.name}
+                  </a>
+                </span>
+                <div class="header-actions">
+                  <span class="post-time"><a href="${noteUrl}" target="_blank" rel="noopener noreferrer">${formattedTime}</a></span>
+                </div>
+              </div>
+              <div class="post-content">${note.text || ''}</div>
+              ${quotedHtml}
+              ${note.files && note.files.length > 0 ? `
+                <div class="post-media">
+                  <a href="${noteUrl}" target="_blank" rel="noopener noreferrer">
+                    <img src="${absUrl(MISSKEY_INSTANCE, note.files[0].url)}" alt="附件图片" loading="lazy" />
+                  </a>
+                </div>` : ''}
+              <div class="replies" data-note-id="${note.id}"></div>
+              <div class="card-actions">
+                <a href="${noteUrl}" target="_blank" rel="noopener noreferrer" class="action-link view-detail">
+                  <svg class="icon-detail" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  详情
+                </a>
+              </div>
+            `;
+
+            const repliesWrap = postCard.querySelector('.replies');
+            if (isOwnPost && repliesWrap) {
+              const replies = await fetchReplies(MISSKEY_INSTANCE, note.id, 5);
+              if (Array.isArray(replies) && replies.length > 0) {
+                const replyCount = document.createElement('div');
+                replyCount.className = 'reply-count';
+                replyCount.textContent = `共 ${replies.length} 条回复`;
+                repliesWrap.appendChild(replyCount);
+
+                replies.forEach((r) => {
+                  const item = document.createElement('div');
+                  item.className = 'reply';
+                  const replyTime = formatDate(r.createdAt);
+                  const rUser = r.user || {};
+                  const replyUrl = getNoteDetailUrl(MISSKEY_INSTANCE, r.id);
+                  item.innerHTML = `
+                    <img src="${absUrl(MISSKEY_INSTANCE, rUser.avatarUrl)}" class="avatar" alt="${rUser.name || rUser.username || '用户'}头像" loading="lazy" />
+                    <div class="reply-body">
+                      <div class="author-name">
+                        <a href="${absUrl(MISSKEY_INSTANCE, `/@${rUser.username || ''}`)}" target="_blank" rel="noopener noreferrer">${rUser.name || rUser.username || '用户'}</a>
+                        <span class="post-time" style="margin-left: 8px;"><a href="${replyUrl}" target="_blank" rel="noopener noreferrer">${replyTime}</a></span>
+                      </div>
+                      <div class="reply-text">${r.text || ''}</div>
                     </div>
-                    <div class="quoted-content">${quotedNote.text || '[无内容]'}</div>
-                    ${quotedNote.files && quotedNote.files.length > 0 ? 
-                        `<div class="quoted-media">
-                            <img src="${absUrl(quotedNote.files[0].url)}" alt="引用内容图片" loading="lazy" />
-                        </div>` : ''
-                    }
-                    <a href="${quotedUrl}" target="_blank" class="quoted-link" rel="noopener noreferrer">
-                        查看原文
-                    </a>
-                </div>
-            `;
-        }
-
-        // 主函数：获取并渲染时间线（保留现有实现）
-        async function fetchMisskeyTimeline(): Promise<void> {
-            const container = document.getElementById('timeline-container') as HTMLDivElement | null;
-            if (!container) return;
-
-            // 初始加载态
-            container.innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>加载中...</p>
-                </div>
-            `;
-
-            try {
-                const userRes = await fetch(`${MISSKEY_INSTANCE}/api/users/show`, {
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ userId: USER_ID })
+                  `;
+                  repliesWrap.appendChild(item);
                 });
-                const user: MisskeyUser = await userRes.json();
-                const currentUserId: string = user.id;
-
-                const timelineRes = await fetch(`${MISSKEY_INSTANCE}/api/users/notes`, {
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: USER_ID, limit: LIMIT, withReplies: true })
-                });
-                const notes: MisskeyNote[] = await timelineRes.json();
-
-                const filteredNotes: MisskeyNote[] = notes.filter((note: MisskeyNote) => {
-                    if (!note.replyId) return true;
-                    return note.userId !== currentUserId;
-                });
-
-                container.innerHTML = '';
-                if (filteredNotes.length === 0) {
-                    container.innerHTML = '<div class="no-posts">暂无内容</div>';
-                    return;
-                }
-
-                for (const note of filteredNotes) {
-                    const postCard = document.createElement('div');
-                    postCard.className = 'post-card';
-                    const formattedTime = formatDate(note.createdAt);
-                    const isOwnPost = note.userId === currentUserId;
-                    const noteUrl = getNoteDetailUrl(note.id);
-
-                    const quotedHtml = note.renoteId && note.renoteId !== note.id 
-                        ? await renderQuotedNote(note.renoteId) 
-                        : '';
-
-                    postCard.innerHTML = `
-                        <div class="post-header">
-                            <img src="${absUrl(note.user?.avatarUrl || user.avatarUrl)}" class="avatar" 
-                                 alt="${note.user?.name || user.name}的头像" loading="lazy" />
-                            <span class="author-name">
-                                <a href="${absUrl(`/@${note.user?.username || user.username}`)}" target="_blank" rel="noopener noreferrer">
-                                    ${note.user?.name || note.user?.username || user.name}
-                                </a>
-                            </span>
-                            <div class="header-actions">
-                                <span class="post-time">
-                                    <a href="${noteUrl}" target="_blank" rel="noopener noreferrer">
-                                        ${formattedTime}
-                                    </a>
-                                </span>
-                                <a href="${noteUrl}" target="_blank" rel="noopener noreferrer" class="action-link view-detail">
-                                    <i class="icon-detail"></i> 详情
-                                </a>
-                            </div>
-                        </div>
-                        <div class="post-content">${note.text || ''}</div>
-                        ${quotedHtml}
-                        ${note.files && note.files.length > 0 ? 
-                            `<div class="post-media">
-                                <a href="${noteUrl}" target="_blank" rel="noopener noreferrer">
-                                    <img src="${absUrl(note.files[0].url)}" alt="附件图片" loading="lazy" />
-                                </a>
-                            </div>` : ''
-                        }
-                        <div class="replies" data-note-id="${note.id}"></div>
-                    `;
-
-                    const repliesWrap = postCard.querySelector<HTMLDivElement>('.replies');
-                    if (isOwnPost && repliesWrap) {
-                        const replies: MisskeyNote[] = await fetchReplies(note.id, 5);
-                        if (Array.isArray(replies) && replies.length > 0) {
-                            const replyCount = document.createElement('div');
-                            replyCount.className = 'reply-count';
-                            replyCount.textContent = `共 ${replies.length} 条回复`;
-                            repliesWrap.appendChild(replyCount);
-
-                            replies.forEach((r: MisskeyNote) => {
-                                const item = document.createElement('div');
-                                item.className = 'reply';
-                                const replyTime = formatDate(r.createdAt);
-                                const rUser = r.user || {} as MisskeyUser;
-                                const replyUrl = getNoteDetailUrl(r.id);
-                                item.innerHTML = `
-                                    <img src="${absUrl(rUser.avatarUrl)}" class="avatar" alt="${rUser.name || rUser.username || '用户'}头像" loading="lazy" />
-                                    <div class="reply-body">
-                                        <div class="author-name">
-                                            <a href="${absUrl(`/@${rUser.username}`)}" target="_blank" rel="noopener noreferrer">
-                                                ${rUser.name || rUser.username || '用户'}
-                                            </a>
-                                            <span class="post-time" style="margin-left: 8px;">
-                                                <a href="${replyUrl}" target="_blank" rel="noopener noreferrer">
-                                                    ${replyTime}
-                                                </a>
-                                            </span>
-                                        </div>
-                                        <div class="reply-text">${r.text || ''}</div>
-                                    </div>
-                                `;
-                                repliesWrap.appendChild(item);
-                            });
-                        } else {
-                            repliesWrap.style.display = 'none';
-                        }
-                    } else if (repliesWrap) {
-                        repliesWrap.style.display = 'none';
-                    }
-
-                    container.appendChild(postCard);
-                }
-            } catch (err) {
-                const msg = (err && typeof err === 'object' && 'message' in err) ? (err as any).message : String(err);
-                container.innerHTML = `<div class="error">加载失败: ${msg}</div>`;
-                console.error('获取Misskey数据失败:', err);
+              } else {
+                repliesWrap.style.display = 'none';
+              }
+            } else if (repliesWrap) {
+              repliesWrap.style.display = 'none';
             }
+
+            container.appendChild(postCard);
+          }
+        } catch (err) {
+          const msg = (err && typeof err === 'object' && 'message' in err) ? err.message : String(err);
+          container.innerHTML = `<div class="error">加载失败: ${msg}</div>`;
+          console.error('获取Misskey数据失败:', err);
         }
+      };
 
-        // 统一初始化：页面加载与视图交换都触发，但同一页面只执行一次
-        function initTimeline(): void {
-            const container = document.getElementById('timeline-container') as HTMLDivElement | null;
-            if (!container) return;
-            if (container.dataset.init === '1') return; // 已初始化，避免重复
-            container.dataset.init = '1';
-            fetchMisskeyTimeline();
-        }
-
-        // 首次进入页面（直接加载或 SSR 渲染后）
-        if (document.readyState !== 'loading') {
-            initTimeline();
-        } else {
-            window.addEventListener('DOMContentLoaded', initTimeline, { once: true });
-        }
-
-        // Astro 客户端导航事件：进入页面后触发
-        document.addEventListener('astro:page-load', initTimeline);
-        // Astro 视图过渡：DOM 交换完成后触发
-        document.addEventListener('astro:after-swap', initTimeline);
-
-        // 如之前有 didLoad/dataset.loaded/pageshow 的旧逻辑，请移除，避免相互干扰
+      // 首次加载与 Astro 客户端导航
+      const run = () => initTimeline();
+      if (document.readyState !== 'loading') {
+        run();
+      } else {
+        window.addEventListener('DOMContentLoaded', run, { once: true });
+      }
+      document.addEventListener('astro:page-load', run);
+      document.addEventListener('astro:after-swap', run);
     </script>
-</MainLayout>
 
-
-
-<style is:global>
+    <style is:global>
         .misskey-timeline { 
             max-width: 1000px;
             margin: 0 auto; 
@@ -318,28 +245,6 @@ const title = 'Misskey 动态';
             margin: 0;
         }
 
-        /* 原 section-header 可移除或保留不使用 */
-        .section-header {
-            display: none;
-        }
-
-        .section-header {
-            margin-bottom: 24px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .section-header h2 {
-            margin: 0 0 8px 0;
-            color: #2d3748;
-            font-size: 1.5rem;
-        }
-
-        .filter-info { 
-            color: #666; 
-            font-size: 0.9rem; 
-        }
-
         .timeline-container { 
             display: grid; 
             gap: 24px; 
@@ -352,6 +257,10 @@ const title = 'Misskey 动态';
             box-shadow: 0 2px 12px rgba(0,0,0,0.04); 
             border: 1px solid #f0f0f0;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            /* 确保卡片作为定位容器 */
+            position: relative;
+            /* 为底部操作区预留空间 */
+            padding-bottom: 40px;
         }
 
         .post-card:hover {
@@ -506,7 +415,14 @@ const title = 'Misskey 动态';
             transform: scale(1.01);
         }
 
-        /* 操作按钮样式 */
+        /* 操作按钮样式 - 重点修改部分 */
+        .card-actions {
+            /* 关键：固定在卡片右下角 */
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+        }
+
         .action-link {
             display: inline-flex;
             align-items: center;
@@ -525,16 +441,14 @@ const title = 'Misskey 动态';
             background-color: #eff6ff;
         }
 
-        .icon-detail::before {
-            content: '🔍';
-        }
-
         /* 回复样式 */
         .replies { 
             margin-top: 16px; 
             padding-top: 16px; 
             border-top: 1px dashed #e5e7eb; 
             padding-left: 3rem;
+            /* 确保回复区域不会被固定定位的按钮覆盖 */
+            margin-bottom: 24px;
         }
         
         .reply-count {
@@ -584,61 +498,7 @@ const title = 'Misskey 动态';
             animation: spin 1s linear infinite;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error { 
-            text-align: center; 
-            padding: 60px 20px; 
-            color: #dc3545; 
-            background-color: #fef2f2;
-            border-radius: 8px;
-        }
-
-        .no-posts { 
-            text-align: center; 
-            padding: 60px 20px; 
-            color: #666; 
-            background-color: #f9fafb;
-            border-radius: 8px;
-        }
-
-        /* 响应式调整 */
-        @media (max-width: 768px) {
-            .misskey-timeline {
-                padding: 12px;
-            }
-            
-            .post-card {
-                padding: 16px;
-            }
-            
-            .post-content, .replies {
-                padding-left: 1rem;
-                padding-right: 1rem;
-            }
-            
-            .post-content {
-                font-size: 0.95rem;
-            }
-            
-            .post-media {
-                width: 100%;
-            }
-            
-            .post-media img {
-                max-height: 320px;
-            }
-            
-            .header-actions {
-                gap: 8px;
-            }
-            
-            .action-link {
-                font-size: 0.85rem;
-                padding: 2px 6px;
-            }
-        }
-    </style>
+        /* 现在已使用 Tailwind，建议删除整个样式块；若需保留仅保留这个无依赖动画 */
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        </style>
+</MainLayout>
