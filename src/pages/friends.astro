@@ -6,10 +6,12 @@ const title = "友链";
 const description = "一些朋友们的网站";
 
 ---
-<MainLayout title={title} description={description}>
+<MainLayout title={title}>
   <div class="px-4">
-    <h1 class="text-3xl font-bold mb-6">{title}</h1>
-    <p class="mb-8">{description}</p>
+    <header class="about-header">
+      <h1 class="about-title">{title}</h1>
+      <p class="about-subtitle">{description}</p>
+    </header>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {friends.map(friend => (
         <a href={friend.siteurl} target="_blank" rel="noopener noreferrer" class="block p-6 bg-[var(--page-bg)] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -27,4 +29,29 @@ const description = "一些朋友们的网站";
       ))}
     </div>
   </div>
+  <style>
+    .about-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid var(--line-divider);
+      width: 100%;
+    }
+    .about-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      line-height: 1;
+    }
+    .about-subtitle {
+      color: var(--text-secondary);
+      font-size: 1.125rem;
+      margin: 0;
+    }
+  </style>
 </MainLayout>

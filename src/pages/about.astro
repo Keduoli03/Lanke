@@ -14,9 +14,36 @@ if (!aboutPost) {
 const { Content } = await render(aboutPost);
 ---
 <MainLayout 
-    title={aboutPost.data.title} 
-    description={aboutPost.data.description}>
+    title={aboutPost.data.title}>
+    <header class="about-header">
+      <h1 class="about-title">{aboutPost.data.title}</h1>
+    </header>
     <Markdown>
         <Content />
     </Markdown>
+    <style>
+      .about-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid var(--line-divider);
+        width: 100%;
+      }
+      .about-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        line-height: 1;
+      }
+      .about-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.125rem;
+        margin: 0;
+      }
+    </style>
 </MainLayout>

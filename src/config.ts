@@ -43,11 +43,17 @@ export const navBarConfig: NavBarConfig = {
       url: "/friends",
       icon: "material-symbols:group-outline-rounded",
     },
+    memos: {
+      name: "说说",
+      url: "/memos",
+      icon: "material-symbols:chat-outline",
+    },
     about: {
       name: "关于",
       url: "/about",
       icon: "material-symbols:person-outline",
     },
+    
     
   },
 };

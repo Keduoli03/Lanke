@@ -68,38 +68,37 @@ const today = new Date();
     box-sizing: border-box;
   }
 
-  /* 核心调整：Footer 垂直对齐方式改为靠下，增加底部空间实现下移 */
   footer {
-    padding: 2em 2em 3.5em; /* 上内边距减小，下内边距加大，给下移留空间 */
+    padding: 2em 2em 3.5em;
     background: linear-gradient(180deg, rgba(var(--gray-light), 0.5) 0%, rgba(var(--gray-light), 0) 100%);
     color: rgb(var(--gray));
     display: flex;
     justify-content: space-between;
-    align-items: flex-end; /* 关键：从center改为flex-end，让内容靠下对齐（下移核心） */
+    align-items: flex-end; 
     flex-wrap: wrap;
-    gap: 1.5em 0; /* 上下间距1.5em，左右间距0，避免三栏水平拥挤 */
+    gap: 1.5em 0; 
     max-width: 1200px;
     margin: 2em auto 0;
     border-top: 1px solid rgba(var(--gray), 0.1);
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.02);
   }
 
-  /* 左侧：年份 - 下移后调整字体，保持稳重 */
+
   .footer-left {
     font-size: 0.95rem;
     font-weight: 400;
     letter-spacing: 0.02em;
-    margin-bottom: 0.2em; /* 微调下移幅度，与中间/右侧对齐 */
+    margin-bottom: 0.2em; 
   }
 
-  /* 中间：同步下移，保持与左右垂直一致 */
+
   .footer-middle {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.5em;
     font-size: 0.9rem;
-    margin-bottom: 0.2em; /* 与左侧下移幅度匹配 */
+    margin-bottom: 0.2em;
   }
 
   .icp-link {
@@ -118,20 +117,20 @@ const today = new Date();
     font-size: 0.75rem;
   }
 
-  /* 右侧：全面优化样式 - 区分层级、优化间距、增强视觉 */
+ 
   .footer-right {
-    margin-bottom: 0.2em; /* 与左右下移幅度一致，避免垂直错位 */
+    margin-bottom: 0.2em; 
   }
 
   .author-info {
     display: flex;
     align-items: center;
-    gap: 0.6em; /* 元素间间距统一，避免拥挤 */
+    gap: 0.6em; 
     font-size: 0.9rem;
     letter-spacing: 0.01em;
   }
 
-  /* 右侧标签优化：Powered by / Theme by 弱化处理，突出链接 */
+
   .tech-label, .theme-label {
     color: rgba(var(--gray), 0.7); /* 半透明灰，降低标签存在感 */
     font-size: 0.85rem;
@@ -177,26 +176,54 @@ const today = new Date();
     width: 100%;
   }
 
-  /* 响应式：下移后小屏幕仍居中，避免贴底 */
+  /* 响应式：移动端优化布局与字体 */
   @media (max-width: 768px) {
     footer {
-      padding: 1.5em 1.5em 2.5em; /* 移动端下内边距减小，避免下移过多 */
-      align-items: center; /* 移动端恢复center，避免内容贴底 */
-      gap: 1em 0;
+      padding: 1rem 1rem 2rem; /* 更紧凑的上下内边距 */
+      flex-direction: column;   /* 改为纵向堆叠 */
+      align-items: center;      /* 居中对齐 */
+      justify-content: center;  /* 垂直居中 */
+      gap: 1rem;                /* 统一块间距 */
+      text-align: center;       /* 文本居中 */
     }
-
+  
     .footer-left, .footer-middle, .footer-right {
-      margin-bottom: 0; /* 移动端取消额外下移，保持居中 */
+      width: 100%;              /* 三栏占满行宽 */
+      margin-bottom: 0;         /* 移除额外下移 */
     }
-
+  
+    .footer-left {
+      font-size: clamp(0.9rem, 2.8vw, 1rem);
+      line-height: 1.5;
+    }
+  
+    .footer-middle {
+      font-size: clamp(0.85rem, 2.6vw, 0.95rem);
+      line-height: 1.5;
+    }
+  
+    .middle-links {
+      gap: 0.6em;                          /* 链接间距更紧凑 */
+      font-size: clamp(0.8rem, 2.4vw, 0.9rem);
+      flex-wrap: wrap;                      /* 允许换行，防拥挤 */
+      justify-content: center;              /* 居中排列 */
+    }
+  
     .author-info {
-      flex-direction: column; /* 移动端右侧改为垂直排列，避免水平拥挤 */
-      gap: 0.4em;
-      text-align: center;
+      flex-direction: row;                  /* 改为一行（可换行） */
+      flex-wrap: wrap;                      /* 允许换行 */
+      justify-content: center;              /* 居中 */
+      gap: 0.5em;                           /* 更紧凑间距 */
+      font-size: clamp(0.85rem, 2.8vw, 0.95rem);
+      line-height: 1.5;
     }
-
-    .divider {
-      display: none; /* 移动端隐藏分隔符，垂直排列更清晰 */
+  
+    .tech-label, .theme-label {
+      font-size: clamp(0.75rem, 2.2vw, 0.85rem);
     }
+  
+    .divider { display: none; }             /* 移动端隐藏分隔符 */
+  
+    .footer-link::after { bottom: -2px; }   /* 下划线微调，避免错位 */
   }
 </style>
