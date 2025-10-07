@@ -285,10 +285,6 @@ const title = 'Misskey 动态';
             const title = imgEl?.getAttribute('title') || '';
             openLightbox(url, alt, title);
           };
-          
-          // 同时监听 click 与 touchstart，提升移动端响应 → 改为只监听 click，避免触摸导致的双事件
-          document.addEventListener('click', handleImageLinkClick, { capture: true });
-          // document.addEventListener('touchstart', handleImageLinkClick, { capture: true });
         } catch (err) {
       const msg = (err && typeof err === 'object' && 'message' in err) ? err.message : String(err);
       container.innerHTML = `<div class="error">加载失败: ${msg}</div>`;
