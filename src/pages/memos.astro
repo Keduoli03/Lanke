@@ -17,12 +17,6 @@ const title = 'Misskey 动态';
              data-limit="20"></div>
     </div>
 
-    <!-- 接入全局灯箱对话框（与 Markdown 页相同结构） -->
-    <dialog id="md-lightbox-dialog" class="md-lightbox-dialog">
-      <img id="md-lightbox-img" alt="" />
-      <p id="md-lightbox-caption"></p>
-      <button id="md-lightbox-close" aria-label="close">×</button>
-    </dialog>
 </MainLayout>
 
 <script type="module">
@@ -205,31 +199,6 @@ const title = 'Misskey 动态';
             container.appendChild(postCard);
           }
 
-          // —— 移除 PhotoSwipe 相关初始化 ——
-          // （删除 ensureLightbox() 的定义与调用，以及只阻止默认的点击监听）
-          
-          // —— 使用自定义灯箱，拦截并打开对话框 ——
-          let preventScroll = null;
-          const lockScroll = () => {
-            document.documentElement.classList.add('lightbox-open');
-            preventScroll = (ev) => {
-              ev.preventDefault();
-              ev.stopPropagation();
-              if (typeof ev.stopImmediatePropagation === 'function') {
-                ev.stopImmediatePropagation();
-              }
-            };
-            window.addEventListener('wheel', preventScroll, { passive: false, capture: true });
-            window.addEventListener('touchmove', preventScroll, { passive: false, capture: true });
-          };
-          const unlockScroll = () => {
-            document.documentElement.classList.remove('lightbox-open');
-            if (preventScroll) {
-              window.removeEventListener('wheel', preventScroll, { capture: true });
-              window.removeEventListener('touchmove', preventScroll, { capture: true });
-              preventScroll = null;
-            }
-          };
           
           const openLightbox = (url, alt = '', title = '') => {
             const dialog = document.getElementById('md-lightbox-dialog');
@@ -242,40 +211,70 @@ const title = 'Misskey 动态';
             img.alt = alt || '';
             if (caption) caption.textContent = title || alt || '';
           
-            if (typeof dialog.showModal === 'function') {
-              dialog.showModal();
-            } else {
-              dialog.setAttribute('open', '');
-            }
-            lockScroll();
+            const show = () => {
+              if (typeof dialog.showModal === 'function') {
+                dialog.showModal();
+              } else {
+                dialog.setAttribute('open', '');
+                // 回退：强制固定定位与全屏（移动端不支持 showModal 时）
+                dialog.style.position = 'fixed';
+                dialog.style.inset = '0';
+                dialog.style.left = '0';
+                dialog.style.top = '0';
+                dialog.style.width = '100vw';
+                dialog.style.height = '100vh';
+                dialog.style.padding = '0';
+              }
+              lockScroll();
+              // 打开后短时间内忽略背景点击，避免移动端同一次触摸触发关闭
+              recentlyOpenedUntil = performance.now() + 400;
           
-            if (!dialog.dataset.init) {
-              dialog.dataset.init = '1';
-              closeBtn?.addEventListener('click', () => {
-                if (typeof dialog.close === 'function') dialog.close(); else dialog.removeAttribute('open');
-                unlockScroll();
-              });
-              dialog.addEventListener('click', (e) => {
-                if (e.target === dialog) {
+              if (!dialog.dataset.init) {
+                dialog.dataset.init = '1';
+                closeBtn?.addEventListener('click', () => {
                   if (typeof dialog.close === 'function') dialog.close(); else dialog.removeAttribute('open');
                   unlockScroll();
-                }
-              });
-              dialog.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                  if (typeof dialog.close === 'function') dialog.close(); else dialog.removeAttribute('open');
-                  unlockScroll();
-                }
-              });
-              dialog.addEventListener('close', unlockScroll);
-            }
+                });
+                dialog.addEventListener('click', (e) => {
+                  if (performance.now() < recentlyOpenedUntil) return;
+                  if (e.target === dialog) {
+                    if (typeof dialog.close === 'function') dialog.close(); else dialog.removeAttribute('open');
+                    unlockScroll();
+                  }
+                });
+                dialog.addEventListener('keydown', (e) => {
+                  if (e.key === 'Escape') {
+                    if (typeof dialog.close === 'function') dialog.close(); else dialog.removeAttribute('open');
+                    unlockScroll();
+                  }
+                });
+                dialog.addEventListener('close', unlockScroll);
+              }
+            };
+          
+            // 延迟到当前点击事件完成后再打开，避免同一次触摸的 click 落到对话框
+            setTimeout(show, 50);
           };
           
-          container.addEventListener('click', (e) => {
-            const t = e.target;
-            if (!(t instanceof Element)) return;
-            const link = t.closest('.post-image-link');
+          // 删除原本的 container.addEventListener('click', ...) 委托，改为更健壮的全局委托
+          const handleImageLinkClick = (e) => {
+            // 兼容 Shadow DOM/移动端：优先使用 composedPath 获取目标链
+            const getLinkFromEvent = (ev) => {
+              if (typeof ev.composedPath === 'function') {
+                const path = ev.composedPath();
+                for (const node of path) {
+                  if (node && node.nodeType === 1 && node.classList && node.classList.contains('post-image-link')) {
+                    return node;
+                  }
+                }
+              }
+              const t = ev.target;
+              return t && t.closest ? t.closest('.post-image-link') : null;
+            };
+          
+            const link = getLinkFromEvent(e);
             if (!link) return;
+          
             e.preventDefault();
             e.stopPropagation();
             if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
@@ -285,7 +284,11 @@ const title = 'Misskey 动态';
             const alt = imgEl?.getAttribute('alt') || '';
             const title = imgEl?.getAttribute('title') || '';
             openLightbox(url, alt, title);
-          }, { capture: true });
+          };
+          
+          // 同时监听 click 与 touchstart，提升移动端响应 → 改为只监听 click，避免触摸导致的双事件
+          document.addEventListener('click', handleImageLinkClick, { capture: true });
+          // document.addEventListener('touchstart', handleImageLinkClick, { capture: true });
         } catch (err) {
       const msg = (err && typeof err === 'object' && 'message' in err) ? err.message : String(err);
       container.innerHTML = `<div class="error">加载失败: ${msg}</div>`;

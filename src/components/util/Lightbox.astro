@@ -1,119 +1,335 @@
----
-import { Image, getImage } from "astro:assets";
-
-interface ImageData {
-  src: string;
-  alt?: string;
-  title?: string;
-}
-
-interface Props {
-  images: ImageData[]; // 接收图片数组
-}
-
-const { images } = Astro.props;
-
-// 使用 getImage 生成 ImageMetadata
-const processedImages = await Promise.all(
-  images.map(async (image) => {
-    const metadata = (await getImage({ src: image.src })) as unknown as ImageMetadata;
-    return {
-      ...image,
-      metadata,
-    };
-  })
-);
----
-
-<section class="lightbox-container">
-  <div class="thumbnail-grid">
-    {
-      processedImages.map((image, index) => (
-        <button
-          class="thumbnail-button"
-          aria-label={`View image ${index + 1}: ${image.alt || image.title || "Image"}`}
-          data-index={index}
-        >
-          <Image
-            src={image.metadata}
-            alt={image.alt || ""}
-            layout="constrained"
-            width={300}
-            quality={40}
-            loading="eager"
-            class="thumbnail"
-          />
-        </button>
-      ))
-    }
-  </div>
-  <dialog class="lightbox-dialog">
-    <div class="lightbox-content">
-      {
-        processedImages.map((image, index) => (
-          <div
-            class="lightbox-image-container"
-            id={`image-${index}`}
-            data-index={index}
-          >
-            <Image
-              src={image.metadata} 
-              alt={image.alt || ""}
-              layout="full-width"
-              quality={80}
-              loading="eager"
-              class="lightbox-image"
-            />
-            {image.title ? <p class="lightbox-caption">{image.title}</p> : null}
-          </div>
-        ))
-      }
+<dialog id="md-lightbox-dialog" class="md-lightbox-dialog">
+  <!-- 合并图片和描述到同一个容器，实现上下排列 -->
+  <div class="lightbox-content-wrapper">
+    <div class="lightbox-image-container">
+      <img id="md-lightbox-img" alt="" />
+      <button id="md-lightbox-close" aria-label="close">×</button>
     </div>
-    <button class="close-button" aria-label="close button">×</button>
-  </dialog>
-</section>
+    <!-- 描述放在图片容器下方 -->
+    <p id="md-lightbox-caption"></p>
+  </div>
+</dialog>
 
-<script lang="ts">
-  document.addEventListener("astro:page-load", () => {
-    const dialog = document.querySelector<HTMLDialogElement>(".lightbox-dialog");
-    const closeButton = dialog?.querySelector<HTMLButtonElement>(".close-button");
-    const thumbnailButtons = document.querySelectorAll<HTMLButtonElement>(".thumbnail-button");
+<style>
+/* 核心全屏修复样式 */
+.md-lightbox-dialog[open] {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100vw !important;
+  min-height: 100vh !important;
+  
+  margin: 0 !important;
+    border: none !important;
+  
+  /* 容器居中整个内容块 */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  
+  background: transparent !important;
+  z-index: 2147483647 !important;
+}
 
-    let currentIndex = 0;
+/* 内容包裹器：垂直排列图片和描述 */
+.lightbox-content-wrapper {
+  display: flex !important;
+  flex-direction: column !important; /* 垂直排列 */
+  align-items: center !important; /* 水平居中 */
+  max-width: 100% !important;
+  max-height: 100% !important;
+  padding: 1rem !important;
+  box-sizing: border-box !important;
+}
 
-    function showImage(index) {
-      const images = document.querySelectorAll<HTMLDivElement>(".lightbox-image-container");
-      images.forEach((image, i) => {
-        const element = image;
-        element.style.display = i === index ? "block" : "none";
-      });
-      currentIndex = index;
+/* 图片容器：只包含图片 */
+.lightbox-image-container {
+  position: relative !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  max-width: 100% !important;
+  max-height: calc(100vh - 8rem) !important; /* 预留描述和边距空间 */
+}
 
-      const container = document.getElementById(`image-${index}`);
-      const img = container?.querySelector<HTMLImageElement>('.lightbox-image');
-      if (dialog && img) {
-        const rect = img.getBoundingClientRect();
-        dialog.style.setProperty('--lb-img-top', `${Math.max(12, rect.top + 8)}px`);
+/* 图片样式 */
+#md-lightbox-img {
+  max-width: 100% !important;
+  max-height: calc(100vh - 8rem) !important; /* 确保有足够空间放下下方的描述 */
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+/* 图片描述：紧跟在图片下方 */
+#md-lightbox-caption {
+  /* 移除固定定位，改为自然流布局 */
+  position: static !important;
+  margin-top: 1rem !important; /* 与图片保持距离 */
+  color: #fff !important;
+  text-align: center !important;
+  max-width: 90% !important; /* 避免文字过宽 */
+  padding: 0 0.5rem !important;
+  word-wrap: break-word !important; /* 长文本换行 */
+}
+
+
+/* 背景遮罩 */
+.md-lightbox-dialog::backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.85) !important;
+}
+
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+</style>
+
+<script is:inline>
+// 避免重复初始化
+if (!window.__mdLightboxInit) {
+  window.__mdLightboxInit = true;
+  const dialog = document.getElementById('md-lightbox-dialog');
+  const img = document.getElementById('md-lightbox-img');
+  const caption = document.getElementById('md-lightbox-caption');
+  const closeBtn = document.getElementById('md-lightbox-close');
+  
+  // 将对话框移动到 body
+  if (dialog && dialog.parentElement !== document.body) {
+    document.body.appendChild(dialog);
+  }
+
+  let preventScroll = null;
+  let recentlyOpenedUntil = 0;
+  
+  const lockScroll = () => {
+    document.documentElement.classList.add('lightbox-open');
+    preventScroll = (ev) => { 
+      ev.preventDefault(); 
+      ev.stopPropagation(); 
+      if (typeof ev.stopImmediatePropagation === 'function') 
+        ev.stopImmediatePropagation(); 
+    };
+    window.addEventListener('wheel', preventScroll, { passive: false, capture: true });
+    window.addEventListener('touchmove', preventScroll, { passive: false, capture: true });
+  };
+  
+  const unlockScroll = () => {
+    document.documentElement.classList.remove('lightbox-open');
+    if (preventScroll) {
+      window.removeEventListener('wheel', preventScroll, { capture: true });
+      window.removeEventListener('touchmove', preventScroll, { capture: true });
+      preventScroll = null;
+    }
+  };
+
+  const isLightboxLink = (a) => {
+    if (!a) return false;
+    const hasImg = !!a.querySelector('img');
+    const classes = a.classList;
+    const href = a.getAttribute('href') || '';
+    const ext = href.toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)(\?.*)?$/);
+    return hasImg || classes.contains('md-lightbox') || classes.contains('pswp-link') || classes.contains('post-image-link') || !!ext;
+  };
+
+  const openLightbox = (a) => {
+    const url = a.getAttribute('data-lightbox') || a.getAttribute('data-pswp-src') || a.getAttribute('href') || '';
+    const alt = a.getAttribute('data-alt') || a.querySelector('img')?.getAttribute('alt') || '';
+    const title = a.getAttribute('data-title') || a.querySelector('img')?.getAttribute('title') || '';
+
+    if (img) { img.src = url; img.alt = alt; }
+    if (caption) { caption.textContent = title || alt || ''; }
+
+    const show = () => {
+      if (dialog) {
+        dialog.style.position = 'fixed';
+        dialog.style.inset = '0';
+        dialog.style.width = '100%';
+        dialog.style.height = '100%';
+        dialog.style.padding = 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)';
+        dialog.style.margin = '0';
+        dialog.style.border = 'none';
+
+        if (typeof dialog.showModal === 'function') {
+          dialog.showModal();
+        } else {
+          dialog.setAttribute('open', '');
+        }
+      }
+
+      lockScroll();
+      recentlyOpenedUntil = performance.now() + 400;
+    };
+
+    setTimeout(show, 50);
+  };
+
+  const handler = (e) => {
+    const t = e.target;
+    if (!(t instanceof Element)) return;
+    if (dialog?.open && dialog.contains(t)) return;
+    const a = t.closest('a');
+    if (!a || !isLightboxLink(a)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+    openLightbox(a);
+  };
+
+  document.addEventListener('click', handler, { capture: true });
+
+  closeBtn?.addEventListener('pointerup', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+    if (dialog) {
+      if (typeof dialog.close === 'function') {
+        dialog.close();
+      } else {
+        dialog.removeAttribute('open');
       }
     }
-
-    thumbnailButtons.forEach((button) => {
-      button.addEventListener("click", () => {
-        const idx = parseInt(button.dataset.index || "0", 10);
-        dialog?.showModal();
-        // 在打开后下一帧再测量和定位，避免未开时测量偏差
-        requestAnimationFrame(() => {
-          showImage(idx);
-        });
-      });
-    });
-
-    window.addEventListener('resize', () => showImage(currentIndex));
-
-    closeButton?.addEventListener("click", () => { dialog?.close(); });
-    dialog?.addEventListener("keydown", (event) => {
-      if (event.key === "ArrowRight") showImage((currentIndex + 1) % thumbnailButtons.length);
-      else if (event.key === "Escape") dialog?.close();
-    });
+    unlockScroll();
   });
+
+  closeBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+    if (dialog) {
+      if (typeof dialog.close === 'function') {
+        dialog.close();
+      } else {
+        dialog.removeAttribute('open');
+      }
+    }
+    unlockScroll();
+  });
+
+  dialog?.addEventListener('pointerdown', (e) => {
+    if (performance.now() < recentlyOpenedUntil && e.target === dialog) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+    }
+  });
+
+  dialog?.addEventListener('click', (e) => {
+    if (performance.now() < recentlyOpenedUntil) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+      return;
+    }
+    if (e.target === dialog) {
+      if (dialog) {
+        if (typeof dialog.close === 'function') {
+          dialog.close();
+        } else {
+          dialog.removeAttribute('open');
+        }
+      }
+      unlockScroll();
+    }
+  });
+
+  dialog?.addEventListener('keydown', (e) => { 
+    if (e.key === 'Escape') { 
+      if (dialog) {
+        if (typeof dialog.close === 'function') {
+          dialog.close();
+        } else {
+          dialog.removeAttribute('open');
+        }
+      }
+      unlockScroll(); 
+    } 
+  });
+
+  dialog?.addEventListener('close', unlockScroll);
+
+  window.addEventListener('resize', () => {
+    if (dialog && dialog.open) {
+      dialog.style.width = '100%';
+      dialog.style.height = '100%';
+    }
+  });
+}
 </script>
+
+<style>
+  position: relative !important;
+  overflow: visible !important; /* 允许按钮溢出显示在容器外 */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  max-width: 100% !important;
+  max-height: calc(100vh - 8rem) !important; /* 预留描述和边距空间 */
+
+
+#md-lightbox-img {
+  max-width: 100% !important;
+  max-height: calc(100vh - 8rem) !important; /* 确保有足够空间放下下方的描述 */
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+/* 图片描述：紧跟在图片下方 */
+#md-lightbox-caption {
+  /* 移除固定定位，改为自然流布局 */
+  position: static !important;
+  margin-top: 1rem !important; /* 与图片保持距离 */
+  color: #fff !important;
+  text-align: center !important;
+  max-width: 90% !important; /* 避免文字过宽 */
+  padding: 0 0.5rem !important;
+  word-wrap: break-word !important; /* 长文本换行 */
+}
+
+
+/* 背景遮罩 */
+.md-lightbox-dialog::backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.85) !important;
+}
+
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+#md-lightbox-close {
+  position: absolute !important;
+  /* 将按钮抬到图片容器外的右上角，可微调数值 */
+  top: -2.2rem !important;  /* 往上提 */
+  right: -0.5rem !important; /* 往右外移一点，贴边但不盖住图片 */
+  z-index: 2147483648 !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent;
+
+  /* 保持现有可点击与视觉样式 */
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  width: 2rem;
+  height: 2rem;
+  line-height: 2rem;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
+    

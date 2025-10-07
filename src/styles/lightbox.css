@@ -1,506 +1,138 @@
-/* .md-lightbox-dialog[open] 和 .lightbox-dialog[open] 已是 100dvw/100dvh，无需改动 */
-.md-lightbox-dialog[open] {
-  position: fixed;
-  inset: 0;
-  width: 100dvw;
-  height: 100dvh;
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: transparent; /* 遮罩放到 backdrop */
+
+.md-lightbox-dialog::backdrop,
+.lightbox-dialog::backdrop { background: rgba(0,0,0,0.85); }
+
+/* 恢复 util/Lightbox 内容区的网格居中对齐 */
+.lightbox-dialog .lightbox-content {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+/* 确保图片容器双向居中（util/Lightbox 与 md 灯箱一致） */
+.lightbox-dialog .lightbox-image-container,
+.md-lightbox-dialog .lightbox-image-container {
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 9999;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }
-/* 全屏遮罩 */
-.md-lightbox-dialog::backdrop {
-  background: rgba(0, 0, 0, 0.85);
-}
-/* 图片与文案布局（桌面端，保证居中更稳） */
-.md-lightbox-dialog img {
+
+/* 所有图片保持水平居中 */
+.md-lightbox-dialog img,
+.lightbox-dialog .lightbox-image,
+#md-lightbox-img {
   max-width: 90vw;
   max-height: 90vh;
   object-fit: contain;
-  display: block;      /* 让图片可通过 margin 居中 */
-  margin: 0 auto;      /* 居中 */
-}
-.md-lightbox-dialog button {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  font-size: 2rem;
-  color: #fff;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-.md-lightbox-dialog p {
-  position: fixed;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #fff;
-  text-align: center;
-  margin: 0;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* 兼容 util/Lightbox.astro 的灯箱样式（桌面端同样居中对齐） */
-.lightbox-dialog[open] {
-  position: fixed;
-  inset: 0;
-  width: 100dvw;
-  height: 100dvh;
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-.lightbox-dialog::backdrop { background: rgba(0, 0, 0, 0.85); }
-.lightbox-dialog .lightbox-content { display: grid; place-items: center; width: 100%; }
-.lightbox-dialog .lightbox-image { max-width: 90vw; max-height: 90vh; object-fit: contain; }
-.lightbox-dialog .lightbox-image-container { display: flex; justify-content: center; align-items: center; }
+/* 关闭按钮：统一使用变量定位，避免固定高度 */
+.md-lightbox-dialog button,
 .lightbox-dialog .close-button {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  font-size: 2rem;
-  color: #fff;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-.lightbox-dialog .lightbox-caption {
-  position: fixed;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #fff;
-  text-align: center;
-  margin: 0;
-}
-
-/* 手机端重排：纵向栈，元素更集中，避免横向滚动 */
-@media (max-width: 640px) {
-  .md-lightbox-dialog[open],
-  .lightbox-dialog[open] {
-    box-sizing: border-box;
-    overflow: hidden;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
-    gap: 0.5rem;
-  }
-  .md-lightbox-dialog img,
-  .lightbox-dialog .lightbox-image {
-    max-width: 100%;
-    max-height: calc(100vh - 7rem);
-    display: block;
-    width: 100%;         /* 容器占满宽度，内部用 flex 居中 */
-    margin: 0 auto;      /* 居中 */
-    display: block;      /* 保证可被 margin 居中 */
-    margin: 0 auto;      /* 居中 */
-  }
-  .md-lightbox-dialog p,
-  .lightbox-dialog .lightbox-caption {
-    position: static;
-    transform: none;
-    width: 100%;
-    margin: 0;
-    padding: 0 0.5rem;
-    color: #fff;
-    text-align: center;
-    box-sizing: border-box;
-  }
-  .md-lightbox-dialog button,
-  .lightbox-dialog .close-button {
-    position: absolute;
-    top: 12rem !important;
-    right: 0.75rem;   /* 改回右上角 */
-    left: auto;
-    transform: none;
-    font-size: 1.75rem;
-  }
-}
-
-html.lightbox-open, html.lightbox-open body {
-  overflow: hidden !important;
-  overscroll-behavior: none;
-  touch-action: none;
-}
-
-/* 针对 Markdown 灯箱的图片，进一步提升居中优先级 */
-#md-lightbox-img {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* 兼容 util/Lightbox.astro 的灯箱：容器使用栈布局并居中 */
-.lightbox-dialog .lightbox-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-.lightbox-dialog .lightbox-image {
-  max-width: 90vw;
-  max-height: 90vh;
-  object-fit: contain;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* 容器撑满宽度，让内部 flex 居中生效 */
-.lightbox-dialog .lightbox-image-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-/* 扩大移动端断点并保持按钮右上角、图片强制居中 */
-/* 移动端：让图片覆盖整个屏幕宽度并取消左右外边距 */
-/* 删除 640px 断点的重复移动端块（保留 768px 块），并统一在 768px 下调整 */
-@media (max-width: 768px) {
-  .md-lightbox-dialog[open],
-  .lightbox-dialog[open] {
-    padding: 0 0.75rem; /* 保留少量安全区 */
-    gap: 0.5rem;
-    box-sizing: border-box;
-    overflow-x: hidden;  /* 仅隐藏横向，避免左右裁切 */
-    overflow-y: auto;    /* 允许纵向滚动，避免高度裁切 */
-    justify-content: center;
-    align-items: center;
-  }
-  .md-lightbox-dialog img,
-  .lightbox-dialog .lightbox-image,
-  #md-lightbox-img {
-    max-width: 100%;       /* 不强制满屏宽，避免异常裁切 */
-    width: auto;           /* 让浏览器按比例自适应 */
-    height: auto;
-    max-height: calc(100dvh - 7rem);
-    object-fit: contain;   /* 保证不裁切内容 */
-    display: block;
-    margin: 0 auto !important; /* 居中且无左右偏移 */
-    box-sizing: border-box;
-  }
-
-  /* 关闭按钮下移一点 */
-  .md-lightbox-dialog button,
-  .lightbox-dialog .close-button {
-    position: absolute;
-    top: 1.25rem;          /* 下移一点 */
-    right: 0.75rem !important;
-    left: auto !important;
-    transform: none;
-  }
-}
-
-/* 移除分散的 #md-lightbox-img 单独偏移，统一用 margin: 0 auto 居中 */
-#md-lightbox-img {
-  display: block;
-  margin: 0 auto !important;
-}
-
-/* 移除重复的 html.lightbox-open 定义，仅保留一处 */
-html.lightbox-open, html.lightbox-open body {
-  overflow: hidden !important;
-  overscroll-behavior: none;
-  touch-action: none;
-}
-
-/* 让 util/Lightbox 的容器和图片在移动端真正满宽 */
-.lightbox-dialog .lightbox-image-container.fullwidth {
-  width: 100dvw;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-@media (max-width: 768px) {
-  #md-lightbox-img {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    margin-left: 1rem !important;
-    display: block;
-    object-fit: contain;
-    box-sizing: border-box;
-  }
-}
-
-/* 为按钮定位提供变量与默认偏移 */
-.md-lightbox-dialog[open],
-.lightbox-dialog[open] {
-  /* 供 JS 写入图片顶部像素值 */
-  --lb-img-top: 1rem;
-  --lb-btn-offset: 0.75rem; /* 按钮相对图片顶部的上方偏移 */
-}
-
-/* 移动端 640px 断点：用变量控制按钮位置，覆盖旧的 12rem !important */
-@media (max-width: 640px) {
-  .md-lightbox-dialog[open],
-  .lightbox-dialog[open] {
-    box-sizing: border-box;
-    overflow: hidden;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
-    gap: 0.5rem;
-  }
-  .md-lightbox-dialog img,
-  .lightbox-dialog .lightbox-image {
-    max-width: 100%;
-    max-height: calc(100vh - 7rem);
-    display: block;
-    width: 100%;         /* 容器占满宽度，内部用 flex 居中 */
-    margin: 0 auto;      /* 居中 */
-    display: block;      /* 保证可被 margin 居中 */
-    margin: 0 auto;      /* 居中 */
-  }
-  .md-lightbox-dialog p,
-  .lightbox-dialog .lightbox-caption {
-    position: static;
-    transform: none;
-    width: 100%;
-    margin: 0;
-    padding: 0 0.5rem;
-    color: #fff;
-    text-align: center;
-    box-sizing: border-box;
-  }
-  .md-lightbox-dialog button,
-  .lightbox-dialog .close-button {
-    position: absolute;
-    top: calc(var(--lb-img-top, 1rem) - var(--lb-btn-offset, 1rem)) !important; /* 上方 1rem，刚好“图片上面一点” */
-    right: 0.75rem;
-    left: auto;
-    transform: none;
-    font-size: 1.75rem;
-  }
-}
-
-html.lightbox-open, html.lightbox-open body {
-  overflow: hidden !important;
-  overscroll-behavior: none;
-  touch-action: none;
-}
-
-/* 针对 Markdown 灯箱的图片，进一步提升居中优先级 */
-#md-lightbox-img {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* 兼容 util/Lightbox.astro 的灯箱：容器使用栈布局并居中 */
-.lightbox-dialog .lightbox-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-.lightbox-dialog .lightbox-image {
-  max-width: 90vw;
-  max-height: 90vh;
-  object-fit: contain;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* 容器撑满宽度，让内部 flex 居中生效 */
-.lightbox-dialog .lightbox-image-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-/* 扩大移动端断点并保持按钮右上角、图片强制居中 */
-/* 移动端：让图片覆盖整个屏幕宽度并取消左右外边距 */
-/* 删除 640px 断点的重复移动端块（保留 768px 块），并统一在 768px 下调整 */
-@media (max-width: 768px) {
-  .md-lightbox-dialog[open],
-  .lightbox-dialog[open] {
-    padding: 0 0.75rem; /* 保留少量安全区 */
-    gap: 0.5rem;
-    box-sizing: border-box;
-    overflow-x: hidden;  /* 仅隐藏横向，避免左右裁切 */
-    overflow-y: auto;    /* 允许纵向滚动，避免高度裁切 */
-    justify-content: center;
-    align-items: center;
-  }
-  .md-lightbox-dialog img,
-  .lightbox-dialog .lightbox-image,
-  #md-lightbox-img {
-    max-width: 100%;       /* 不强制满屏宽，避免异常裁切 */
-    width: auto;           /* 让浏览器按比例自适应 */
-    height: auto;
-    max-height: calc(100dvh - 7rem);
-    object-fit: contain;   /* 保证不裁切内容 */
-    display: block;
-    margin: 0 auto !important; /* 居中且无左右偏移 */
-    box-sizing: border-box;
-  }
-
-  /* 关闭按钮下移一点 */
-  .md-lightbox-dialog button,
-  .lightbox-dialog .close-button {
-    position: absolute;
-    top: 1.25rem;          /* 下移一点 */
-    right: 0.75rem !important;
-    left: auto !important;
-    transform: none;
-  }
-}
-
-/* 移除分散的 #md-lightbox-img 单独偏移，统一用 margin: 0 auto 居中 */
-#md-lightbox-img {
-  display: block;
-  margin: 0 auto !important;
-}
-
-/* 移除重复的 html.lightbox-open 定义，仅保留一处 */
-html.lightbox-open, html.lightbox-open body {
-  overflow: hidden !important;
-  overscroll-behavior: none;
-  touch-action: none;
-}
-
-/* 让 util/Lightbox 的容器和图片在移动端真正满宽 */
-.lightbox-dialog .lightbox-image-container.fullwidth {
-  width: 100dvw;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-@media (max-width: 768px) {
-  #md-lightbox-img {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    margin-left: 1rem !important;
-    display: block;
-    object-fit: contain;
-    box-sizing: border-box;
-  }
-}
-
-/* 为按钮定位提供变量与默认偏移 */
-.md-lightbox-dialog[open],
-.lightbox-dialog[open] {
-  /* 供 JS 写入图片顶部像素值 */
-  --lb-img-top: 1rem;
-  --lb-btn-offset: 0.75rem; /* 按钮相对图片顶部的上方偏移 */
-}
-
-/* 桌面端与通用：统一用变量定位，避免固定右上角 */
-.md-lightbox-dialog button {
   position: absolute;
-  top: calc(var(--lb-img-top, 1rem) - var(--lb-btn-offset, 0.75rem)) !important;
+  top: calc(var(--lb-img-top, 3vh) - var(--lb-btn-offset, 1rem)) !important;
   right: 0.75rem;
   left: auto;
   transform: none;
   font-size: 1.75rem;
+  color: #fff;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
-/* 移动端：按钮跟随图片顶部，始终“在图片上面一点” */
-@media (max-width: 768px) {
-  .md-lightbox-dialog button,
-  .lightbox-dialog .close-button {
-    position: absolute;
-    top: calc(var(--lb-img-top, 1rem) - var(--lb-btn-offset, 0.75rem)) !important;
-    right: 0.75rem;
-    left: auto;
-    transform: none;
-    font-size: 1.75rem;
-  }
-}
 
-/* 精简：删除分散的硬编码 top 值（例如 top: 12rem !important;） */
-/* 请移除旧的 top 固定值规则，统一由变量控制 */
-#md-lightbox-img {
-  display: block;
-  margin: 0 auto !important;
-}
-
-/* 移除重复的 html.lightbox-open 定义，仅保留一处 */
+/* 打开灯箱时禁用滚动 */
 html.lightbox-open, html.lightbox-open body {
   overflow: hidden !important;
   overscroll-behavior: none;
   touch-action: none;
 }
 
-/* 让 util/Lightbox 的容器和图片在移动端真正满宽 */
-.lightbox-dialog .lightbox-image-container.fullwidth {
-  width: 100dvw;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* Markdown 灯箱图片的中心对齐辅助 */
+#md-lightbox-img {
+  display: block;
+  margin: 0 auto;
 }
 
+/* 移动端优化：栈布局、图片更靠中心、文案回到流内 */
 @media (max-width: 768px) {
+  .md-lightbox-dialog[open],
+  .lightbox-dialog[open] {
+    padding: 0.5rem 0.75rem;
+    gap: 0.5rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .md-lightbox-dialog img,
+  .lightbox-dialog .lightbox-image,
   #md-lightbox-img {
-    width: 100%;
     max-width: 100%;
+    width: auto;
     height: auto;
-    margin-left: 1rem !important;
-    display: block;
+    max-height: calc(100dvh - 7rem);
     object-fit: contain;
+    display: block;
+    margin: 0 auto !important;
     box-sizing: border-box;
   }
-}
-/* 变量定义（保持不变或确保存在） */
-.md-lightbox-dialog[open],
-.lightbox-dialog[open] {
-  --lb-img-top: 1rem;
-  --lb-btn-offset: 0.75rem; /* 桌面：略小的上方偏移 */
+  .md-lightbox-dialog p,
+  .lightbox-dialog .lightbox-caption {
+    position: static;
+    transform: none;
+    width: 100%;
+    margin: 0;
+    padding: 0 0.5rem;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  .md-lightbox-dialog button,
+  .lightbox-dialog .close-button {
+    /* 描述跟随内容流：显示在图片下方居中 */
+    #md-lightbox-caption {
+      position: static !important;
+      left: auto !important;
+      right: auto !important;
+      bottom: auto !important;
+      transform: none !important;
+      width: 100% !important;
+      margin: 0.25rem 0 0 !important;
+      padding: 0 0.5rem !important;
+      text-align: center !important;
+      color: #fff !important;
+    }
+    
+    /* 关闭按钮贴近图片右上角，并确保可点击 */
+    /* 让图片容器成为定位上下文 */
+    .md-lightbox-dialog .lightbox-image-container {
+      position: relative !important;
+    }
+    
+    /* 关闭按钮：相对图片容器右上角（不依赖 --lb-img-top） */
+    #md-lightbox-close {
+      position: absolute !important;
+      top: -0.5rem !important;
+      right: -0.5rem !important;
+      z-index: 2147483648 !important;
+      pointer-events: auto !important;
+      touch-action: manipulation !important;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* 对话框采用纵向布局，让图片在上、描述在下 */
+    .md-lightbox-dialog[open] {
+      flex-direction: column !important;
+      gap: 0.5rem !important;
+    }
+    font-size: 1.75rem;
+  }
 }

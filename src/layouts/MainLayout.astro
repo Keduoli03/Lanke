@@ -6,6 +6,7 @@ import Footer from '../components/Footer.astro';
 import Sidebar from '../components/Sidebar.astro';
 import MobileNav from '../components/MobileNav.astro';
 import themeScript from '../utils/theme-script.ts?raw';
+import LightboxDialog from '../components/util/Lightbox.astro';
 
 export interface Props {
   title: string;
@@ -47,7 +48,7 @@ const { title=siteConfig.title, description = siteConfig.description, useContent
 		</div>
 
 		<Footer />
-		
+		<LightboxDialog />
 		<style is:global>
 			* {
 				box-sizing: border-box;
