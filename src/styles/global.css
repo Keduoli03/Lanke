@@ -1,10 +1,11 @@
 
 @import "tailwindcss";
 @plugin '@tailwindcss/typography';
+@import "./lightbox.css";
 @import "./callout.css";
 @import "./gcard.css";
 @import "./aplayer.css";	
-@import "./lightbox.css";
+
 
 
 
