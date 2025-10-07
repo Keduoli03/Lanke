@@ -16,7 +16,7 @@ const { images } = Astro.props;
 // 使用 getImage 生成 ImageMetadata
 const processedImages = await Promise.all(
   images.map(async (image) => {
-    const metadata = (await getImage({ src: image.src })) as unknown as ImageMetadata; // 使用 unknown 作为中间类型
+    const metadata = (await getImage({ src: image.src })) as unknown as ImageMetadata;
     return {
       ...image,
       metadata,
@@ -73,43 +73,44 @@ const processedImages = await Promise.all(
   </dialog>
 </section>
 
-<script>
+<script lang="ts">
   document.addEventListener("astro:page-load", () => {
-    const dialog = document.querySelector(".lightbox-dialog") as HTMLDialogElement;
-    const closeButton = dialog?.querySelector(".close-button");
-    const thumbnailButtons = document.querySelectorAll(".thumbnail-button");
+    const dialog = document.querySelector<HTMLDialogElement>(".lightbox-dialog");
+    const closeButton = dialog?.querySelector<HTMLButtonElement>(".close-button");
+    const thumbnailButtons = document.querySelectorAll<HTMLButtonElement>(".thumbnail-button");
 
     let currentIndex = 0;
 
-    function showImage(index: number) { 
-      const images = document.querySelectorAll(".lightbox-image-container");
+    function showImage(index) {
+      const images = document.querySelectorAll<HTMLDivElement>(".lightbox-image-container");
       images.forEach((image, i) => {
-        const element = image as HTMLElement;
+        const element = image;
         element.style.display = i === index ? "block" : "none";
       });
       currentIndex = index;
+
+      const container = document.getElementById(`image-${index}`);
+      const img = container?.querySelector<HTMLImageElement>('.lightbox-image');
+      if (dialog && img) {
+        const rect = img.getBoundingClientRect();
+        dialog.style.setProperty('--lb-img-top', `${Math.max(12, rect.top + 8)}px`);
+      }
     }
 
     thumbnailButtons.forEach((button) => {
       button.addEventListener("click", () => {
-        const index = parseInt((button as HTMLElement).dataset.index || "0", 10);
-        showImage(index);
+        const idx = parseInt(button.dataset.index || "0", 10);
+        showImage(idx);
         dialog?.showModal();
       });
     });
 
-    closeButton?.addEventListener("click", () => {
-      dialog?.close();
-    });
+    window.addEventListener('resize', () => showImage(currentIndex));
 
+    closeButton?.addEventListener("click", () => { dialog?.close(); });
     dialog?.addEventListener("keydown", (event) => {
-      if (event.key === "ArrowLeft") {
-        showImage((currentIndex - 1 + thumbnailButtons.length) % thumbnailButtons.length);
-      } else if (event.key === "ArrowRight") {
-        showImage((currentIndex + 1) % thumbnailButtons.length);
-      } else if (event.key === "Escape") {
-        dialog?.close();
-      }
+      if (event.key === "ArrowRight") showImage((currentIndex + 1) % thumbnailButtons.length);
+      else if (event.key === "Escape") dialog?.close();
     });
   });
 </script>

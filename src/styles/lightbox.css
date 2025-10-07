@@ -253,3 +253,70 @@ html.lightbox-open, html.lightbox-open body {
     box-sizing: border-box;
   }
 }
+
+/* 为按钮定位提供变量与默认偏移 */
+.md-lightbox-dialog[open],
+.lightbox-dialog[open] {
+  /* 供 JS 写入图片顶部像素值 */
+  --lb-img-top: 1rem;
+  --lb-btn-offset: 0.75rem; /* 按钮相对图片顶部的上方偏移 */
+}
+
+/* 桌面端按钮（保持右上角） */
+.md-lightbox-dialog button,
+.lightbox-dialog .close-button {
+  position: absolute;
+  top: calc(var(--lb-img-top, 1rem) - var(--lb-btn-offset, 0.75rem));
+  right: 0.75rem;
+  left: auto;
+  transform: none;
+  font-size: 1.75rem;
+}
+
+/* 移动端：按钮跟随图片顶部，始终“在图片上面一点” */
+@media (max-width: 768px) {
+  .md-lightbox-dialog button,
+  .lightbox-dialog .close-button {
+    position: absolute;
+    top: calc(var(--lb-img-top, 1rem) - var(--lb-btn-offset, 0.75rem));
+    right: 0.75rem;
+    left: auto;
+    transform: none;
+  }
+}
+
+/* 精简：删除分散的硬编码 top 值（例如 top: 12rem !important;） */
+/* 请移除旧的 top 固定值规则，统一由变量控制 */
+#md-lightbox-img {
+  display: block;
+  margin: 0 auto !important;
+}
+
+/* 移除重复的 html.lightbox-open 定义，仅保留一处 */
+html.lightbox-open, html.lightbox-open body {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+/* 让 util/Lightbox 的容器和图片在移动端真正满宽 */
+.lightbox-dialog .lightbox-image-container.fullwidth {
+  width: 100dvw;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  #md-lightbox-img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin-left: 1rem !important;
+    display: block;
+    object-fit: contain;
+    box-sizing: border-box;
+  }
+}

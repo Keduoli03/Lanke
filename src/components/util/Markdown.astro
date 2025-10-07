@@ -19,7 +19,6 @@ document.addEventListener('astro:page-load', () => {
   const closeBtn = document.getElementById('md-lightbox-close');
 
   let preventScroll = null;
-
   const lockScroll = () => {
     document.documentElement.classList.add('lightbox-open');
     preventScroll = (ev) => {
@@ -51,11 +50,7 @@ document.addEventListener('astro:page-load', () => {
     const hasImg = !!a.querySelector('img');
     const isLightbox = a.classList.contains('md-lightbox') || a.classList.contains('pswp-link') || hasImg;
     if (!isLightbox) return;
-    e.preventDefault();
-    e.stopPropagation();
-    if (typeof (e).stopImmediatePropagation === 'function') {
-      (e).stopImmediatePropagation();
-    }
+    e.preventDefault(); e.stopPropagation();
 
     const url = a.getAttribute('data-lightbox') || a.getAttribute('data-pswp-src') || a.getAttribute('href') || '';
     const alt = a.getAttribute('data-alt') || a.querySelector('img')?.getAttribute('alt') || '';
@@ -63,8 +58,16 @@ document.addEventListener('astro:page-load', () => {
 
     if (img) { img.src = url; img.alt = alt; }
     if (caption) { caption.textContent = title || alt || ''; }
-    if (dialog) { dialog.showModal(); } else { document.getElementById('md-lightbox-dialog')?.setAttribute('open', ''); }
+
+    if (dialog && typeof (dialog).showModal === 'function') (dialog).showModal();
+    else document.getElementById('md-lightbox-dialog')?.setAttribute('open', '');
     lockScroll();
+
+    // 打开后测量图片位置，设置变量
+    if (dialog && img) {
+      const rect = img.getBoundingClientRect();
+      dialog.style.setProperty('--lb-img-top', `${Math.max(12, rect.top + 8)}px`);
+    }
   }, { capture: true });
 
   closeBtn?.addEventListener('click', () => {
@@ -86,8 +89,14 @@ document.addEventListener('astro:page-load', () => {
     }
   });
 
-  dialog?.addEventListener('close', () => {
-    unlockScroll();
+  dialog?.addEventListener('close', () => { unlockScroll(); });
+
+  // 窗口尺寸变化时重新计算位置
+  window.addEventListener('resize', () => {
+    if (dialog && img) {
+      const rect = img.getBoundingClientRect();
+      dialog.style.setProperty('--lb-img-top', `${Math.max(12, rect.top + 8)}px`);
+    }
   });
 });
 </script>
