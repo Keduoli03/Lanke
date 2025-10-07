@@ -1,0 +1,49 @@
+/* 让对话框成为全屏覆盖层 */
+.md-lightbox-dialog[open] {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent; /* 遮罩放到 backdrop */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+/* 全屏遮罩 */
+.md-lightbox-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.85);
+}
+/* 图片与文案布局 */
+.md-lightbox-dialog img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+}
+.md-lightbox-dialog button {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  font-size: 2rem;
+  color: #fff;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.md-lightbox-dialog p {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  text-align: center;
+  margin: 0;
+}
+html.lightbox-open, html.lightbox-open body {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: none;
+}

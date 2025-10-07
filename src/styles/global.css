@@ -4,6 +4,9 @@
 @import "./callout.css";
 @import "./gcard.css";
 @import "./aplayer.css";	
+@import "./lightbox.css";
+
+
 
 /* 禁用移动端不必要的触摸行为 */
 html, body {

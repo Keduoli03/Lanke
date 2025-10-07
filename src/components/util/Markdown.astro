@@ -1,7 +1,94 @@
 ---
-//提供Markdown支持，参考https://docs.astro.build/zh-cn/recipes/tailwind-rendered-markdown/
 import '@/styles/markdown.css';
 ---
 <div class="prose prose-lg max-w-none dark:prose-invert">
   <slot />
 </div>
+
+<dialog id="md-lightbox-dialog" class="md-lightbox-dialog">
+  <img id="md-lightbox-img" alt="" />
+  <p id="md-lightbox-caption"></p>
+  <button id="md-lightbox-close" aria-label="close">×</button>
+</dialog>
+
+<script lang="ts">
+document.addEventListener('astro:page-load', () => {
+  const dialog = document.getElementById('md-lightbox-dialog');
+  const img = document.getElementById('md-lightbox-img');
+  const caption = document.getElementById('md-lightbox-caption');
+  const closeBtn = document.getElementById('md-lightbox-close');
+
+  let preventScroll = null;
+
+  const lockScroll = () => {
+    document.documentElement.classList.add('lightbox-open');
+    preventScroll = (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (typeof ev.stopImmediatePropagation === 'function') {
+        ev.stopImmediatePropagation();
+      }
+    };
+    window.addEventListener('wheel', preventScroll, { passive: false, capture: true });
+    window.addEventListener('touchmove', preventScroll, { passive: false, capture: true });
+  };
+
+  const unlockScroll = () => {
+    document.documentElement.classList.remove('lightbox-open');
+    if (preventScroll) {
+      window.removeEventListener('wheel', preventScroll, { capture: true });
+      window.removeEventListener('touchmove', preventScroll, { capture: true });
+      preventScroll = null;
+    }
+  };
+
+  const container = document.querySelector('.prose');
+  container?.addEventListener('click', (e) => {
+    const t = e.target;
+    if (!(t instanceof Element)) return;
+    const a = t.closest('a');
+    if (!a) return;
+    const hasImg = !!a.querySelector('img');
+    const isLightbox = a.classList.contains('md-lightbox') || a.classList.contains('pswp-link') || hasImg;
+    if (!isLightbox) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof (e).stopImmediatePropagation === 'function') {
+      (e).stopImmediatePropagation();
+    }
+
+    const url = a.getAttribute('data-lightbox') || a.getAttribute('data-pswp-src') || a.getAttribute('href') || '';
+    const alt = a.getAttribute('data-alt') || a.querySelector('img')?.getAttribute('alt') || '';
+    const title = a.getAttribute('data-title') || a.querySelector('img')?.getAttribute('title') || '';
+
+    if (img) { img.src = url; img.alt = alt; }
+    if (caption) { caption.textContent = title || alt || ''; }
+    if (dialog) { dialog.showModal(); } else { document.getElementById('md-lightbox-dialog')?.setAttribute('open', ''); }
+    lockScroll();
+  }, { capture: true });
+
+  closeBtn?.addEventListener('click', () => {
+    if (dialog) { dialog.close(); } else { document.getElementById('md-lightbox-dialog')?.removeAttribute('open'); }
+    unlockScroll();
+  });
+
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog) {
+      if (dialog) { dialog.close(); } else { document.getElementById('md-lightbox-dialog')?.removeAttribute('open'); }
+      unlockScroll();
+    }
+  });
+
+  dialog?.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (dialog) { dialog.close(); } else { document.getElementById('md-lightbox-dialog')?.removeAttribute('open'); }
+      unlockScroll();
+    }
+  });
+
+  dialog?.addEventListener('close', () => {
+    unlockScroll();
+  });
+});
+</script>
+

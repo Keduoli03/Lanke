@@ -11,7 +11,6 @@ import { siteConfig } from '@/config';
 import ScrollToTop from '@/components/util/ScrollToTop.astro';
 import ScrollToComment from '@/components/util/ScrollToComment.astro';
 import Artalk from '@/components/util/Artalk.astro';
-import PhotoSwipeLightbox from '@/components/util/PhotoSwipeLightbox.astro';
 
 export const prerender = true; // <--- 添加此行
 
@@ -54,7 +53,6 @@ const fullPostUrl = Astro.url.href;
         <Markdown>
           <Content />
         </Markdown>
-        <PhotoSwipeLightbox gallerySelector=".prose" childrenSelector="a.pswp-link" />
       </article>
       
       {/* 目录区域 */}

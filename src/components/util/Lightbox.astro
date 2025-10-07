@@ -1,0 +1,115 @@
+---
+import { Image, getImage } from "astro:assets";
+
+interface ImageData {
+  src: string;
+  alt?: string;
+  title?: string;
+}
+
+interface Props {
+  images: ImageData[]; // 接收图片数组
+}
+
+const { images } = Astro.props;
+
+// 使用 getImage 生成 ImageMetadata
+const processedImages = await Promise.all(
+  images.map(async (image) => {
+    const metadata = (await getImage({ src: image.src })) as unknown as ImageMetadata; // 使用 unknown 作为中间类型
+    return {
+      ...image,
+      metadata,
+    };
+  })
+);
+---
+
+<section class="lightbox-container">
+  <div class="thumbnail-grid">
+    {
+      processedImages.map((image, index) => (
+        <button
+          class="thumbnail-button"
+          aria-label={`View image ${index + 1}: ${image.alt || image.title || "Image"}`}
+          data-index={index}
+        >
+          <Image
+            src={image.metadata}
+            alt={image.alt || ""}
+            layout="constrained"
+            width={300}
+            quality={40}
+            loading="eager"
+            class="thumbnail"
+          />
+        </button>
+      ))
+    }
+  </div>
+  <dialog class="lightbox-dialog">
+    <div class="lightbox-content">
+      {
+        processedImages.map((image, index) => (
+          <div
+            class="lightbox-image-container"
+            id={`image-${index}`}
+            data-index={index}
+          >
+            <Image
+              src={image.metadata} 
+              alt={image.alt || ""}
+              layout="full-width"
+              quality={80}
+              loading="eager"
+              class="lightbox-image"
+            />
+            {image.title ? <p class="lightbox-caption">{image.title}</p> : null}
+          </div>
+        ))
+      }
+    </div>
+    <button class="close-button" aria-label="close button">×</button>
+  </dialog>
+</section>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const dialog = document.querySelector(".lightbox-dialog") as HTMLDialogElement;
+    const closeButton = dialog?.querySelector(".close-button");
+    const thumbnailButtons = document.querySelectorAll(".thumbnail-button");
+
+    let currentIndex = 0;
+
+    function showImage(index: number) { 
+      const images = document.querySelectorAll(".lightbox-image-container");
+      images.forEach((image, i) => {
+        const element = image as HTMLElement;
+        element.style.display = i === index ? "block" : "none";
+      });
+      currentIndex = index;
+    }
+
+    thumbnailButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const index = parseInt((button as HTMLElement).dataset.index || "0", 10);
+        showImage(index);
+        dialog?.showModal();
+      });
+    });
+
+    closeButton?.addEventListener("click", () => {
+      dialog?.close();
+    });
+
+    dialog?.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") {
+        showImage((currentIndex - 1 + thumbnailButtons.length) % thumbnailButtons.length);
+      } else if (event.key === "ArrowRight") {
+        showImage((currentIndex + 1) % thumbnailButtons.length);
+      } else if (event.key === "Escape") {
+        dialog?.close();
+      }
+    });
+  });
+</script>

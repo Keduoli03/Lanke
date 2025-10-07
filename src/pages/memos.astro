@@ -1,5 +1,4 @@
 ---
-import PhotoSwipeLightbox from '@/components/util/PhotoSwipeLightbox.astro';
 import MainLayout from '../layouts/MainLayout.astro';
 
 const title = 'Misskey 动态';
@@ -16,10 +15,14 @@ const title = 'Misskey 动态';
              data-instance="https://memo.blueke.top"
              data-user-id="adfztpsih1jc0003"
              data-limit="20"></div>
-
-    <!-- 引入灯箱组件（自动初始化&重建） -->
-    <PhotoSwipeLightbox gallerySelector="#timeline-container" childrenSelector=".post-image-link" />
     </div>
+
+    <!-- 接入全局灯箱对话框（与 Markdown 页相同结构） -->
+    <dialog id="md-lightbox-dialog" class="md-lightbox-dialog">
+      <img id="md-lightbox-img" alt="" />
+      <p id="md-lightbox-caption"></p>
+      <button id="md-lightbox-close" aria-label="close">×</button>
+    </dialog>
 </MainLayout>
 
 <script type="module">
@@ -202,31 +205,87 @@ const title = 'Misskey 动态';
             container.appendChild(postCard);
           }
 
-          // 列表渲染完成后，仅初始化一次灯箱并设置兜底拦截
-          const ensureLightbox = async () => {
-            // 不再插入 <script> 标签或使用动态 import
-            window.PSLightbox?.destroy?.();
-            const lb = window.PSLightbox?.create?.({
-              gallery: '#timeline-container',
-              children: '.post-image-link',
-              autoPreventDefault: true,
-              autoWriteSize: true,
-              labels: { close: '关闭' }
-            });
-            if (!lb) {
-              console.error('[PSLightbox] 灯箱实例创建失败');
+          // —— 移除 PhotoSwipe 相关初始化 ——
+          // （删除 ensureLightbox() 的定义与调用，以及只阻止默认的点击监听）
+          
+          // —— 使用自定义灯箱，拦截并打开对话框 ——
+          let preventScroll = null;
+          const lockScroll = () => {
+            document.documentElement.classList.add('lightbox-open');
+            preventScroll = (ev) => {
+              ev.preventDefault();
+              ev.stopPropagation();
+              if (typeof ev.stopImmediatePropagation === 'function') {
+                ev.stopImmediatePropagation();
+              }
+            };
+            window.addEventListener('wheel', preventScroll, { passive: false, capture: true });
+            window.addEventListener('touchmove', preventScroll, { passive: false, capture: true });
+          };
+          const unlockScroll = () => {
+            document.documentElement.classList.remove('lightbox-open');
+            if (preventScroll) {
+              window.removeEventListener('wheel', preventScroll, { capture: true });
+              window.removeEventListener('touchmove', preventScroll, { capture: true });
+              preventScroll = null;
             }
           };
-          await ensureLightbox();
-
-          container.addEventListener('click', (e) => {
-            if (!(e.target instanceof Element)) return;
-            const link = e.target.closest('.post-image-link');
-            if (link) {
-              e.preventDefault();
-              e.stopPropagation();
+          
+          const openLightbox = (url, alt = '', title = '') => {
+            const dialog = document.getElementById('md-lightbox-dialog');
+            const img = document.getElementById('md-lightbox-img');
+            const caption = document.getElementById('md-lightbox-caption');
+            const closeBtn = document.getElementById('md-lightbox-close');
+            if (!dialog || !img) return;
+          
+            img.src = url;
+            img.alt = alt || '';
+            if (caption) caption.textContent = title || alt || '';
+          
+            if (typeof dialog.showModal === 'function') {
+              dialog.showModal();
+            } else {
+              dialog.setAttribute('open', '');
             }
-          }, true);
+            lockScroll();
+          
+            if (!dialog.dataset.init) {
+              dialog.dataset.init = '1';
+              closeBtn?.addEventListener('click', () => {
+                if (typeof dialog.close === 'function') dialog.close(); else dialog.removeAttribute('open');
+                unlockScroll();
+              });
+              dialog.addEventListener('click', (e) => {
+                if (e.target === dialog) {
+                  if (typeof dialog.close === 'function') dialog.close(); else dialog.removeAttribute('open');
+                  unlockScroll();
+                }
+              });
+              dialog.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                  if (typeof dialog.close === 'function') dialog.close(); else dialog.removeAttribute('open');
+                  unlockScroll();
+                }
+              });
+              dialog.addEventListener('close', unlockScroll);
+            }
+          };
+          
+          container.addEventListener('click', (e) => {
+            const t = e.target;
+            if (!(t instanceof Element)) return;
+            const link = t.closest('.post-image-link');
+            if (!link) return;
+            e.preventDefault();
+            e.stopPropagation();
+            if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+          
+            const url = link.getAttribute('href') || '';
+            const imgEl = link.querySelector('img');
+            const alt = imgEl?.getAttribute('alt') || '';
+            const title = imgEl?.getAttribute('title') || '';
+            openLightbox(url, alt, title);
+          }, { capture: true });
         } catch (err) {
       const msg = (err && typeof err === 'object' && 'message' in err) ? err.message : String(err);
       container.innerHTML = `<div class="error">加载失败: ${msg}</div>`;
