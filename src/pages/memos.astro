@@ -408,7 +408,43 @@ const title = 'Misskey 动态';
 
         .error { text-align: center; padding: 60px 20px; color: #dc3545; background-color: #fef2f2; border-radius: 8px; }
         .no-posts { text-align: center; padding: 60px 20px; color: var(--text-secondary); background-color: var(--tag-bg); border-radius: 8px; }
-    </style>
 
+    /* 平板适配 */
+    @media (max-width: 768px) {
+      .misskey-timeline { padding: 16px; }
+      .timeline-container { gap: 18px; }
+      .archive-title { font-size: 1.75rem; }
+      .archive-subtitle { font-size: 1rem; }
+  
+      .post-card { padding: 16px; padding-bottom: 32px; }
+      .post-header { gap: 10px; }
+      .avatar { width: 40px; height: 40px; flex: 0 0 40px; }
+  
+      .post-content { font-size: 0.95rem; padding: 0 1.5rem; }
+      .replies { padding-left: 1.5rem; }
+    }
+  
+    /* 手机适配 */
+    @media (max-width: 480px) {
+      .misskey-timeline { padding: 12px; }
+      .timeline-container { gap: 16px; }
+      .archive-title { font-size: 1.5rem; }
+      .archive-subtitle { font-size: 0.95rem; }
+  
+      .post-card { padding: 14px; padding-bottom: 28px; }
+      .post-header { gap: 8px; }
+      .avatar { width: 36px; height: 36px; flex: 0 0 36px; }
+  
+      .post-content { font-size: 0.9rem; padding: 0 1rem; }
+      .post-media { width: 100%; box-shadow: none; }
+  
+      .reply-count { font-size: 0.85rem; }
+      .reply-text { font-size: 0.85rem; }
+      .replies { padding-left: 1rem; }
+  
+      .header-actions { gap: 10px; }
+      .action-link { font-size: 0.9rem; }
+    }
+    </style>
 
     
