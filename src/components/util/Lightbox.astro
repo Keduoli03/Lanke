@@ -85,22 +85,22 @@ body {
   padding: 0 !important;
 }
 
-/* 关闭按钮基础样式 - 手机端优先 */
+/* 关闭按钮基础样式 - 半透明背景 */
 #md-lightbox-close {
   position: absolute !important;
-  top: -1.25rem !important; /* 向上调整，确保在图片外 */
-  right: -0.5rem !important; /* 向右调整，超出图片范围 */
+  top: -1.25rem !important;
+  right: -0.5rem !important;
   z-index: 2147483648 !important;
   pointer-events: auto !important;
   touch-action: manipulation !important;
   -webkit-tap-highlight-color: transparent;
 
-  /* 手机端按钮尺寸减小 */
   width: 2.5rem !important;
   height: 2.5rem !important;
   font-size: 1.25rem !important;
   
-  background: rgba(0, 0, 0, 0.7) !important;
+  /* 半透明黑色背景（透明度从0.7降低到0.3） */
+  background: rgba(0, 0, 0, 0.3) !important;
   color: #fff !important;
   border: none !important;
   border-radius: 50% !important;
@@ -109,29 +109,30 @@ body {
   justify-content: center !important;
   cursor: pointer !important;
   padding: 0 !important;
-  transition: background 0.2s ease !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important; /* 增加阴影提升层次感 */
+  /* 过渡效果保持，悬停时略微加深 */
+  transition: background 0.2s ease, transform 0.2s ease !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
+/* 悬停/聚焦状态 - 稍微加深但仍保持半透明 */
 #md-lightbox-close:hover,
 #md-lightbox-close:focus {
-  background: rgba(0, 0, 0, 0.9) !important;
+  background: rgba(0, 0, 0, 0.6) !important;
   outline: none !important;
+  transform: scale(1.05) !important; /* 轻微放大增强反馈 */
 }
 
-/* 电脑端按钮调整 - 更大屏幕更靠右 */
+/* 电脑端按钮调整 */
 @media (min-width: 768px) {
   #md-lightbox-close {
-    /* 电脑端尺寸略大但保持精致 */
     width: 2.75rem !important;
     height: 2.75rem !important;
     font-size: 1.35rem !important;
-    right: -1.5rem !important;
+    right: -1.25rem !important;
     top: -1.375rem !important;
   }
 }
 
-/* 大屏设备进一步调整 */
 @media (min-width: 1024px) {
   #md-lightbox-close {
     right: -1.25rem !important;
@@ -141,7 +142,7 @@ body {
 </style>
 
 <script is:inline>
-// 脚本部分保持不变，确保功能正常
+// 脚本部分保持不变
 function initLightbox() {
   const dialog = document.getElementById('md-lightbox-dialog');
   const img = document.getElementById('md-lightbox-img');
