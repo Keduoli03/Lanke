@@ -3,7 +3,7 @@ import type { Page } from 'astro';
 
 interface Props {
   page: Page<any>;
-  baseUrl?: string; // 新增：基础URL参数
+  baseUrl?: string; 
 }
 
 const { page, baseUrl } = Astro.props;
@@ -38,14 +38,15 @@ const generatePageNumbers = (current: number, total: number) => {
 
 const pageNumbers = generatePageNumbers(page.currentPage, page.lastPage);
 
-// 生成正确的页面URL
+// 生成正确的页面URL（适配 trailingSlash: 'always'）
+const normalizeBase = (u: string) => (u.endsWith('/') ? u.slice(0, -1) : u);
+
 const generatePageUrl = (pageNum: number) => {
   if (baseUrl) {
-    // 如果提供了baseUrl（如分类页面），使用它
-    return pageNum === 1 ? baseUrl : `${baseUrl}/${pageNum}`;
+    const b = normalizeBase(baseUrl);
+    return pageNum === 1 ? `${b}/` : `${b}/${pageNum}/`;
   } else {
-    // 默认首页分页
-    return pageNum === 1 ? '/' : `/${pageNum}`;
+    return pageNum === 1 ? '/' : `/${pageNum}/`;
   }
 };
 ---

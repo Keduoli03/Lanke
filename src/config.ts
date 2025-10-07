@@ -43,6 +43,11 @@ export const navBarConfig: NavBarConfig = {
       url: "/friends",
       icon: "material-symbols:group-outline-rounded",
     },
+    bangumi: {
+      name: "番剧",
+      url: "/bangumi",
+      icon:"material-symbols:movie-outline-rounded",
+    },
     memos: {
       name: "说说",
       url: "/memos",
