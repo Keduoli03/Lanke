@@ -100,8 +100,11 @@ const processedImages = await Promise.all(
     thumbnailButtons.forEach((button) => {
       button.addEventListener("click", () => {
         const idx = parseInt(button.dataset.index || "0", 10);
-        showImage(idx);
         dialog?.showModal();
+        // 在打开后下一帧再测量和定位，避免未开时测量偏差
+        requestAnimationFrame(() => {
+          showImage(idx);
+        });
       });
     });
 
