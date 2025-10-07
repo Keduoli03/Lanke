@@ -205,7 +205,7 @@ const title = 'Misskey 动态';
           // 列表渲染完成后，仅初始化一次灯箱并设置兜底拦截
           const ensureLightbox = async () => {
             if (!window.PSLightbox) {
-              const mod = await import('/src/utils/photoswipe-lightbox.ts');
+              const mod = await import('../utils/photoswipe-lightbox.ts');
               window.PSLightbox = mod.createLightbox({
                 gallery: '#timeline-container',
                 children: '.post-image-link',

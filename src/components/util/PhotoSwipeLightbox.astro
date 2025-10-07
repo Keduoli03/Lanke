@@ -7,7 +7,7 @@ const { gallerySelector = '.misskey-timeline', childrenSelector = 'a.pswp-link, 
 ---
 <script type="module" define:vars={{ gallerySelector, childrenSelector }}>
   if (!window.PSLightbox) {
-    await import('/src/utils/photoswipe-lightbox.ts');
+    await import('../../utils/photoswipe-lightbox.ts');
   }
 
   const container = document.querySelector(gallerySelector);
