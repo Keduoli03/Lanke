@@ -204,22 +204,17 @@ const title = 'Misskey 动态';
 
           // 列表渲染完成后，仅初始化一次灯箱并设置兜底拦截
           const ensureLightbox = async () => {
-            if (!window.PSLightbox) {
-              const mod = await import('../utils/photoswipe-lightbox.ts');
-              window.PSLightbox = mod.createLightbox({
-                gallery: '#timeline-container',
-                children: '.post-image-link',
-                autoPreventDefault: true,
-                autoWriteSize: true,
-              });
-            } else {
-              window.PSLightbox.destroy?.();
-              window.PSLightbox = window.PSLightbox.create?.({
-                gallery: '#timeline-container',
-                children: '.post-image-link',
-                autoPreventDefault: true,
-                autoWriteSize: true,
-              });
+            // 不再插入 <script> 标签或使用动态 import
+            window.PSLightbox?.destroy?.();
+            const lb = window.PSLightbox?.create?.({
+              gallery: '#timeline-container',
+              children: '.post-image-link',
+              autoPreventDefault: true,
+              autoWriteSize: true,
+              labels: { close: '关闭' }
+            });
+            if (!lb) {
+              console.error('[PSLightbox] 灯箱实例创建失败');
             }
           };
           await ensureLightbox();
