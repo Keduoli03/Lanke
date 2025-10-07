@@ -88,14 +88,13 @@ const title = 'Misskey 动态';
       const initTimeline = async () => {
         const container = document.getElementById('timeline-container');
         if (!container) return;
-        if (container.dataset.init === '1') return; // 防重复初始化
+        if (container.dataset.init === '1') return;
         container.dataset.init = '1';
 
         const MISSKEY_INSTANCE = container.dataset.instance;
         const USER_ID = container.dataset.userId;
         const LIMIT = Number(container.dataset.limit || '20');
 
-        // 显示加载状态
         container.innerHTML = `
           <div class="text-center py-16 text-gray-600">
             <div class="w-10 h-10 mx-auto mb-4 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
@@ -134,7 +133,6 @@ const title = 'Misskey 动态';
             const quotedHtml = note.renoteId && note.renoteId !== note.id ? await renderQuotedNote(MISSKEY_INSTANCE, note.renoteId) : '';
             const imageUrl = note.files && note.files.length > 0 ? absUrl(MISSKEY_INSTANCE, note.files[0].url) : '';
 
-            // 构建帖子HTML（移除模板中的JavaScript注释）
             postCard.innerHTML = `
               <div class="post-header">
                 <img src="${absUrl(MISSKEY_INSTANCE, note.user?.avatarUrl || user.avatarUrl)}" class="avatar" alt="${note.user?.name || user.name}的头像" loading="lazy" />
@@ -151,7 +149,6 @@ const title = 'Misskey 动态';
               ${quotedHtml}
               ${imageUrl ? `
                 <div class="post-media">
-                  <!-- 图片链接指向图片本身，添加灯箱所需类名 -->
                   <a href="${imageUrl}" class="post-image-link" data-pswp-width="1600" data-pswp-height="900">
                     <img src="${imageUrl}" alt="附件图片" loading="lazy" />
                   </a>
@@ -168,7 +165,6 @@ const title = 'Misskey 动态';
               </div>
             `;
 
-            // 处理回复
             const repliesWrap = postCard.querySelector('.replies');
             if (isOwnPost && repliesWrap) {
               const replies = await fetchReplies(MISSKEY_INSTANCE, note.id, 5);
@@ -204,25 +200,43 @@ const title = 'Misskey 动态';
             }
 
             container.appendChild(postCard);
-
-            // 获取图片真实尺寸用于灯箱
-            const anchor = postCard.querySelector('.post-image-link');
-            const imgEl = anchor?.querySelector('img');
-            if (anchor && imgEl) {
-              const tmpImg = new Image();
-              tmpImg.onload = () => {
-                anchor.setAttribute('data-pswp-width', tmpImg.naturalWidth.toString());
-                anchor.setAttribute('data-pswp-height', tmpImg.naturalHeight.toString());
-              };
-              tmpImg.src = imgEl.src;
-            }
           }
-          
+
+          // 列表渲染完成后，仅初始化一次灯箱并设置兜底拦截
+          const ensureLightbox = async () => {
+            if (!window.PSLightbox) {
+              const mod = await import('/src/utils/photoswipe-lightbox.ts');
+              window.PSLightbox = mod.createLightbox({
+                gallery: '#timeline-container',
+                children: '.post-image-link',
+                autoPreventDefault: true,
+                autoWriteSize: true,
+              });
+            } else {
+              window.PSLightbox.destroy?.();
+              window.PSLightbox = window.PSLightbox.create?.({
+                gallery: '#timeline-container',
+                children: '.post-image-link',
+                autoPreventDefault: true,
+                autoWriteSize: true,
+              });
+            }
+          };
+          await ensureLightbox();
+
+          container.addEventListener('click', (e) => {
+            if (!(e.target instanceof Element)) return;
+            const link = e.target.closest('.post-image-link');
+            if (link) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }, true);
         } catch (err) {
-          const msg = (err && typeof err === 'object' && 'message' in err) ? err.message : String(err);
-          container.innerHTML = `<div class="error">加载失败: ${msg}</div>`;
-          console.error('获取Misskey数据失败:', err);
-        }
+      const msg = (err && typeof err === 'object' && 'message' in err) ? err.message : String(err);
+      container.innerHTML = `<div class="error">加载失败: ${msg}</div>`;
+      console.error('获取Misskey数据失败:', err);
+    }
       };
 
       // 页面加载时初始化（统一并健壮化）

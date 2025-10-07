@@ -1,61 +1,54 @@
-<!-- PhotoSwipeLightbox 组件脚本 -->
 ---
 interface Props {
-  gallerySelector: string;
-  childrenSelector: string;
+  gallerySelector?: string;
+  childrenSelector?: string;
 }
-const { gallerySelector = '.misskey-timeline', childrenSelector = '.post-image-link' } = Astro.props;
-import lightboxScript from '../../utils/photoswipe-lightbox.ts?url';
+const { gallerySelector = '.misskey-timeline', childrenSelector = 'a.pswp-link, a.post-image-link' } = Astro.props as Props;
 ---
-<!-- 先加载打包后的 lightbox 工具脚本，避免 404 -->
-<script type="module" src={lightboxScript}></script>
-
-<!-- 组件内联初始化脚本 -->
 <script type="module" define:vars={{ gallerySelector, childrenSelector }}>
+  if (!window.PSLightbox) {
+    await import('/src/utils/photoswipe-lightbox.ts');
+  }
+
   const container = document.querySelector(gallerySelector);
   if (!container) {
     console.warn('[PSLightbox] 容器未找到:', gallerySelector);
   }
 
-  const build = () => {
+  const initLightbox = () => {
     if (!container) return;
-    // 当有带尺寸的图片（或链接）时再初始化
-    const readyEls = container.querySelectorAll(`${childrenSelector}[data-pswp-width][data-pswp-height]`);
-    if (readyEls.length === 0) return;
-
-    // 使用全局 PSLightbox（由外部脚本提供）创建/重建
-    (window).PSLightbox?.destroy?.();
-    (window).PSLightbox?.create?.({
+    window.PSLightbox?.destroy?.();
+    const newInstance = window.PSLightbox?.create?.({
       gallery: container,
       children: childrenSelector,
+      autoPreventDefault: true,
+      autoWriteSize: true,
+      labels: { close: '关闭' }
     });
+    if (!newInstance) {
+      console.error('[PSLightbox] 灯箱实例创建失败');
+    }
   };
 
-  // 首次构建
-  build();
+  // 双重保险：点击拦截（安全判断 Element，避免 target.closest 抛错）
+  container?.addEventListener('click', (e) => {
+    const t = e.target;
+    if (!(t instanceof Element)) return;
+    const linkElement = t.closest(childrenSelector);
+    if (linkElement) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
 
-  // 拦截可能的链接跳转，仅当目标为 <a> 时拦截
-  container?.addEventListener(
-    'click',
-    (e) => {
-      const target = e.target;
-      const el = target && target.closest(childrenSelector);
-      if (el && (el ).tagName === 'A') {
-        e.preventDefault();
-      }
-    },
-    true // 捕获阶段，优先拦截
-  );
-
-  // 内容或属性变更时重建（支持懒加载/动态属性写入）
+  const mo = new MutationObserver(() => setTimeout(initLightbox, 50));
+  // 启动观察：容器子树变化时重建
   if (container) {
-    const mo = new MutationObserver(() => {
-      build();
-    });
-    mo.observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-pswp-src','data-pswp-width','data-pswp-height'] });
+    mo.observe(container, { childList: true, subtree: true });
   }
 
-  // Astro 页面切换事件下的重建（延后一次，确保别的脚本已写入属性）
-  document.addEventListener('astro:page-load', () => setTimeout(build, 0));
-  document.addEventListener('astro:after-swap', build);
+  document.addEventListener('astro:page-load', () => setTimeout(initLightbox, 50));
+  document.addEventListener('astro:after-swap', () => setTimeout(initLightbox, 50));
+  // 立即初始化一次，避免首屏不触发
+  setTimeout(initLightbox, 50);
 </script>

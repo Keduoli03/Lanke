@@ -54,61 +54,7 @@ const fullPostUrl = Astro.url.href;
         <Markdown>
           <Content />
         </Markdown>
-        <PhotoSwipeLightbox gallerySelector=".prose" childrenSelector=".pswp-link" />
-        <script type="module">
-          document.addEventListener('astro:page-load', () => {
-            const container = document.querySelector('.prose');
-            if (!container) return;
-            const imgs = Array.from(container.querySelectorAll('img'));
-            imgs.forEach((img) => {
-              const src = img.currentSrc || img.src || img.getAttribute('src');
-              if (!src) return;
-
-              // 若尚未被包裹为锚点，则创建并包裹
-              let anchor = img.closest('a.pswp-link');
-              if (!anchor) {
-                anchor = document.createElement('a');
-                anchor.className = 'pswp-link';
-                anchor.href = src;
-                img.parentNode?.insertBefore(anchor, img);
-                anchor.appendChild(img);
-              } else {
-                // 已存在则更新 href（处理 srcset/currentSrc）
-                anchor.href = src;
-              }
-
-              const applySize = (w, h) => {
-                if (w > 0 && h > 0) {
-                  anchor.setAttribute('data-pswp-width', String(w));
-                  anchor.setAttribute('data-pswp-height', String(h));
-                }
-              };
-
-              // 已加载的图片可直接写尺寸
-              if (img.complete && img.naturalWidth > 0) {
-                applySize(img.naturalWidth, img.naturalHeight);
-              } else {
-                // 监听图片加载后补齐尺寸
-                img.addEventListener('load', () => {
-                  const realSrc = img.currentSrc || src;
-                  anchor.href = realSrc;
-                  applySize(img.naturalWidth, img.naturalHeight);
-                }, { once: true });
-
-                // 离屏探测，尽快拿到原始尺寸（适合懒加载或外链延迟）
-                const probe = new Image();
-                probe.onload = () => applySize(probe.naturalWidth, probe.naturalHeight);
-                probe.onerror = () => {
-                  // 兜底尺寸，避免空白（可按需调整为更贴近你图片的常见分辨率）
-                  if (!anchor.hasAttribute('data-pswp-width')) {
-                    applySize(img.width || 1600, img.height || 900);
-                  }
-                };
-                probe.src = src;
-              }
-            });
-          });
-        </script>
+        <PhotoSwipeLightbox gallerySelector=".prose" childrenSelector="a.pswp-link" />
       </article>
       
       {/* 目录区域 */}

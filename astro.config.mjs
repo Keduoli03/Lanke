@@ -18,6 +18,7 @@ import { pluginFileIcons } from "@xt0rted/expressive-code-file-icons";
 import { expressiveCodeConfig, siteConfig } from './src/config';
 import rehypeCallouts from "rehype-callouts";
 import remarkAplayer from './src/plugins/rehype-component-aplayer.mjs';
+import remarkImageWrapper from './src/plugins/remark-image-wrapper.mjs';
 
 import vercel from '@astrojs/vercel';
 
@@ -28,7 +29,8 @@ export default defineConfig({
     remarkPlugins: [
       remarkDirective,
       remarkGithubCard,
-      remarkAplayer
+      remarkAplayer,
+      remarkImageWrapper
     ],
     rehypePlugins: [
       
