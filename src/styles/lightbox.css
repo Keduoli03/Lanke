@@ -262,11 +262,10 @@ html.lightbox-open, html.lightbox-open body {
   --lb-btn-offset: 0.75rem; /* 按钮相对图片顶部的上方偏移 */
 }
 
-/* 桌面端按钮（保持右上角） */
-.md-lightbox-dialog button,
-.lightbox-dialog .close-button {
+/* 桌面端按钮：用变量控制位置，移除固定右上角 */
+.md-lightbox-dialog button {
   position: absolute;
-  top: calc(var(--lb-img-top, 1rem) - var(--lb-btn-offset, 0.75rem));
+  top: calc(var(--lb-img-top, 1rem) - var(--lb-btn-offset, 0.75rem)) !important;
   right: 0.75rem;
   left: auto;
   transform: none;
@@ -278,10 +277,11 @@ html.lightbox-open, html.lightbox-open body {
   .md-lightbox-dialog button,
   .lightbox-dialog .close-button {
     position: absolute;
-    top: calc(var(--lb-img-top, 1rem) - var(--lb-btn-offset, 0.75rem));
+    top: calc(var(--lb-img-top, 1rem) - var(--lb-btn-offset, 0.75rem)) !important;
     right: 0.75rem;
     left: auto;
     transform: none;
+    font-size: 1.75rem;
   }
 }
 
@@ -319,4 +319,10 @@ html.lightbox-open, html.lightbox-open body {
     object-fit: contain;
     box-sizing: border-box;
   }
+}
+/* 变量定义（保持不变或确保存在） */
+.md-lightbox-dialog[open],
+.lightbox-dialog[open] {
+  --lb-img-top: 1rem;
+  --lb-btn-offset: 0.75rem;
 }
