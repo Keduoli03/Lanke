@@ -3,6 +3,7 @@ import Markdown from '@/components/util/Markdown.astro';
 import MainLayout from '../layouts/MainLayout.astro';
 import { getEntry } from 'astro:content';
 import { render } from 'astro:content';
+import Artalk from '@/components/util/Artalk.astro';
 
 const aboutPost = await getEntry("pages", "about");
 
@@ -21,6 +22,9 @@ const { Content } = await render(aboutPost);
     <Markdown>
         <Content />
     </Markdown>
+    <div id="comment-section">
+    <Artalk />
+  </div>
     <style>
       .about-header {
         text-align: center;

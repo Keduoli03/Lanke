@@ -1,4 +1,5 @@
 ---
+import Artalk from '@/components/util/Artalk.astro';
 import MainLayout from '../layouts/MainLayout.astro';
 import { items as friends } from '../page_data/friend';
 
@@ -28,6 +29,9 @@ const description = "一些朋友们的网站";
         </a>
       ))}
     </div>
+    <div id="comment-section">
+    <Artalk />
+  </div>
   </div>
   <style>
     .about-header {
