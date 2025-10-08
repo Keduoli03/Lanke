@@ -21,10 +21,10 @@ import remarkAplayer from './src/plugins/rehype-component-aplayer.mjs';
 import remarkImageWrapper from './src/plugins/remark-image-wrapper.mjs';
 
 import vercel from '@astrojs/vercel';
-
 // https://astro.build/config
 export default defineConfig({
   site: siteConfig.url,
+  prefetch: true,
   markdown: {
     remarkPlugins: [
       remarkDirective,
@@ -57,6 +57,7 @@ export default defineConfig({
   },
 
   integrations: [
+    
     sitemap(),
     icon({
     include: {
