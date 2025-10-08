@@ -178,11 +178,23 @@ function initLightbox() {
 
   const isLightboxLink = (a) => {
     if (!a) return false;
-    const hasImg = !!a.querySelector('img');
-    const classes = a.classList;
+    // 忽略外链 / 新窗口链接
+    const target = a.getAttribute('target');
+    const rel = (a.getAttribute('rel') || '').toLowerCase();
+    if (target === '_blank' || rel.includes('noopener') || rel.includes('noreferrer')) return false;
+    // 支持显式关闭灯箱
+    if (a.getAttribute('data-no-lightbox') === 'true') return false;
+  
     const href = a.getAttribute('href') || '';
-    const ext = href.toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)(\?.*)?$/);
-    return hasImg || classes.contains('md-lightbox') || classes.contains('pswp-link') || classes.contains('post-image-link') || !!ext;
+    const classes = a.classList;
+    const hasData = a.hasAttribute('data-lightbox') || a.hasAttribute('data-pswp-src');
+    const isImageHref = /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(href);
+  
+    return hasData
+      || classes.contains('md-lightbox')
+      || classes.contains('pswp-link')
+      || classes.contains('post-image-link')
+      || isImageHref;
   };
 
   const openLightbox = (a) => {
