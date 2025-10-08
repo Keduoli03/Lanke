@@ -43,6 +43,7 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
                         href={l.external ? l.url : linkPath}
                         target={l.external ? '_blank' : '_self'}
                         rel={l.external ? 'noopener noreferrer' : ''}
+                        data-astro-prefetch={l.external ? "false" : "tap"}
                         class="transition-all group nav-link flex flex-row items-center p-2 w-full rounded-lg"
                         data-navigation-link
                     >

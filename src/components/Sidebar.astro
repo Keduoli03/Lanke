@@ -32,12 +32,13 @@ const currentPath = Astro.url.pathname;
             href={linkPath}
             target={l.external ? "_blank" : "_self"}
             rel={l.external ? "noopener noreferrer" : ""}
+            data-astro-prefetch={l.external ? "false" : "viewport"}
             class:list={[
                 "group flex flex-col items-center p-1 w-auto nav-link",
                 { "is-active": isActive },
             ]}
           >
-            <div class="icon-container w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all relative shadow-md bg-[var(--content-bg)] group-hover:border-2 group-hover:border-[var(--theme-color-light)] group-hover:scale-110 group-hover:shadow-lg">
+            <div class="icon-container w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-transform relative shadow-md bg-[var(--content-bg)] group-hover:border-2 group-hover:border-[var(--theme-color-light)] group-hover:scale-110">
               {l.icon && <Icon name={l.icon} class="icon text-sm" />}
             </div>
             <span class="text-xs text-center leading-tight text-[var(--text-secondary)] font-medium">
@@ -87,6 +88,8 @@ const currentPath = Astro.url.pathname;
 
   .icon-container {
     background-color: var(--sidebar-icon-bg);
+    will-change: transform;
+    transition: transform 150ms ease, border-color 150ms ease;
   }
 
   .nav-link.is-active .icon-container {
