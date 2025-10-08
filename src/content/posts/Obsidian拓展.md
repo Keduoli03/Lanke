@@ -4,18 +4,18 @@ categories:
 tags:
   - 笔记
   - 博客
-cove: 
+cove:
 status: 已完成
 title: Obsidian拓展
-description: 最近又对笔记进行了一些优化，目前感觉还可以，简单记录一下。
-slug: "obsidiantuo-zhan"
+slug: obsidiantuo-zhan
 cover: ""
 halo:
   site: https://www.blueke.top
   name: 89ce33e0-365c-422c-b39b-73e8adaff2ad
   publish: true
 date: 2024-11-17 13:59
-updated: 2025-05-14 18:42
+updated: 2025-09-13 00:07
+description: 最近又对笔记进行了一些优化，目前感觉还可以，简单记录一下。
 ---
 最近又对笔记进行了一些优化，目前感觉还可以，简单记录一下。 ^b9bb4d
 
@@ -24,6 +24,7 @@ DataView 是 Obsidian 社区中的热门插件，它为用户提供了一个强�
 > 首先我们要知道，插件为我们初始化了很多参数，方便我们调用。请先大致浏览下图
 
 ![&dataview-参数|475](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@img/img/dataview%E9%A2%9D%E5%A4%96%E5%B1%9E%E6%80%A7)
+
 ### 展示最近的文件
 ![&dataview-展示最近文件](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@img/img/%26dataview-%E5%B1%95%E7%A4%BA%E6%9C%80%E8%BF%91%E6%96%87%E4%BB%B6.png)
 
@@ -64,6 +65,7 @@ limit 10
 ````
 
 我就简单弄了下标签的布局，并都改成左对齐了。你可以自己发挥一下
+
 ### 展示含有某个标签的笔记
 上面的细化，比如我就只想看数据库标签的笔记
 
@@ -96,6 +98,7 @@ limit 10
 ## dataviewjs
 dataview 本身是支持 JS 语法拓展的。这里展示一些我使用的例子，具体语法不详细展开。
 原贴放到最后
+
 ### 展示天数
 直接上代码了
 
@@ -125,6 +128,7 @@ dv.paragraph(`==标签== **${i[3]}**个`)
 > 如果要搜索标签，在其中输入 `#对应标签` 即可
 
 `dv.paragraph` 输出，类似 print 语法，输出结果。
+
 #### 拓展
 > 输出的拓展，可以略过
 
@@ -169,23 +173,26 @@ dv.paragraph(dv.current().file.name);
 我用的是二改过的，然后自己再修改了一点，加了创建日期。
 链接：[点我下载]( https://www.123684.com/s/YyUDVv-B1IJA )
 **用法**
+
 ````javascript
 ```dataviewjs
 dv.view("笔记模板/字数统计","")
 ```
 ````
+
 只要在合适的地方引用即可
+
 ## Quick Add
 目前我只用到快速创建笔记，更多功能可以看下面的链接，那个博主写的很好。
 简单来说就是，你写好模板，然后可以用这个快速创建笔记。
 比如我一般写编程时，就用下面的
 ![[模板举例.png|475]]
 这样就不需要自己添加属性值了，笔记也会自动创建在你指定的文件夹中
+
 ### 简单实现
 首先，我们在插件设置中，写好名字，右侧选择 `template`，模板格式，然后点击 add choice 创建
 然后下面是我的一些配置：
 ![QuickAdd参数配置](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@img/img/QuickAdd%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE.png)
-
 
 template path: 模板地址，我是专门建个文件夹存放的
 打开 create in folder 设置，然后根据自己需要，自己每次选择文件夹还是自动放到指定好的文件夹。如果希望自动放到指定文件夹，那下面那一个不能打开。
@@ -202,16 +209,19 @@ template path: 模板地址，我是专门建个文件夹存放的
 ![[块引用.png]]
 在本文中也是可以进行块引用的，直接使用 `^` 选择即可
 ![[#^28840b | 块引用展示]]
+
 ### 快速跳转到笔记的其他标题
 比如跳到 dataview，格式为 `[[#dataview]]`，也可以 `[[#dataview | 自定义文本]]` 来修改文本
 `[[#^....]]` 来进行文字块的选择，也能快速跳转
 例如
 - [[#dataview | 来到第一个插件介绍]]
 - [[#^b9bb4d| 跳转到顶部]]
+
 ## 教程参考
 ### dataview
 1. [obsidian插件之dataview入门 - 经验分享 - Obsidian 中文论坛](https://forum-zh.obsidian.md/t/topic/195)
 2. [基于dataviewjs的字数统计功能 - 经验分享 - Obsidian 中文论坛](https://forum-zh.obsidian.md/t/topic/32608)
+
 #### dataviewjs
 1. [DataviewJS - 从入门到退坑 01 - 餐巾纸盒子 - Obsidian Publish](https://publish.obsidian.md/napkinium/Ideas/Dataview/Learnings/DataviewJS+-+%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E9%80%80%E5%9D%91+01)
 2. [Dataviewjs的奇技淫巧 - 经验分享 - Obsidian 中文论坛](https://forum-zh.obsidian.md/t/topic/5954/128)

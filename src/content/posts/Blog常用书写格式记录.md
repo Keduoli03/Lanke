@@ -8,10 +8,9 @@ tags:
   - 博客
 series: 博客
 cover:
-pinned: true
-status: 已完成
+status: 未完成
 date: 2025-04-23 00:47
-updated: 2025-09-09 20:30
+updated: 2025-10-08 16:52
 slug: "303355"
 ---
 
@@ -84,18 +83,18 @@ slug: "303355"
 
 #### 可折叠的 Callout
 
-通过添加 `|collapsible` 参数实现折叠功能，默认折叠状态；添加 `|collapsible,expanded` 可默认展开：
+通过添加 `-` 参数实现折叠功能，默认折叠状态；添加 `+` 可默认展开：
 
 ```markdown
 # 默认折叠（需点击展开）
-> [!IMPORTANT|collapsible] 折叠的重要信息
+> [!IMPORTANT]- 折叠的重要信息
 > 点击标题可展开/折叠内容，适合内容较长的标注，减少视觉干扰。
 > - 列表项 1
 > - 列表项 2
 > - 列表项 3
 
 # 默认展开（可手动折叠）
-> [!CAUTION|collapsible,expanded] 可折叠的警告
+> [!CAUTION]+ 可折叠的警告
 > 这是默认展开的折叠标注，包含多行内容时非常实用：
 > 1. 第一步操作
 > 2. 第二步操作
@@ -126,4 +125,9 @@ slug: "303355"
 
 ## 代码块
 
-通过安装 [Expressive Cod](https://expressive-code.com/installation/#astro) 增强 Astro 的代码块
+通过安装 [Expressive Code](https://expressive-code.com/installation/#astro) 增强 Astro 的代码块
+
+## 音乐卡片
+根据 remark 写的卡片，支持外部音乐链接。没有使用 meetingjs，因为我不相信国内的音乐平台
+
+具体可见[博客美化记录](https://blog.blueke.top/posts/bo-ke-mei-hua-ji-lu/#aplayer-%E7%BB%84%E4%BB%B6%E5%B0%81%E8%A3%85)
