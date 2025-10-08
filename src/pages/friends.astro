@@ -2,9 +2,18 @@
 import Artalk from '@/components/util/Artalk.astro';
 import MainLayout from '../layouts/MainLayout.astro';
 import { items as friends } from '../page_data/friend';
+import Markdown from '@/components/util/Markdown.astro';
+import { getEntry } from 'astro:content';
+import { render } from 'astro:content';
 
 const title = "友链";
 const description = "一些朋友们的网站";
+const friendPost = await getEntry("pages", "friend");
+// 添加类型检查
+if (!friendPost) {
+  throw new Error('Friend page not found');
+}
+const { Content } = await render(friendPost);
 
 ---
 <MainLayout title={title}>
@@ -29,9 +38,19 @@ const description = "一些朋友们的网站";
         </a>
       ))}
     </div>
-    <div id="comment-section">
-    <Artalk />
-  </div>
+
+    <!-- 与Markdown内容保持距离的分隔区块 -->
+    <div class="friend-notes-separator"></div>
+
+    <Markdown>
+      <Content />
+    </Markdown>
+    <section class="comments-section" aria-labelledby="comments-title">
+      <h2 id="comments-title" class="comments-title">评论</h2>
+      <div id="comment-section">
+        <Artalk />
+      </div>
+    </section>
   </div>
   <style>
     .about-header {
@@ -56,6 +75,78 @@ const description = "一些朋友们的网站";
       color: var(--text-secondary);
       font-size: 1.125rem;
       margin: 0;
+    }
+    /* 新增：评论区样式 */
+    .comments-section {
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--line-divider);
+    }
+    .comments-title {
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    #comment-section {
+      max-width: var(--page-width);
+      margin: 0 auto;
+    }
+    .link-requirements {
+      margin-top: 2rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--line-divider);
+    }
+    .section-title {
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+    .requirements-code {
+      background: var(--content-pane-bg);
+      border: 1px solid var(--line-divider);
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+    .requirements-list {
+      margin-top: 0.75rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .requirements-list .link {
+      color: var(--theme-color);
+      text-decoration: none;
+    }
+    .requirements-list .link:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 1023px) {
+      .link-requirements {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+      }
+    }
+    @media (max-width: 1023px) {
+      .comments-section {
+        margin-top: 2rem;
+        padding-top: 1rem;
+      }
+    }
+    .friend-notes-separator {
+      margin-top: 2rem; /* 与上方网格的距离 */
+      padding-top: 1rem; /* 分隔内边距 */
+      border-top: 1px solid var(--line-divider); /* 分隔线 */
+    }
+    @media (max-width: 1023px) {
+      .friend-notes-separator {
+        margin-top: 1.5rem;
+        padding-top: 0.75rem;
+      }
     }
   </style>
 </MainLayout>
