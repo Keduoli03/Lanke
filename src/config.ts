@@ -20,7 +20,7 @@ export const siteConfig: SiteConfig = {
     fixed: false,
   },
   
-  pageWidth: "80rem", // 内容区域最大宽度
+  pageWidth: "72rem", // 内容区域最大宽度
   sidebarWidth: "4rem", // 侧边栏宽度
   tocWidth: "12rem", // 目录宽度 (224px)
   tocMaxDepth: 3, // 目录最大显示深度

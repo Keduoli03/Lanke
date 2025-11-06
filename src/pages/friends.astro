@@ -17,29 +17,53 @@ const { Content } = await render(friendPost);
 
 ---
 <MainLayout title={title}>
-  <div class="px-4">
+  <div class="px-4 max-w-[var(--page-width)] mx-auto">
     <header class="about-header">
       <h1 class="about-title">{title}</h1>
       <p class="about-subtitle">{description}</p>
     </header>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {friends.map(friend => (
-        <a href={friend.siteurl} target="_blank" rel="noopener noreferrer" class="block p-6 bg-[var(--page-bg)] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-          <div class="flex items-center mb-4">
-            {friend.imgurl && <img src={friend.imgurl} alt={friend.title} class="w-12 h-12 rounded-full mr-4 object-cover" />}
-            <h2 class="text-xl font-semibold">{friend.title}</h2>
+    <!-- 优化网格布局：调整间距和响应式列数 -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {friends.map((friend, index) => (
+        <a 
+          href={friend.siteurl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex flex-col p-6 bg-[var(--page-bg)] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+        >
+          <div class="flex items-center mb-3">
+            {/* 缩小头像尺寸，优化圆角和边框 */}
+            {friend.imgurl && (
+              <img 
+                src={friend.imgurl} 
+                alt={friend.title} 
+                class="w-10 h-10 rounded-full mr-3 object-cover border border-[var(--border-color)]" 
+                loading="lazy"
+                onerror="this.onerror=null; this.src='/assets/default-avatar.png';"
+              />
+            )}
+            <!-- 缩小标题字体，优化权重 -->
+            <h2 class="text-lg font-medium text-[var(--text-primary)] truncate">{friend.title}</h2>
           </div>
-          <p class="text-[var(--text-secondary)] mb-4">{friend.desc}</p>
-          <div class="flex flex-wrap gap-2">
-            {friend.tags.map(tag => (
-              <span class="px-2 py-1 bg-[var(--tag-bg)] text-sm rounded-md">{tag}</span>
+          <!-- 优化描述文本：缩小字体、限制行数、调整间距 -->
+          <p class="text-[var(--text-secondary)] text-sm mb-3 line-clamp-2 leading-relaxed flex-1">
+            {friend.desc || '暂无描述'}
+          </p>
+          <!-- 优化标签样式：更小尺寸、更精致圆角，始终在底部 -->
+          <div class="flex flex-wrap gap-1.5 mt-auto">
+            {friend.tags?.map((tag, tagIndex) => (
+              <span 
+                class="px-2 py-0.5 bg-[var(--tag-bg)] text-xs rounded-full text-[var(--text-tertiary)]"
+              >
+                {tag}
+              </span>
             ))}
           </div>
         </a>
       ))}
     </div>
 
-    <!-- 与Markdown内容保持距离的分隔区块 -->
+    <!-- 分隔区块优化 -->
     <div class="friend-notes-separator"></div>
 
     <Markdown>
@@ -55,8 +79,8 @@ const { Content } = await render(friendPost);
   <style>
     .about-header {
       text-align: center;
-      margin-bottom: 3rem;
-      padding-bottom: 1.5rem;
+      margin-bottom: 2rem; /* 缩小底部间距 */
+      padding-bottom: 1rem; /* 缩小底部内边距 */
       border-bottom: 2px solid var(--line-divider);
       width: 100%;
     }
@@ -65,7 +89,7 @@ const { Content } = await render(friendPost);
       align-items: center;
       justify-content: center;
       gap: 0.75rem;
-      font-size: 2.25rem;
+      font-size: 2rem; /* 微调标题大小 */
       font-weight: 700;
       color: var(--text-primary);
       margin-bottom: 0.5rem;
@@ -73,10 +97,10 @@ const { Content } = await render(friendPost);
     }
     .about-subtitle {
       color: var(--text-secondary);
-      font-size: 1.125rem;
+      font-size: 1rem; /* 缩小副标题字体 */
       margin: 0;
     }
-    /* 新增：评论区样式 */
+    /* 评论区样式 */
     .comments-section {
       margin-top: 2.5rem;
       padding-top: 1.5rem;
@@ -125,28 +149,47 @@ const { Content } = await render(friendPost);
     .requirements-list .link:hover {
       text-decoration: underline;
     }
-    @media (max-width: 1023px) {
-      .link-requirements {
-        margin-top: 1.5rem;
-        padding-top: 1rem;
-      }
-    }
-    @media (max-width: 1023px) {
-      .comments-section {
-        margin-top: 2rem;
-        padding-top: 1rem;
-      }
-    }
     .friend-notes-separator {
-      margin-top: 2rem; /* 与上方网格的距离 */
-      padding-top: 1rem; /* 分隔内边距 */
-      border-top: 1px solid var(--line-divider); /* 分隔线 */
+      margin-top: 1.5rem; /* 缩小间距 */
+      padding-top: 1rem;
+      border-top: 1px solid var(--line-divider);
+    }
+    /* 响应式优化 */
+    @media (max-width: 1279px) {
+      .grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
     }
     @media (max-width: 1023px) {
-      .friend-notes-separator {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .link-requirements, .comments-section {
         margin-top: 1.5rem;
+        padding-top: 1rem;
+      }
+      .friend-notes-separator {
+        margin-top: 1.25rem;
         padding-top: 0.75rem;
       }
+    }
+    @media (max-width: 639px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .about-title {
+        font-size: 1.75rem;
+      }
+      .about-header {
+        margin-bottom: 1.5rem;
+      }
+    }
+    /* 新增：文本行数限制样式 */
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
   </style>
 </MainLayout>

@@ -66,13 +66,6 @@ export const items = [
 		tags: ["友链"],
 	},
 	{
-		title: "JIPA233の小窝",
-		imgurl: "https://jipa.moe/static/avatar.jpg",
-		desc: "Deed divides beings into lower and higher ones.",
-		siteurl: "https://jipa.moe",
-		tags: ["友链", "已失联"],
-	},
-	{
 		title: "岚天小窝",
 		imgurl:
 			"https://gravatar.ltya.top/avatar/5af06b461740fb2bd7467b8561399703?s=500",
