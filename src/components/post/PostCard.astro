@@ -172,7 +172,7 @@ const categoryStyle = getCategoryStyle(firstCategory);
           {categories && categories.length > 0 && (
             <a
               href={`/categories/${categories.map((c) => encodeURIComponent(c)).join('/')}/`}
-              class="inline-flex items-center gap-1 px-3 py-1 rounded-full category-container"
+              class="inline-flex items-center gap-0.5 md:gap-1 px-2 py-0.5 md:px-3 md:py-1 rounded-full category-container"
               style="
                 background: color-mix(in srgb, var(--theme-color) 12%, transparent);
                 color: var(--theme-color);
@@ -180,21 +180,21 @@ const categoryStyle = getCategoryStyle(firstCategory);
               "
               aria-label={`查看分类：${categories.join(' / ')}`}
             >
-              <Icon name="material-symbols:folder-open-outline" class="h-4 w-4 flex-shrink-0" />
-              <span class="text-xs font-medium">{categories.join(' / ')}</span>
+              <Icon name="material-symbols:folder-open-outline" class="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
+              <span class="text-xs font-medium">{categories.join('/')}</span>
             </a>
           )}
 
           {tags && tags.length > 0 && (
             <div
-              class="inline-flex items-center gap-1 px-3 py-1 rounded-full tag-container"
+              class="inline-flex items-center gap-0.5 md:gap-1 px-2 py-0.5 md:px-3 md:py-1 rounded-full tag-container"
               style="
                 background: color-mix(in srgb, var(--theme-color) 10%, transparent);
                 color: var(--theme-color);
                 border: 1px solid color-mix(in srgb, var(--theme-color) 30%, transparent);
               "
             >
-              <Icon name="material-symbols:label-outline" class="h-4 w-4 flex-shrink-0" />
+              <Icon name="material-symbols:label-outline" class="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
               <span class="text-xs font-medium">
                 {
                   tags.map((tag, i) => (
@@ -206,7 +206,7 @@ const categoryStyle = getCategoryStyle(firstCategory);
                       >
                         {tag}
                       </a>
-                      {i < tags.length - 1 ? <span class="mx-1 opacity-70">/</span> : null}
+                      {i < tags.length - 1 ? <span class="mx-0.5 md:mx-1 opacity-70">/</span> : null}
                     </span>
                   ))
                 }
