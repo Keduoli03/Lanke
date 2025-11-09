@@ -167,8 +167,9 @@ const categoryStyle = getCategoryStyle(firstCategory);
       {/* ================================= */}
       {/*  底部区域：分类标签 + 阅读全文     */}
       {/* ================================= */}
-      <div class="mt-auto flex flex-wrap items-center justify-between gap-2">
-        <div class="flex flex-wrap items-center gap-3">
+      <!-- 底部区域（分类/标签 + 阅读全文） -->
+      <div class="mt-auto flex items-end gap-2">
+        <div class="flex flex-wrap items-center gap-3 flex-1 min-w-0">
           {categories && categories.length > 0 && (
             <a
               href={`/categories/${categories.map((c) => encodeURIComponent(c)).join('/')}/`}
@@ -181,10 +182,10 @@ const categoryStyle = getCategoryStyle(firstCategory);
               aria-label={`查看分类：${categories.join(' / ')}`}
             >
               <Icon name="material-symbols:folder-open-outline" class="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
-              <span class="text-xs font-medium">{categories.join('/')}</span>
+              <span class="text-xs font-medium">{categories.join(' / ')}</span>
             </a>
           )}
-
+      
           {tags && tags.length > 0 && (
             <div
               class="inline-flex items-center gap-0.5 md:gap-1 px-2 py-0.5 md:px-3 md:py-1 rounded-full tag-container"
@@ -195,28 +196,22 @@ const categoryStyle = getCategoryStyle(firstCategory);
               "
             >
               <Icon name="material-symbols:label-outline" class="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
-              <span class="text-xs font-medium">
-                {
-                  tags.map((tag, i) => (
-                    <span>
-                      <a
-                        href={`/tags/${encodeURIComponent(tag)}/`}
-                        class="hover:underline"
-                        aria-label={`查看标签：${tag}`}
-                      >
-                        {tag}
-                      </a>
-                      {i < tags.length - 1 ? <span class="mx-0.5 md:mx-1 opacity-70">/</span> : null}
-                    </span>
-                  ))
-                }
+              <span class="font-medium tag-list">
+                {tags.map((tag, i) => (
+                  <span>
+                    <a
+                      href={`/tags/${encodeURIComponent(tag)}/`}
+                      class="text-xs hover:underline"
+                      aria-label={`查看标签：${tag}`}
+                    >{tag}</a>{i < tags.length - 1 ? <span class="sep text-xs">/</span> : null}
+                  </span>
+                ))}
               </span>
             </div>
           )}
         </div>
-
-        {/* 右侧：阅读全文 */}
-        <a href={url} class="group text-sm font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1
+      
+        <a href={url} class="ml-auto self-end group text-sm font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1
           hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-300">
           <span>阅读全文</span>
           <Icon name="material-symbols:arrow-right-alt" class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
@@ -234,10 +229,23 @@ const categoryStyle = getCategoryStyle(firstCategory);
     overflow: hidden;
   }
 
-  /* 保持整条徽章 hover 略微放大 */
   .category-container:hover,
   .tag-container:hover {
     transform: scale(1.03);
     transition: transform 0.2s ease;
+  }
+
+  /* 斜杠紧贴：消除内联元素间空白 */
+  .tag-container .tag-list {
+    font-size: 0;
+  }
+  .tag-container .tag-list span,
+  .tag-container .tag-list a,
+  .tag-container .tag-list .sep {
+    font-size: 0.75rem; /* 等同于 text-xs */
+    line-height: 1rem;
+  }
+  .tag-container .tag-list .sep {
+    margin: 0;
   }
 </style>
