@@ -96,7 +96,7 @@ export const items = [
 	},
 	{
 		title: "流月小站",
-		imgurl: "https://cdn.flowmoon.cn/assets/img/avatar.png",
+		imgurl: "https://cdn.liuyue.net/assets/img/avatar.jpg",
 		desc: "且听风吟，静待花开",
 		siteurl: "https://blog.flowmoon.cn/",
 		tags: ["友链"],
