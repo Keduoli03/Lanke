@@ -1,5 +1,5 @@
 ---
-title: 在Astro新增一个时间盒子页面
+title: 【失效】在Astro新增一个时间盒子页面
 description: 自己写了一个页面，可以记录动漫、音乐、照片等
 categories:
   - 博客
@@ -9,7 +9,7 @@ series: 博客
 cover: 
 status: 已完成
 date: 2025-04-29 17:41
-updated: 2025-08-08 23:46
+updated: 2025-11-09 20:24
 slug: "772272"
 ---
 

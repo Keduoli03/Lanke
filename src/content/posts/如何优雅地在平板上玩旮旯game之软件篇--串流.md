@@ -11,7 +11,7 @@ status: 已完成
 pinned: false
 aiSummary: true
 date: 2025-11-08 22:46
-updated: 2025-11-09 14:27
+updated: 2025-11-09 20:05
 slug: "717"
 ---
 
@@ -22,11 +22,9 @@ slug: "717"
 ## 本文软件
 
 - [Sunshine-Foundation](https://github.com/qiin2333/Sunshine-Foundation)：Sunshine 基地版，电脑端软件
-- [moonlight 第三方版)：安卓端软件，同Sunshine 基地版作者开发
+- [moonlight-vplus](https://github.com/qiin2333/moonlight-vplus)：安卓端软件，同Sunshine 基地版作者开发
 
-当然，你也可以选择原版的 [Sunshine](https://app.lizardbyte.dev/Sunshine/?lng=en#Download) 和 [Moonlight](https://moonlight-stream.org/)
-
-此外，这还有一些改版：
+当然，你也可以选择原版的 [Sunshine](https://app.lizardbyte.dev/Sunshine/?lng=en#Download) 和 [Moonlight](https://moonlight-stream.org/)。此外，这还有一些改版：
 
 - [Apollo](https://github.com/ClassicOldSong/Apollo)：第三方 Sunshine
 
