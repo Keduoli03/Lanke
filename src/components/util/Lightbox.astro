@@ -204,14 +204,59 @@ function initLightbox() {
       || isImageHref;
   };
 
-  // 解析点击目标：优先识别可用的链接，否则兜底识别 img
   const resolveClickTarget = (t) => {
     if (!(t instanceof Element)) return null;
+
+    // 排除评论容器（根据你的结构同时匹配 #comment-section 与 .artalk）
+    if (t.closest('#comment-section') || t.closest('.artalk')) return null;
+
+    // 优先识别链接
     const a = t.closest('a');
     if (a && isLightboxLink(a)) return { type: 'a', el: a };
+
+    // 兜底识别图片（再次排除评论容器与表情）
     const imgEl = t.closest('img');
-    if (imgEl) return { type: 'img', el: imgEl };
+    if (imgEl) {
+      if (imgEl.closest('#comment-section') || imgEl.closest('.artalk')) return null;
+
+      const altLower = (imgEl.getAttribute('alt') || '').toLowerCase();
+      const isEmoji =
+        imgEl.classList.contains('artalk-emoji') ||
+        imgEl.classList.contains('atk-emoji') ||
+        imgEl.hasAttribute('data-emoji') ||
+        /emoji|表情/.test(altLower);
+      if (isEmoji) return null;
+
+      return { type: 'img', el: imgEl };
+    }
     return null;
+  };
+
+  // 只保留这一份：点击处理（排除评论区）
+  const handleClick = (e) => {
+    const t = e.target;
+    if (!(t instanceof Element)) return;
+
+    // 灯箱自身的点击不处理
+    if (dialog?.open && dialog.contains(t)) return;
+
+    // 直接跳过评论容器的点击
+    if (t.closest('#comment-section') || t.closest('.artalk')) return;
+
+    const targetInfo = resolveClickTarget(t);
+    if (!targetInfo) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof e.stopImmediatePropagation === 'function') {
+      e.stopImmediatePropagation();
+    }
+
+    if (targetInfo.type === 'a') {
+      openLightbox(targetInfo.el);
+    } else {
+      openLightboxFromImg(targetInfo.el);
+    }
   };
 
   const sanitizeCaption = (text) => {
@@ -311,25 +356,6 @@ function initLightbox() {
       };
   
       setTimeout(show, 50);
-  };
-
-  const handleClick = (e) => {
-    const t = e.target;
-    if (!(t instanceof Element)) return;
-    if (dialog?.open && dialog.contains(t)) return;
-
-    const targetInfo = resolveClickTarget(t);
-    if (!targetInfo) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-    if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
-
-    if (targetInfo.type === 'a') {
-      openLightbox(targetInfo.el);
-    } else {
-      openLightboxFromImg(targetInfo.el);
-    }
   };
 
   const handleClose = (e) => {
