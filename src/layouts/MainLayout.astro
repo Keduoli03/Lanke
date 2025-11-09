@@ -33,7 +33,6 @@ const { title=siteConfig.title, description = siteConfig.description, useContent
 		<div class="layout-container">
 			<Sidebar transition:persist />
             <MobileNav /> 
-			<!-- 添加导航切换动画类 -->
 			<main class="main-content">
 				{useContentPane ? (
 					<div class="content-pane">
@@ -76,7 +75,7 @@ const { title=siteConfig.title, description = siteConfig.description, useContent
 				padding: 2rem 1rem;
 			}
 
-			/* 用于文章详情页等有面板页面：带背景、阴影、圆角 */
+
 			.content-pane {
 				max-width: var(--page-width);
 				width: 100%;
@@ -87,14 +86,12 @@ const { title=siteConfig.title, description = siteConfig.description, useContent
 				box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.08);
 			}
 
-			/* 深色模式调整 */
 			html.dark .content-pane {
 				background-color: var(--content-pane-bg);
 				border: 1px solid var(--line-divider);
 				box-shadow: none;
 			}
 
-			/* 桌面端适配（≥1024px） */
 			@media (min-width: 1024px) {
 				:global(#sidebar) {
 					width: var(--sidebar-width) !important;
