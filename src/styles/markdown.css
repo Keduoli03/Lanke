@@ -283,6 +283,15 @@ html.dark .prose blockquote::before {
   .prose li {
     @apply text-sm;
   }
+  /* 修复 CJK 禁则导致的行尾空白：尽量填满每一行 */
+  .prose p,
+  .prose li,
+  .prose blockquote p {
+    line-break: anywhere;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+    white-space: normal;
+  }
 }
 
 /*
@@ -298,18 +307,20 @@ html.dark .prose blockquote::before {
 }
 
 /* 移动端代码块调整 */
-@media (max-width: 768px) {
-  .prose pre {
-    @apply text-xs p-3;
-  }
-  
-  .prose code {
-    @apply text-xs;
-  }
-  
+@media (max-width: 768px) {  
   /* 行内代码调整 */
   .prose :not(pre) > code {
     @apply text-xs px-1 py-0.5;
+  }
+
+  /* 覆盖为更小字号与更紧凑内边距（手机端） */
+  .prose pre {
+    font-size: 0.5rem !important;   /* ≈ 11px，更省空间 */
+    line-height: 1.3;
+    padding: 0.5rem 0.75rem;
+  }
+  .prose pre code {
+    font-size: 0.85em;      /* 让内部代码相对 pre 再小一点点 */
   }
 }
 
