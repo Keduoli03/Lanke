@@ -18,7 +18,8 @@ import { pluginFileIcons } from "@xt0rted/expressive-code-file-icons";
 import { expressiveCodeConfig, siteConfig } from './src/config';
 import rehypeCallouts from "rehype-callouts";
 import remarkAplayer from './src/plugins/rehype-component-aplayer.mjs';
-import remarkImageWrapper from './src/plugins/remark-image-wrapper.mjs';
+// 删除：import remarkImageWrapper from './src/plugins/remark-image-wrapper.mjs'
+import rehypeImageLightbox from './src/plugins/rehype-image-lightbox.mjs';
 
 import vercel from '@astrojs/vercel';
 // https://astro.build/config
@@ -33,13 +34,10 @@ export default defineConfig({
       remarkDirective,
       remarkGithubCard,
       remarkAplayer,
-      remarkImageWrapper
+      // 删除：remarkImageWrapper
     ],
     rehypePlugins: [
-      
-      [rehypeCallouts, {
-        theme: "github",
-      }],
+      [rehypeCallouts, { theme: "github" }],
       rehypeAplayer,
       readingStats,
       rehypeSlug,
@@ -47,11 +45,11 @@ export default defineConfig({
         rehypeAutolinkHeadings,
         {
           behavior: 'wrap',
-          properties: {
-            className: ['anchor'],
-          },
+          properties: { className: ['anchor'] },
         },
       ],
+      // 新增：在 Astro 完成图片处理后再包裹 Lightbox
+      rehypeImageLightbox,
     ],
     shikiConfig: {
       theme: "one-dark-pro",

@@ -84,6 +84,16 @@ body {
   padding: 0 !important;
 }
 
+/* 让可点击图片显示放大镜指针 */
+.md-lightbox img {
+  cursor: zoom-in !important;
+}
+
+/* 如果没有外层链接，兜底让普通 img 也有指针提示 */
+.prose img {
+  cursor: zoom-in !important;
+}
+
 /* 关闭按钮基础样式 - 半透明背景 */
 #md-lightbox-close {
   position: absolute !important;
@@ -178,18 +188,16 @@ function initLightbox() {
 
   const isLightboxLink = (a) => {
     if (!a) return false;
-    // 忽略外链 / 新窗口链接
     const target = a.getAttribute('target');
     const rel = (a.getAttribute('rel') || '').toLowerCase();
     if (target === '_blank' || rel.includes('noopener') || rel.includes('noreferrer')) return false;
-    // 支持显式关闭灯箱
     if (a.getAttribute('data-no-lightbox') === 'true') return false;
-  
+
     const href = a.getAttribute('href') || '';
     const classes = a.classList;
     const hasData = a.hasAttribute('data-lightbox') || a.hasAttribute('data-pswp-src');
     const isImageHref = /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(href);
-  
+
     return hasData
       || classes.contains('md-lightbox')
       || classes.contains('pswp-link')
@@ -197,10 +205,27 @@ function initLightbox() {
       || isImageHref;
   };
 
+  // 解析点击目标：优先识别可用的链接，否则兜底识别 img
+  const resolveClickTarget = (t) => {
+    if (!(t instanceof Element)) return null;
+    const a = t.closest('a');
+    if (a && isLightboxLink(a)) return { type: 'a', el: a };
+    const imgEl = t.closest('img');
+    if (imgEl) return { type: 'img', el: imgEl };
+    return null;
+  };
+
   const openLightbox = (a) => {
-    const url = a.getAttribute('data-lightbox') || a.getAttribute('data-pswp-src') || a.getAttribute('href') || '';
-    const alt = a.getAttribute('data-alt') || a.querySelector('img')?.getAttribute('alt') || '';
-    const title = a.getAttribute('data-title') || a.querySelector('img')?.getAttribute('title') || '';
+    const childImg = a.querySelector('img');
+    const url =
+      childImg?.currentSrc ||
+      childImg?.src ||
+      a.getAttribute('data-pswp-src') ||
+      a.getAttribute('data-lightbox') ||
+      a.getAttribute('href') ||
+      '';
+    const alt = a.getAttribute('data-alt') || childImg?.getAttribute('alt') || '';
+    const title = a.getAttribute('data-title') || childImg?.getAttribute('title') || '';
 
     if (img) { 
       img.src = '';
@@ -209,6 +234,45 @@ function initLightbox() {
     }
     if (caption) { 
       caption.textContent = title || alt || ''; 
+      caption.style.display = (title || alt) ? 'block' : 'none';
+    }
+
+    const show = () => {
+      if (dialog) {
+        dialog.style.position = 'fixed';
+        dialog.style.inset = '0';
+        dialog.style.width = '100%';
+        dialog.style.height = '100%';
+        dialog.style.padding = 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)';
+        dialog.style.margin = '0';
+        dialog.style.border = 'none';
+
+        if (typeof dialog.showModal === 'function') {
+          dialog.showModal();
+        } else {
+          dialog.setAttribute('open', '');
+        }
+      }
+      lockScroll();
+      recentlyOpenedUntil = performance.now() + 400;
+    };
+
+    setTimeout(show, 50);
+  };
+
+  // 兜底：直接从 img 元素打开灯箱
+  const openLightboxFromImg = (imgEl) => {
+    const url = imgEl.getAttribute('data-pswp-src') || imgEl.currentSrc || imgEl.src || '';
+    const alt = imgEl.getAttribute('alt') || '';
+    const title = imgEl.getAttribute('title') || '';
+
+    if (img) {
+      img.src = '';
+      img.src = url;
+      img.alt = alt;
+    }
+    if (caption) {
+      caption.textContent = title || alt || '';
       caption.style.display = (title || alt) ? 'block' : 'none';
     }
 
@@ -240,12 +304,19 @@ function initLightbox() {
     const t = e.target;
     if (!(t instanceof Element)) return;
     if (dialog?.open && dialog.contains(t)) return;
-    const a = t.closest('a');
-    if (!a || !isLightboxLink(a)) return;
+
+    const targetInfo = resolveClickTarget(t);
+    if (!targetInfo) return;
+
     e.preventDefault();
     e.stopPropagation();
     if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
-    openLightbox(a);
+
+    if (targetInfo.type === 'a') {
+      openLightbox(targetInfo.el);
+    } else {
+      openLightboxFromImg(targetInfo.el);
+    }
   };
 
   const handleClose = (e) => {
