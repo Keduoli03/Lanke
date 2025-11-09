@@ -5,12 +5,12 @@ const today = new Date();
 ---
 
 <footer>
-  <!-- 左侧：年份版权（下移调整） -->
+ 
   <div class="footer-left">
     &copy; {today.getFullYear()} All rights reserved.
   </div>
 
-  <!-- 中间：萌ICP备案 + RSS + Sitemap（同步下移，保持对齐） -->
+ 
   <div class="footer-middle">
     <a 
       href="https://icp.gov.moe/?keyword=20250012" 
@@ -45,7 +45,6 @@ const today = new Date();
     </div>
   </div>
 
-  <!-- 右侧：厂商/主题/作者信息（样式全面优化） -->
   <div class="footer-right">
     <div class="author-info">
       <span class="tech-label">Powered by</span>
@@ -132,27 +131,27 @@ const today = new Date();
 
 
   .tech-label, .theme-label {
-    color: rgba(var(--gray), 0.7); /* 半透明灰，降低标签存在感 */
+    color: rgba(var(--gray), 0.7);
     font-size: 0.85rem;
     font-weight: 300;
   }
 
-  /* 右侧分隔符优化：从“-”改为“•”，更精致 */
+ 
   .divider {
     color: rgba(var(--gray), 0.4);
     font-size: 0.7rem;
     margin: 0 0.2em;
   }
 
-  /* 右侧链接强化：hover 效果更明显，区分于标签 */
+ 
   .tech-link, .author-link {
     font-weight: 500;
     color: rgb(var(--gray));
-    transition: all 0.3s ease; /* 增加all，支持多属性过渡 */
+    transition: all 0.3s ease; 
   }
 
   .tech-link:hover, .author-link:hover {
-    color: rgb(var(--primary)); /* hover 变主色，比之前的dark更醒目（优化右侧关键） */
+    color: rgb(var(--primary)); 
   }
 
   /* 通用链接样式：保留下划线动效，调整位置适配下移 */
@@ -176,20 +175,28 @@ const today = new Date();
     width: 100%;
   }
 
-  /* 响应式：移动端优化布局与字体 */
+ 
+  /* 修复平板模式 */
+  @media (min-width: 1024px) {
+    footer {
+      padding-left: calc(var(--sidebar-width, 4rem) + 2em);
+      box-sizing: border-box;
+    }
+  }
+
   @media (max-width: 768px) {
     footer {
-      padding: 1rem 1rem 2rem; /* 更紧凑的上下内边距 */
-      flex-direction: column;   /* 改为纵向堆叠 */
-      align-items: center;      /* 居中对齐 */
-      justify-content: center;  /* 垂直居中 */
-      gap: 1rem;                /* 统一块间距 */
-      text-align: center;       /* 文本居中 */
+      padding: 1rem 1rem 2rem; 
+      flex-direction: column;   
+      align-items: center;      
+      justify-content: center;  
+      gap: 1rem;                
+      text-align: center;      
     }
   
     .footer-left, .footer-middle, .footer-right {
-      width: 100%;              /* 三栏占满行宽 */
-      margin-bottom: 0;         /* 移除额外下移 */
+      width: 100%;            
+      margin-bottom: 0;       
     }
   
     .footer-left {
@@ -203,17 +210,17 @@ const today = new Date();
     }
   
     .middle-links {
-      gap: 0.6em;                          /* 链接间距更紧凑 */
+      gap: 0.6em;                         
       font-size: clamp(0.8rem, 2.4vw, 0.9rem);
-      flex-wrap: wrap;                      /* 允许换行，防拥挤 */
-      justify-content: center;              /* 居中排列 */
+      flex-wrap: wrap;                     
+      justify-content: center;            
     }
   
     .author-info {
-      flex-direction: row;                  /* 改为一行（可换行） */
-      flex-wrap: wrap;                      /* 允许换行 */
-      justify-content: center;              /* 居中 */
-      gap: 0.5em;                           /* 更紧凑间距 */
+      flex-direction: row;               
+      flex-wrap: wrap;             
+      justify-content: center;      
+      gap: 0.5em;                     
       font-size: clamp(0.85rem, 2.8vw, 0.95rem);
       line-height: 1.5;
     }
@@ -222,8 +229,8 @@ const today = new Date();
       font-size: clamp(0.75rem, 2.2vw, 0.85rem);
     }
   
-    .divider { display: none; }             /* 移动端隐藏分隔符 */
+    .divider { display: none; }        
   
-    .footer-link::after { bottom: -2px; }   /* 下划线微调，避免错位 */
+    .footer-link::after { bottom: -2px; }   
   }
 </style>
