@@ -32,12 +32,12 @@ const fullPostUrl = Astro.url.href;
     
     >
   {/* 容器保持居中 */}
-  <div class="w-full flex justify-center px-2 sm:px-3 md:px-4 py-6 md:py-8">
+  <div class="w-full flex justify-center px-2 sm:px-3 md:px-4 py-4 md:py-8">
     <div class="w-full max-w-7xl flex flex-col lg:flex-row gap-x-12 gap-y-8" style={`--toc-width: ${siteConfig.tocWidth}`}>
       {/* 文章区域 */}
       <article class="min-w-0 flex-1">
         {entry.data.cover && (
-          <div class="hero-image mb-8" transition:name={`hero-${entry.data.slug}`}>
+          <div class="hero-image mb-4 sm:mb-6 lg:mb-8" transition:name={`hero-${entry.data.slug}`}>
             <Image 
               width={1020} 
               height={510} 
@@ -81,11 +81,10 @@ const fullPostUrl = Astro.url.href;
     overflow: visible !important;
   }
 
-  /* 仅本页的移动端覆盖：收紧内容面板左右 padding */
+  /* 仅本页的移动端覆盖：收紧内容面板的顶部内边距 */
   @media (max-width: 640px) {
     :global(.content-pane) {
-      padding-left: 1rem;
-      padding-right: 1rem;
+      padding-top: 1rem;
     }
   }
 </style>
