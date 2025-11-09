@@ -151,7 +151,6 @@ body {
 </style>
 
 <script is:inline>
-// 脚本部分保持不变
 function initLightbox() {
   const dialog = document.getElementById('md-lightbox-dialog');
   const img = document.getElementById('md-lightbox-img');
@@ -215,89 +214,103 @@ function initLightbox() {
     return null;
   };
 
-  const openLightbox = (a) => {
-    const childImg = a.querySelector('img');
-    const url =
-      childImg?.currentSrc ||
-      childImg?.src ||
-      a.getAttribute('data-pswp-src') ||
-      a.getAttribute('data-lightbox') ||
-      a.getAttribute('href') ||
-      '';
-    const alt = a.getAttribute('data-alt') || childImg?.getAttribute('alt') || '';
-    const title = a.getAttribute('data-title') || childImg?.getAttribute('title') || '';
-
-    if (img) { 
-      img.src = '';
-      img.src = url; 
-      img.alt = alt; 
-    }
-    if (caption) { 
-      caption.textContent = title || alt || ''; 
-      caption.style.display = (title || alt) ? 'block' : 'none';
-    }
-
-    const show = () => {
-      if (dialog) {
-        dialog.style.position = 'fixed';
-        dialog.style.inset = '0';
-        dialog.style.width = '100%';
-        dialog.style.height = '100%';
-        dialog.style.padding = 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)';
-        dialog.style.margin = '0';
-        dialog.style.border = 'none';
-
-        if (typeof dialog.showModal === 'function') {
-          dialog.showModal();
-        } else {
-          dialog.setAttribute('open', '');
-        }
-      }
-      lockScroll();
-      recentlyOpenedUntil = performance.now() + 400;
-    };
-
-    setTimeout(show, 50);
+  const sanitizeCaption = (text) => {
+      const s = (text || '').trim();
+      if (!s) return '';
+      // 纯尺寸标记：|500 或 |500x300（忽略）
+      if (/^\|\s*\d+(\s*x\s*\d+)?\s*$/i.test(s)) return '';
+      // 尾随尺寸标记：alt|500 或 alt|500x300（去掉）
+      const cleaned = s.replace(/\|\s*\d+(\s*x\s*\d+)?\s*$/i, '').trim();
+      return cleaned;
   };
 
+  const openLightbox = (a) => {
+      const childImg = a.querySelector('img');
+      const url =
+          childImg?.currentSrc ||
+          childImg?.src ||
+          a.getAttribute('data-pswp-src') ||
+          a.getAttribute('data-lightbox') ||
+          a.getAttribute('href') ||
+          '';
+      const alt = a.getAttribute('data-alt') || childImg?.getAttribute('alt') || '';
+      const title = a.getAttribute('data-title') || childImg?.getAttribute('title') || '';
+      const captionText = title || alt || '未命名图片';
+  
+      if (img) {
+          img.src = '';
+          img.src = url;
+          img.alt = alt || '';
+      }
+      if (caption) {
+          caption.textContent = captionText;
+          caption.style.display = captionText ? 'block' : 'none';
+      }
+  
+      const show = () => {
+          if (dialog) {
+              dialog.style.position = 'fixed';
+              dialog.style.inset = '0';
+              dialog.style.width = '100%';
+              dialog.style.height = '100%';
+              dialog.style.padding = 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)';
+              dialog.style.margin = '0';
+              dialog.style.border = 'none';
+  
+              if (typeof dialog.showModal === 'function') {
+                  dialog.showModal();
+              } else {
+                  dialog.setAttribute('open', '');
+              }
+          }
+          lockScroll();
+          recentlyOpenedUntil = performance.now() + 400;
+      };
+  
+      setTimeout(show, 50);
+  };
+  
   // 兜底：直接从 img 元素打开灯箱
   const openLightboxFromImg = (imgEl) => {
-    const url = imgEl.getAttribute('data-pswp-src') || imgEl.currentSrc || imgEl.src || '';
-    const alt = imgEl.getAttribute('alt') || '';
-    const title = imgEl.getAttribute('title') || '';
-
-    if (img) {
-      img.src = '';
-      img.src = url;
-      img.alt = alt;
-    }
-    if (caption) {
-      caption.textContent = title || alt || '';
-      caption.style.display = (title || alt) ? 'block' : 'none';
-    }
-
-    const show = () => {
-      if (dialog) {
-        dialog.style.position = 'fixed';
-        dialog.style.inset = '0';
-        dialog.style.width = '100%';
-        dialog.style.height = '100%';
-        dialog.style.padding = 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)';
-        dialog.style.margin = '0';
-        dialog.style.border = 'none';
-
-        if (typeof dialog.showModal === 'function') {
-          dialog.showModal();
-        } else {
-          dialog.setAttribute('open', '');
-        }
+      const url = imgEl.getAttribute('data-pswp-src') || imgEl.currentSrc || imgEl.src || '';
+      const rawAlt = imgEl.getAttribute('alt') || '';
+      const rawTitle = imgEl.getAttribute('title') || '';
+      const alt = sanitizeCaption(rawAlt);
+      const title = sanitizeCaption(rawTitle);
+      const captionText = title || alt || '未命名图片';
+  
+      if (img) {
+          img.src = '';
+          img.src = url;
+          img.alt = alt || '';
       }
-
-      lockScroll();
-      recentlyOpenedUntil = performance.now() + 400;
-    };
-
-    setTimeout(show, 50);
+      if (caption) {
+          caption.textContent = captionText;
+          caption.style.display = captionText ? 'block' : 'none';
+      }
+  
+      const show = () => {
+          if (dialog) {
+              dialog.style.position = 'fixed';
+              dialog.style.inset = '0';
+              dialog.style.width = '100%';
+              dialog.style.height = '100%';
+              dialog.style.padding = 'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)';
+              dialog.style.margin = '0';
+              dialog.style.border = 'none';
+  
+              if (typeof dialog.showModal === 'function') {
+                  dialog.showModal();
+              } else {
+                  dialog.setAttribute('open', '');
+              }
+          }
+  
+          lockScroll();
+          recentlyOpenedUntil = performance.now() + 400;
+      };
+  
+      setTimeout(show, 50);
   };
 
   const handleClick = (e) => {
