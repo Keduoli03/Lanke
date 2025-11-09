@@ -11,6 +11,7 @@ import { siteConfig } from '@/config';
 import ScrollToTop from '@/components/util/ScrollToTop.astro';
 import ScrollToComment from '@/components/util/ScrollToComment.astro';
 import Artalk from '@/components/util/Artalk.astro';
+import AiSummary from '@/components/util/AiSummary.astro';
 
 export const prerender = true; // <--- 添加此行
 
@@ -33,7 +34,7 @@ const fullPostUrl = Astro.url.href;
     >
   {/* 容器保持居中 */}
   <div class="w-full flex justify-center px-2 sm:px-3 md:px-4 py-4 md:py-8">
-    <div class="w-full max-w-7xl flex flex-col lg:flex-row gap-x-12 gap-y-8" style={`--toc-width: ${siteConfig.tocWidth}`}>
+    <div class="w-full max-w-7xl flex flex-col lg:flex-row lg:gap-x-8 xl:gap-x-12 gap-y-8" style={`--toc-width: ${siteConfig.tocWidth}`}>
       {/* 文章区域 */}
       <article class="min-w-0 flex-1">
         {entry.data.cover && (
@@ -49,6 +50,14 @@ const fullPostUrl = Astro.url.href;
         )}
         
         <PostHeader post={entry} transition:name={`title-${entry.data.slug}`} />
+        <!-- AI summary -->
+            {entry.data.aiSummary && (
+                <AiSummary 
+                    slug={entry.data.slug} 
+                    title={entry.data.title} 
+                    body={entry.body} 
+                    />
+            )}
       
         <Markdown>
           <Content />
@@ -56,9 +65,9 @@ const fullPostUrl = Astro.url.href;
       </article>
       
       {/* 目录区域 */}
-      <aside class="hidden lg:block w-60 flex-shrink-0">
-        <div class="sticky top-16 flex flex-col min-h-0" style="max-height: calc(100vh - 12rem);">
-          <div class="flex-1 min-h-0 overflow-y-auto pr-4 pb-2">
+      <aside class="hidden lg:block lg:w-48 xl:w-60 flex-shrink-0">
+        <div class="sticky top-20 flex flex-col" style="height: calc(100vh - 20rem);">
+          <div class="overflow-y-auto pr-4">
             <Toc items={headings} />
           </div>
           <div class="mt-auto flex-shrink-0 flex flex-col items-center gap-3 py-4">
