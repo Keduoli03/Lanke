@@ -125,7 +125,7 @@ const categoryStyle = getCategoryStyle(firstCategory);
     </div>
 
     {/* ================================= */}
-    {/*  2. 内容区域 (优化后布局)       */}
+    {/*  2. 内容区域       */}
     {/* ================================= */}
     <div class="flex flex-col p-4 md:p-6 w-full md:w-2/3">
       <div class="flex items-start justify-between mb-3">
@@ -145,9 +145,7 @@ const categoryStyle = getCategoryStyle(firstCategory);
         )}
       </div>
 
-      {/* --- 元信息布局 (移除了分类标签部分) --- */}
       <div class="flex flex-col gap-y-2 text-sm text-secondary mb-4">
-        {/* 仅保留日期、时长、字数 */}
         <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
           <div class="inline-flex items-center gap-1.5">
             <Icon name="material-symbols:calendar-month-outline" class="h-5 w-5 flex-shrink-0" />
@@ -172,21 +170,49 @@ const categoryStyle = getCategoryStyle(firstCategory);
       {/*  底部区域：分类标签 + 阅读全文     */}
       {/* ================================= */}
       <div class="mt-auto flex flex-wrap items-center justify-between gap-2">
-        {/* 左侧：分类和标签 (优化后) */}
         <div class="flex flex-wrap items-center gap-3">
-          {/* 分类部分 - 优化样式区分 */}
           {categories && categories.length > 0 && (
-            <div class="inline-flex items-center gap-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full border border-blue-100 dark:border-blue-800" class="category-container">
+            <a
+              href={`/categories/${categories.map((c) => encodeURIComponent(c)).join('/')}/`}
+              class="inline-flex items-center gap-1 px-3 py-1 rounded-full category-container"
+              style="
+                background: color-mix(in srgb, var(--theme-color) 12%, transparent);
+                color: var(--theme-color);
+                border: 1px solid color-mix(in srgb, var(--theme-color) 35%, transparent);
+              "
+              aria-label={`查看分类：${categories.join(' / ')}`}
+            >
               <Icon name="material-symbols:folder-open-outline" class="h-4 w-4 flex-shrink-0" />
               <span class="text-xs font-medium">{categories.join(' / ')}</span>
-            </div>
+            </a>
           )}
 
-          {/* 标签部分 - 优化显示方式：一个图标 + 多个标签用/分割 */}
           {tags && tags.length > 0 && (
-            <div class="inline-flex items-center gap-1 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full border border-purple-100 dark:border-purple-800" class="tag-container">
+            <div
+              class="inline-flex items-center gap-1 px-3 py-1 rounded-full tag-container"
+              style="
+                background: color-mix(in srgb, var(--theme-color) 10%, transparent);
+                color: var(--theme-color);
+                border: 1px solid color-mix(in srgb, var(--theme-color) 30%, transparent);
+              "
+            >
               <Icon name="material-symbols:label-outline" class="h-4 w-4 flex-shrink-0" />
-              <span class="text-xs font-medium">{tags.join(' / ')}</span>
+              <span class="text-xs font-medium">
+                {
+                  tags.map((tag, i) => (
+                    <span>
+                      <a
+                        href={`/tags/${encodeURIComponent(tag)}/`}
+                        class="hover:underline"
+                        aria-label={`查看标签：${tag}`}
+                      >
+                        {tag}
+                      </a>
+                      {i < tags.length - 1 ? <span class="mx-1 opacity-70">/</span> : null}
+                    </span>
+                  ))
+                }
+              </span>
             </div>
           )}
         </div>
@@ -210,9 +236,9 @@ const categoryStyle = getCategoryStyle(firstCategory);
     overflow: hidden;
   }
 
-  /* 可选：添加hover效果增强交互 */
-  [key="category-container"]:hover,
-  [key="tag-container"]:hover {
+  /* 保持整条徽章 hover 略微放大 */
+  .category-container:hover,
+  .tag-container:hover {
     transform: scale(1.03);
     transition: transform 0.2s ease;
   }
