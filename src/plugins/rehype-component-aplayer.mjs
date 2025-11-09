@@ -20,65 +20,57 @@ function createAplayerHtml(properties) {
 
     const scriptContent = `
     (function() {
-        function initPlayer_${playerUuid}() {
-            const container = document.getElementById('${playerUuid}-player');
-            if (container && typeof APlayer !== 'undefined') {
-                try {
-                    new APlayer({
-                        container: container,
-                        showlrc: ${showlrc},
-                        fixed: ${fixed},
-                        mini: ${mini},
-                        audio: [{
-                            title: '${title}',
-                            artist: '${author}',
-                            url: '${url}',
-                            pic: '${pic}'
-                        }]
-                    });
-                } catch (e) {
-                    console.error('[APLAYER] Error initializing player ${playerUuid}:', e);
-                    if (container) container.textContent = 'Error initializing APlayer.';
-                }
-            }
-        }
-
-        function setupAplayer() {
-            if (window.aplayerLoaded) {
-                initPlayer_${playerUuid}();
-                return;
-            }
-            if (!window.aplayerCallbacks) {
-                window.aplayerCallbacks = [];
-            }
-            window.aplayerCallbacks.push(initPlayer_${playerUuid});
-
-            if (window.aplayerLoading) return;
-            window.aplayerLoading = true;
-
+        function ensureAPlayerAssets() {
             if (!document.querySelector('link[href*="aplayer.min.css"]')) {
                 const link = document.createElement('link');
                 link.rel = 'stylesheet';
                 link.href = 'https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css';
                 document.head.appendChild(link);
             }
-
             if (!document.querySelector('script[src*="aplayer.min.js"]')) {
                 const script = document.createElement('script');
                 script.src = 'https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js';
                 script.onload = () => {
                     window.aplayerLoaded = true;
-                    window.aplayerCallbacks.forEach(cb => cb());
+                    (window.aplayerCallbacks || []).forEach(cb => cb());
                     window.aplayerCallbacks = [];
                 };
                 document.head.appendChild(script);
             }
         }
 
+        function initPlayer_${playerUuid}() {
+            const container = document.getElementById('${playerUuid}-player');
+            if (container && typeof APlayer !== 'undefined') {
+                new APlayer({
+                    container: container,
+                    showlrc: ${showlrc},
+                    fixed: ${fixed},
+                    mini: ${mini},
+                    audio: [{
+                        title: '${title}',
+                        artist: '${author}',
+                        url: '${url}',
+                        pic: ('${pic}'.trim() || '')
+                    }]
+                });
+            }
+        }
+
+        function setup() {
+            if (window.aplayerLoaded) {
+                initPlayer_${playerUuid}();
+                return;
+            }
+            window.aplayerCallbacks = window.aplayerCallbacks || [];
+            window.aplayerCallbacks.push(initPlayer_${playerUuid});
+            ensureAPlayerAssets();
+        }
+
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', setupAplayer);
+            document.addEventListener('DOMContentLoaded', setup);
         } else {
-            setupAplayer();
+            setup();
         }
     })();
     `;
@@ -98,13 +90,13 @@ export default function remarkAplayer() {
     return (tree) => {
         visit(tree, (node) => {
             if (
-                (node.type === 'textDirective' || node.type === 'leafDirective') &&
-                node.name === 'aplayer'
+                (node.type === 'textDirective' ||
+                 node.type === 'leafDirective' ||
+                 node.type === 'containerDirective') &&
+                (node.name === 'aplayer' || node.name === 'music')
             ) {
                 const attributes = node.attributes || {};
                 const html = createAplayerHtml(attributes);
-
-                // Convert the directive node into an HTML node
                 node.type = 'html';
                 node.value = html;
             }

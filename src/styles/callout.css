@@ -211,26 +211,24 @@
     height: 12px !important;
   }
   .callout-content > :first-child {
-    margin-top: 0.2rem !important;                  /* 标题与正文间距更小 */
+    margin-top: 0.2rem !important;       /* 标题与正文间距更小 */
   }
-}
-/* 
-行内代码块
-*/
-@media (max-width: 768px) {
+
+  /* 行内代码块（移动端） */
   .prose .callout pre,
   .callout pre {
     font-size: 0.5rem;
     line-height: 1.3;
-    padding: 0.5rem 0.75rem; 
+    padding: 0.5rem 0.75rem;
   }
 
   .prose .callout :not(pre) > code,
   .callout :not(pre) > code {
-    font-size: 0.5rem; 
+    font-size: 0.5rem;
     padding: 2px 6px;
   }
 }
+
 .dark .prose .callout :not(pre) > code {
   background-color: hsl(var(--primary-hue), 40%, 20%);
   color: hsl(var(--primary-hue), 60%, 80%);

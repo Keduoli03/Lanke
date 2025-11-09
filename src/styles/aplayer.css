@@ -3,9 +3,9 @@
   margin: 1rem auto; /* 改为 auto 实现居中 */
   border-radius: var(--radius-large);
   overflow: hidden;
-  background: var(--card-bg);
-  border: 1px solid var(--line-divider);
-  max-width: 500px; /* 添加最大宽度限制 */
+  background: var(--card-bg, #fff);
+  border: none; /* 去掉外框线 */
+  max-width: 600px; /* 桌面宽度放大 */
   width: 100%; /* 保持响应式 */
 }
 
@@ -18,28 +18,50 @@
 }
 
 .aplayer-wrapper .aplayer-container {
-  min-height: 66px;
+  min-height: 70px;
 }
 
-/* 自定义 APlayer 主题以匹配网站样式 */
+.aplayer-wrapper {
+  background: var(--card-bg, #fff) !important;
+}
+
 .aplayer-wrapper .aplayer {
-  background: var(--card-bg);
-  color: var(--tw-prose-body);
-  box-shadow: none;
-  border-radius: 0;
-  margin: 0;
+  background: var(--card-bg, #fff) !important;
+  color: var(--tw-prose-body, #374151) !important;
 }
 
+.aplayer-wrapper .aplayer .aplayer-music .aplayer-title {
+  color: var(--tw-prose-headings, #111827);
+}
+
+.aplayer-wrapper .aplayer .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played {
+  background: var(--primary) !important;
+}
+
+.aplayer-wrapper .aplayer .aplayer-time {
+  color: var(--tw-prose-body) !important;
+}
+
+
+.aplayer-wrapper .aplayer .aplayer-pic {
+  width: 70px !important;
+  height: 70px !important;
+}
+.aplayer-wrapper .aplayer .aplayer-pic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 .aplayer-wrapper .aplayer .aplayer-info {
-  background: var(--card-bg);
+  height: 70px !important;
+  min-height: 70px !important;
 }
-
 .aplayer-wrapper .aplayer .aplayer-music .aplayer-title {
   color: var(--tw-prose-headings);
 }
 
 .aplayer-wrapper .aplayer .aplayer-music .aplayer-author {
-  color: var(--tw-prose-body);
+  color: var(--tw-prose-body, #6b7280);
 }
 
 .aplayer-wrapper .aplayer .aplayer-controller .aplayer-bar-wrap .aplayer-bar {
@@ -59,18 +81,18 @@
 }
 
 .aplayer-wrapper .aplayer .aplayer-controller .aplayer-time {
-  color: var(--tw-prose-body);
+  color: var(--tw-prose-body, #6b7280);
 }
 
 .aplayer-wrapper .aplayer .aplayer-list {
-  background: var(--card-bg);
-  border-top: 1px solid var(--line-divider);
+  background: var(--card-bg, #fff);
+  border-top: 1px solid var(--line-divider, #e5e7eb);
 }
 
 .aplayer-wrapper .aplayer .aplayer-list li {
-  background: var(--card-bg);
-  color: var(--tw-prose-body);
-  border-bottom: 1px solid var(--line-divider);
+  background: var(--card-bg, #fff);
+  color: var(--tw-prose-body, #374151);
+  border-bottom: 1px solid var(--line-divider, #e5e7eb);
 }
 
 .aplayer-wrapper .aplayer .aplayer-list li:hover {
