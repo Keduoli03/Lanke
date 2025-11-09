@@ -1,6 +1,6 @@
 ---
 title: 如何优雅地在平板上玩旮旯game之软件篇--串流
-description: 摘要
+description: 使用Sunshine基地班和moonlight实现
 categories:
   - 大杂烩
 tags:
@@ -11,7 +11,7 @@ status: 已完成
 pinned: false
 aiSummary: true
 date: 2025-11-08 22:46
-updated: 2025-11-09 13:04
+updated: 2025-11-09 13:05
 slug: "717"
 ---
 
