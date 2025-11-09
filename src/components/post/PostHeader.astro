@@ -14,9 +14,9 @@ const { remarkPluginFrontmatter } = await render(post);
 const { wordCount, readingTime } = remarkPluginFrontmatter || { wordCount: 0, readingTime: 0 };
 const minutes = Math.ceil(readingTime) || 0;
 ---
-<header class="mb-8">
+<header class="mb-8 post-header">
   <h1 class="text-2xl font-bold mb-4 text-primary md:text-4xl">{title}</h1>
-  <div class="text-secondary mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+  <div class="text-secondary mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm meta">
     <div class="flex items-center gap-x-1.5">
       <Icon name="material-symbols:calendar-today-outline-rounded" class="w-4 h-4" />
       <span>发布于 {formatDateToYYYYMMDD(date)}</span>
@@ -48,7 +48,7 @@ const minutes = Math.ceil(readingTime) || 0;
     )}
   </div>
   
-  <div class="flex flex-wrap gap-3 mb-6">
+  <div class="flex flex-wrap gap-3 mb-6 badges">
     {categories && categories.map((category, index) => (
       <a 
         href={`/categories/${category}/`} 
@@ -66,6 +66,7 @@ const minutes = Math.ceil(readingTime) || 0;
     ))}
   </div>
 </header>
+
 <style>
   .category-badge, .tag-badge {
     display: inline-flex;
@@ -117,5 +118,40 @@ const minutes = Math.ceil(readingTime) || 0;
   html.dark .pinned-badge {
     background-color: hsl(50, 40%, 20%);
     color: hsl(50, 90%, 80%);
+  }
+
+  /* 手机端优化：仅在没有封面图（PostHeader是首个元素）时，收紧标题与顶部的距离 */
+  @media (max-width: 640px) {
+    .post-header {
+      margin-top: 0;
+    }
+
+    .post-header:first-child {
+      margin-top: -0.75rem; /* 轻微上移，抵消容器的上内边距 */
+    }
+
+    .post-header h1 {
+      font-size: 1.25rem;  /* 原 text-2xl ≈ 1.5rem，下调 */
+      line-height: 1.3;
+      margin-bottom: 0.4rem; /* 再稍微缩小下间距 */
+    }
+
+    .post-header .meta {
+      font-size: 0.78rem;       /* 发布/更新等信息整体再缩小一点 */
+      gap: 0.2rem 0.4rem;       /* 横纵向间距进一步收紧，尽量压一行 */
+      margin-bottom: 0.45rem;   /* 与下方更紧凑 */
+    }
+
+    .post-header .badges {
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .post-header .category-badge,
+    .post-header .tag-badge {
+      font-size: 0.78rem;
+      padding: 0.18rem 0.55rem;
+      gap: 0.28rem;
+    }
   }
 </style>
