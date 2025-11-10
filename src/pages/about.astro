@@ -4,6 +4,8 @@ import MainLayout from '../layouts/MainLayout.astro';
 import { getEntry } from 'astro:content';
 import { render } from 'astro:content';
 import Artalk from '@/components/util/Artalk.astro';
+import PageHeader from '@/components/page/PageHeader.astro';
+import { Icon } from 'astro-icon/components';
 
 const aboutPost = await getEntry("pages", "about");
 
@@ -16,38 +18,23 @@ const { Content } = await render(aboutPost);
 ---
 <MainLayout 
     title={aboutPost.data.title}>
-    <header class="about-header">
-      <h1 class="about-title">{aboutPost.data.title}</h1>
-    </header>
+    <div class="about-container">
+      <PageHeader title={aboutPost.data.title} subtitle={`关于我~`}>
+    <Icon slot="icon" name="material-symbols:person-outline" class="w-11 h-11" />
+  </PageHeader>
+
     <Markdown>
         <Content />
     </Markdown>
+
     <div id="comment-section">
     <Artalk />
   </div>
-    <style>
-      .about-header {
-        text-align: center;
-        margin-bottom: 3rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 2px solid var(--line-divider);
-        width: 100%;
-      }
-      .about-title {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.75rem;
-        font-size: 2.25rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 0.5rem;
-        line-height: 1;
-      }
-      .about-subtitle {
-        color: var(--text-secondary);
-        font-size: 1.125rem;
-        margin: 0;
-      }
-    </style>
+    </div>
+    
+    
 </MainLayout>
+
+<style>
+      
+</style>
