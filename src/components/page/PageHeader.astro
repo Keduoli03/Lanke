@@ -1,0 +1,71 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+}
+const { title, subtitle } = Astro.props as Props;
+---
+
+<header class="page-header">
+  <h1 class="page-title">
+    <slot name="icon" />
+    {title}
+  </h1>
+  {subtitle && <p class="page-subtitle">{subtitle}</p>}
+</header>
+
+<style>
+  .page-header {
+    display: block;                 /* 桌面端：纵向布局 */
+    text-align: center;             
+    margin-bottom: 2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid var(--line-divider); 
+  }
+  .page-title {
+    display: inline-flex;           /* 使标题在居中时自然贴合图标 */
+    flex-direction: row;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0;
+    font-size: 2rem;
+    white-space: nowrap;            
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .page-subtitle {        
+    white-space: nowrap;            
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 768px) {
+    .page-header {
+      display: flex;                /* 手机端：左右分布 */
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;             /* 手机端左对齐 */
+      gap: 0rem;
+      margin-bottom: 1rem !important;
+      border-bottom: 2px solid var(--line-divider);
+    }
+    .page-title {
+      font-size: 1.4rem;
+      white-space: nowrap;          /* 手机端标题保持单行 */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: -0.5rem !important;
+    }
+    .page-title :global(svg) {
+      width: 1.4rem !important;     /* 手机端缩小图标尺寸 */
+      height: 1.4rem !important;
+      flex-shrink: 0;
+    }
+    .page-subtitle {
+      margin-bottom: -1rem !important;
+      line-height: 1.4;
+    }
+  }
+</style>

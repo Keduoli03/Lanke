@@ -1,14 +1,15 @@
 ---
+import PageHeader from '@/components/page/PageHeader.astro';
 import MainLayout from '../layouts/MainLayout.astro';
+import { Icon } from 'astro-icon/components';
 
-const title = 'Misskey 动态';
+const title = '说说';
 ---
 <MainLayout title={title}>
     <div class="misskey-timeline">
-        <header class="archive-header">
-            <h1 class="archive-title">我的动态</h1>
-            <p class="archive-subtitle">点击详情可跳转到 Misskey</p>
-        </header>
+        <PageHeader title="说说">
+          <Icon slot="icon" name="material-symbols:archive-outline" class="w-11 h-11" />
+        </PageHeader>
         
         <div id="timeline-container"
              class="timeline-container"
@@ -305,12 +306,12 @@ const title = 'Misskey 动态';
       document.addEventListener('astro:after-swap', run);
     </script>
 
-    <style is:global>
-        .misskey-timeline { 
-            max-width: 1000px;
-            margin: 0 auto; 
-            padding: 20px; 
-        }
+<style is:global>
+    .misskey-timeline { 
+      max-width: var(--page-width);
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
 
         .archive-header {
             text-align: center;

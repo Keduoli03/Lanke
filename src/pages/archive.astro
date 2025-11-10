@@ -2,23 +2,67 @@
 import MainLayout from '../layouts/MainLayout.astro';
 import { getSortedPosts } from '../utils/content-utils';
 import TimelineArchive from '../components/archive/TimelineArchive.astro';
+import PageHeader from '@/components/page/PageHeader.astro';
+import { Icon } from 'astro-icon/components';
+
+const title = "归档";
+const description = "所有文章的时间线归档";
 
 // 获取所有文章并按时间排序
 const posts = await getSortedPosts();
 ---
 
-<MainLayout 
-  title="归档"
-  description="所有文章的时间线归档"
->
+<MainLayout title={title} description={description}>
+
+  <div class="archive-container">
+    <PageHeader title={title} subtitle={`共 ${posts.length} 篇文章`}>
+    <Icon slot="icon" name="material-symbols:archive-outline" class="w-11 h-11" />
+  </PageHeader>
+
   <TimelineArchive 
     posts={posts}
-    title="归档"
-    subtitle={`共 ${posts.length} 篇文章`}
-    icon="material-symbols:archive-outline"
     baseUrl="/posts"
     showCategory={true}
     showTags={true}
     showSidebar={true}
   />
+  </div>
+
+  
 </MainLayout>
+
+<!-- 监听时间线组件广播的可见数量，实时更新页头副标题 -->
+<script is:inline>
+  document.addEventListener('astro:page-load', () => {
+    const subtitleEl = document.querySelector('#archive-page-header .archive-subtitle');
+    const containerEl = document.querySelector('.timeline-archive-container');
+    if (!subtitleEl) return;
+
+    const setCount = (n) => {
+      subtitleEl.textContent = `共 ${n} 篇文章`;
+    };
+
+    const getVisibleCount = () => {
+      if (!containerEl) return 0;
+      return containerEl.querySelectorAll('.posts-list .post-item:not([style*="display: none"])').length;
+    };
+
+    setCount(getVisibleCount());
+
+    // 监听组件广播，实时更新；若事件未带数量则回退为 DOM 计算
+    window.addEventListener('archive:visible-count', (e) => {
+      const n = e.detail && typeof e.detail.totalVisible === 'number'
+        ? e.detail.totalVisible
+        : getVisibleCount();
+      setCount(n);
+    });
+  });
+</script>
+
+<style is:inline>
+  .archive-container {
+      max-width: var(--page-width);
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
+</style>

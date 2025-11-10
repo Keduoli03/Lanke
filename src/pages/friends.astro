@@ -5,6 +5,8 @@ import { items as friends } from './page_data/friend.ts';
 import Markdown from '@/components/util/Markdown.astro';
 import { getEntry } from 'astro:content';
 import { render } from 'astro:content';
+import PageHeader from '@/components/page/PageHeader.astro';
+import { Icon } from 'astro-icon/components';
 
 const title = "友链";
 const description = "一些朋友们的网站";
@@ -17,11 +19,12 @@ const { Content } = await render(friendPost);
 
 ---
 <MainLayout title={title}>
-  <div class="px-4 max-w-[var(--page-width)] mx-auto">
-    <header class="about-header">
-      <h1 class="about-title">{title}</h1>
-      <p class="about-subtitle">{description}</p>
-    </header>
+  
+  <div class="friend-container">
+    <PageHeader title={title} subtitle={description}>
+    <Icon slot="icon" name="material-symbols:handshake-outline-rounded" class="w-11 h-11" />
+  </PageHeader>
+
     <!-- 优化网格布局：调整间距和响应式列数 -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {friends.map((friend, index) => (
@@ -77,28 +80,10 @@ const { Content } = await render(friendPost);
     </section>
   </div>
   <style>
-    .about-header {
-      text-align: center;
-      margin-bottom: 2rem; /* 缩小底部间距 */
-      padding-bottom: 1rem; /* 缩小底部内边距 */
-      border-bottom: 2px solid var(--line-divider);
-      width: 100%;
-    }
-    .about-title {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      font-size: 2rem; /* 微调标题大小 */
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 0.5rem;
-      line-height: 1;
-    }
-    .about-subtitle {
-      color: var(--text-secondary);
-      font-size: 1rem; /* 缩小副标题字体 */
-      margin: 0;
+    .friend-container {
+      max-width: var(--page-width);
+      margin-left: 1rem;
+      margin-right: 1rem;
     }
     /* 评论区样式 */
     .comments-section {

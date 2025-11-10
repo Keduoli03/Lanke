@@ -62,9 +62,7 @@ const { title=siteConfig.title, description = siteConfig.description, useContent
 				flex: 1;
 				background-color: var(--page-bg);
 				min-height: 100vh;
-				/* 仅保留 margin-left 过渡，用于侧边栏响应式变化 */
-				transition: margin-left 0.3s ease;
-				padding: 0 1rem;
+				/* transition: margin-left 0.3s ease; */
 			}
 
 			/* 用于首页列表等无面板页面：仅居中和限制宽度 */
@@ -80,7 +78,6 @@ const { title=siteConfig.title, description = siteConfig.description, useContent
 				max-width: var(--page-width);
 				width: 100%;
 				margin: 2rem auto;
-				padding: 2rem;
 				background-color: var(--content-pane-bg);
 				border-radius: 0.75rem;
 				box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.08);

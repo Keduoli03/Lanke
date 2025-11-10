@@ -3,24 +3,19 @@ import { formatFullDate } from '../../utils/date-utils';
 import { Icon } from 'astro-icon/components';
 import type { CollectionEntry } from 'astro:content';
 import ArchiveFilters from './ArchiveFilters.astro';
+import PageHeader from '../page/PageHeader.astro';
 
 
 interface Props {
   posts: CollectionEntry<'posts'>[];
-  title: string;
-  subtitle: string;
-  icon: string;
   showCategory?: boolean;
   showTags?: boolean;
-  baseUrl?: string; 
-  showSidebar?: boolean; 
+  baseUrl?: string;
+  showSidebar?: boolean;
 }
 
 const { 
   posts, 
-  title, 
-  subtitle, 
-  icon, 
   showCategory = true, 
   showTags = false, 
   baseUrl = '/posts',
@@ -43,14 +38,7 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
 ---
 
 <div class="timeline-archive-container">
-  <!-- 页面标题 - 独占一行 -->
-  <header class="archive-header">
-    <h1 class="archive-title">
-      <Icon name={icon} class="w-11 h-11" />
-      {title}
-    </h1>
-    <p class="archive-subtitle">{subtitle}</p>
-  </header>
+  
 
   <!-- 主要内容区域 - 时间线和侧边栏的两列布局 -->
   <div class={showSidebar ? "main-content-with-sidebar" : "main-content-full-width"}>
@@ -132,7 +120,6 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
 
 <style>
   :root {
-    /* 可根据你的网站主题色调整 */
     --timeline-color: var(--theme-color);
     --timeline-light: var(--line-divider);
     --hover-bg: rgba(0, 0, 0, 0.02);
@@ -140,45 +127,6 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
     --connector-gap: 4px;
     --category-bg: rgba(0, 0, 0, 0.05);
     --dark-category-bg: rgba(255, 255, 255, 0.08);
-  }
-
-  .timeline-archive-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem 1rem 1.5rem; /* 原 2rem 1rem，收紧顶部间距 */
-  }
-
-  /* 页面标题 - 独占一行 */
-  .archive-header {
-    text-align: center;
-    margin-bottom: 2rem;     /* 原 3rem，减小标题下方留白 */
-    padding-bottom: 1rem;    /* 原 1.5rem，减小分割线与标题的距离 */
-    border-bottom: 2px solid var(--line-divider);
-    width: 100%;
-  }
-
-  .archive-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    font-size: 2.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-    line-height: 1; /* 添加行高控制 */
-  }
-
-  /* 确保图标与文字完美对齐 */
-  .archive-title :global(svg) {
-    flex-shrink: 0; /* 防止图标被压缩 */
-    vertical-align: middle; /* 垂直居中对齐 */
-  }
-
-  .archive-subtitle {
-    color: var(--text-secondary);
-    font-size: 1.125rem;
-    margin: 0;
   }
 
   /* 主要内容区域 - 时间线和侧边栏的两列布局 */
@@ -458,32 +406,6 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
     padding-bottom: 0.5rem;
     border-bottom: 2px solid var(--line-divider);
   }
-  .archive-title {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.4rem;
-    margin: 0;
-    font-size: 1.4rem;
-    line-height: 1.25;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 0;
-  }
-  .archive-title :global(svg) {
-    width: 1.4rem !important;
-    height: 1.4rem !important;
-    flex-shrink: 0;
-  }
-  .archive-subtitle {
-    margin: 0;
-    white-space: nowrap;
-    font-size: 0.875rem;
-    line-height: 1.4;
-    color: var(--text-secondary);
-    flex-shrink: 0;
-  }
 
   /* 主内容：单列，侧边栏置顶 */
   .main-content-with-sidebar {
@@ -613,13 +535,6 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
 
   /* 更窄屏：≤640px 再微调 */
   @media (max-width: 640px) {
-    .archive-title {
-      font-size: 1.3rem;
-    }
-    .archive-title :global(svg) {
-      width: 1.25rem !important;
-      height: 1.25rem !important;
-    }
     .posts-list {
       margin-left: calc(0.5rem - var(--connector-gap));
     }
@@ -644,20 +559,23 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
 
 <script>
   document.addEventListener('astro:page-load', () => {
-    const yearSections = Array.from(document.querySelectorAll<HTMLElement>('.year-section'));
-    const subtitleEls = Array.from(document.querySelectorAll<HTMLElement>('.archive-subtitle'));
-    const emptyEl = document.querySelector<HTMLElement>('.archive-empty');
+    const containerEl = document.querySelector<HTMLElement>('.timeline-archive-container');
+    if (!containerEl) return;
+
+    const yearSections = Array.from(containerEl.querySelectorAll<HTMLElement>('.year-section'));
+    const subtitleEl = containerEl.querySelector<HTMLElement>('.archive-subtitle');
+    const emptyEl = containerEl.querySelector<HTMLElement>('.archive-empty');
 
     const getSelectedFromURL = (): { categories: string[]; tags: string[] } => {
       const params = new URLSearchParams(window.location.search);
       const cat = params.get('分类') || '';
-      const cats = cat ? [cat] : [];       // 分类单值
-      const tags = params.getAll('标签');  // 标签多值
+      const cats = cat ? [cat] : [];
+      const tags = params.getAll('标签');
       return { categories: cats, tags };
     };
 
-    function updateVisibility(selected: { categories: string[]; tags: string[] }) {
-      const posts = Array.from(document.querySelectorAll<HTMLElement>('.post-item'));
+    function updateVisibility(container: HTMLElement, selected: { categories: string[]; tags: string[] }) {
+      const posts = Array.from(container.querySelectorAll<HTMLElement>('.post-item'));
       posts.forEach(li => {
         const cats = (li.getAttribute('data-categories') || '').split('|').filter(Boolean);
         const tags = (li.getAttribute('data-tags') || '').split('|').filter(Boolean);
@@ -666,7 +584,6 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
           selected.categories.length === 0 ||
           selected.categories.some((c: string) => cats.includes(c));
 
-        // 标签为“与”关系（如需“或”，将 every 改为 some）
         const matchTag =
           selected.tags.length === 0 ||
           selected.tags.every((t: string) => tags.includes(t));
@@ -684,23 +601,29 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
       });
 
       if (emptyEl) emptyEl.hidden = totalVisible !== 0;
-      subtitleEls.forEach(el => {
-        el.textContent = `共 ${totalVisible} 篇文章`;
-      });
+      if (subtitleEl) {
+        subtitleEl.textContent = `共 ${totalVisible} 篇文章`;
+      }
+
+      // 向页面广播当前可见文章数，供外部页头更新
+      window.dispatchEvent(
+        new CustomEvent('archive:visible-count', { detail: { totalVisible } })
+      );
     }
 
-    updateVisibility(getSelectedFromURL());
+    updateVisibility(containerEl, getSelectedFromURL());
 
     window.addEventListener(
       'filters:changed',
       ((e: Event) => {
         const detail = (e as CustomEvent<{ categories: string[]; tags: string[] }>).detail;
-        updateVisibility(detail || { categories: [], tags: [] });
+        updateVisibility(containerEl, detail || { categories: [], tags: [] });
       }) as EventListener
     );
 
     window.addEventListener('popstate', () => {
-      updateVisibility(getSelectedFromURL());
+      updateVisibility(containerEl, getSelectedFromURL());
     });
   });
 </script>
+
