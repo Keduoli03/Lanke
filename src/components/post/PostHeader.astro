@@ -51,7 +51,7 @@ const minutes = Math.ceil(readingTime) || 0;
   <div class="flex flex-wrap gap-3 mb-6 badges">
     {categories && categories.map((category, index) => (
       <a 
-        href={`/categories/${category}/`} 
+        href={`/archive/?分类=${encodeURIComponent(category)}`}
         class="category-badge"
         transition:name={index === 0 ? `category-${post.data.slug}` : ''}
       >
@@ -60,7 +60,7 @@ const minutes = Math.ceil(readingTime) || 0;
       </a>
     ))}
     {tags && tags.map(tag => (
-      <a href={`/tags/${tag}/`} class="tag-badge">
+      <a href={`/archive/?标签=${encodeURIComponent(tag)}`} class="tag-badge">
         #{tag}
       </a>
     ))}

@@ -2,8 +2,8 @@
 import { formatFullDate } from '../../utils/date-utils';
 import { Icon } from 'astro-icon/components';
 import type { CollectionEntry } from 'astro:content';
-import CategoryList from './CategoryList.astro';
-import TagCloud from './TagCloud.astro';
+import ArchiveFilters from './ArchiveFilters.astro';
+
 
 interface Props {
   posts: CollectionEntry<'posts'>[];
@@ -12,8 +12,9 @@ interface Props {
   icon: string;
   showCategory?: boolean;
   showTags?: boolean;
-  baseUrl?: string; // 用于生成链接的基础URL
-  showSidebar?: boolean; // 新增：是否显示侧边栏
+  baseUrl?: string; 
+  showSidebar?: boolean; 
+  subtitleCountMode?: 'static' | 'filtered';
 }
 
 const { 
@@ -63,6 +64,8 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
 
         <!-- 右侧年份+文章内容 -->
         <div class="timeline-content">
+          <!-- 新增：空列表提示，占位元素，默认隐藏 -->
+          <div class="archive-empty" hidden>暂无文章</div>
           {years.map(year => {
             const yearPosts = groupedPosts[year];
             return (
@@ -77,21 +80,29 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
                 <!-- 该年份的文章列表 -->
                 <ul class="posts-list">
                   {yearPosts.map(post => {
-                    const firstCategory = post.data.categories?.[0] || '未分类';
+                    const categories = post.data.categories || [];
                     const tags = post.data.tags || [];
+                    const categoriesAttr = categories.join('|');  // 用 | 作为分隔符
+                    const tagsAttr = tags.join('|');
+
                     return (
-                      <li class="post-item">
+                      <li
+                        class="post-item"
+                        data-year={year}
+                        data-categories={categoriesAttr}
+                        data-tags={tagsAttr}
+                      >
                         <div class="post-connector"></div>
                         <time class="post-date">{formatFullDate(new Date(post.data.date))}</time>
-                        
+
                         {showCategory && (
-                          <span class="post-category">{firstCategory}</span>
+                          <span class="post-category">{categories[0] || '未分类'}</span>
                         )}
-                        
+
                         <a href={`${baseUrl}/${post.data.slug}/`} class="post-link">
                           {post.data.title}
                         </a>
-                        
+
                         {showTags && tags.length > 0 && (
                           <div class="post-tags">
                             {tags.slice(0, 3).map(tag => (
@@ -114,10 +125,7 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
     <!-- 右侧：分类和标签侧边栏（可选） -->
     {showSidebar && (
       <aside class="archive-sidebar">
-
-          <CategoryList/>
-
-          <TagCloud />
+          <ArchiveFilters defaultExpanded={true}/>
       </aside>
     )}
   </div>
@@ -138,14 +146,14 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
   .timeline-archive-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 1rem 1rem 1.5rem; /* 原 2rem 1rem，收紧顶部间距 */
   }
 
   /* 页面标题 - 独占一行 */
   .archive-header {
     text-align: center;
-    margin-bottom: 3rem;
-    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;     /* 原 3rem，减小标题下方留白 */
+    padding-bottom: 1rem;    /* 原 1.5rem，减小分割线与标题的距离 */
     border-bottom: 2px solid var(--line-divider);
     width: 100%;
   }
@@ -442,7 +450,13 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
 
   @media (max-width: 768px) {
     .timeline-archive-container {
-      padding: 1rem 0.5rem;
+      padding: 0.5rem 0.5rem; /* 原 1rem 0.5rem，移动端更紧凑 */
+    }
+
+    /* 移动端进一步收紧标题区块的下间距 */
+    .archive-header {
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
     }
 
     .main-content-with-sidebar {
@@ -459,8 +473,24 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
       padding: 1rem;
     }
 
+    /* 统一标题与图标尺寸（贴近 markdown.css: .prose h1 ≈ text-2xl） */
     .archive-title {
-      font-size: 2rem;
+      font-size: 1.5rem;   /* ≈ text-2xl */
+      line-height: 1.3;
+      gap: 0.5rem;
+    }
+    .archive-title :global(svg) {
+      width: 1.5rem !important;
+      height: 1.5rem !important;
+    }
+
+    .archive-subtitle {
+      font-size: 0.875rem; /* ≈ text-sm */
+      line-height: 1.4;
+      line-break: anywhere;
+      overflow-wrap: anywhere;
+      word-break: break-all;
+      white-space: normal;
     }
 
     .timeline-archive {
@@ -548,10 +578,21 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
   }
 
   @media (max-width: 640px) {
+    /* 更小屏时进一步压缩标题与图标 */
     .archive-title {
-      font-size: 1.8rem;
+      font-size: 1.375rem; /* 进一步贴合窄屏 */
+      line-height: 1.3;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.4rem;
+    }
+    .archive-title :global(svg) {
+      width: 1.25rem !important;
+      height: 1.25rem !important;
+    }
+
+    .archive-subtitle {
+      font-size: 0.8125rem;
+      line-height: 1.35;
     }
 
     .timeline-line {
@@ -593,3 +634,70 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
     background-color: var(--dark-hover-bg);
   }
 </style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const yearSections = Array.from(document.querySelectorAll<HTMLElement>('.year-section'));
+    const subtitleEls = Array.from(document.querySelectorAll<HTMLElement>('.archive-subtitle'));
+    const emptyEl = document.querySelector<HTMLElement>('.archive-empty');
+
+    const getSelectedFromURL = (): { categories: string[]; tags: string[] } => {
+      const params = new URLSearchParams(window.location.search);
+      const cat = params.get('分类') || '';
+      const cats = cat ? [cat] : [];            // 分类单值
+      const tags = params.getAll('标签');       // 标签多值
+      return { categories: cats, tags };
+    };
+
+    function updateVisibility(selected: { categories: string[]; tags: string[] }) {
+      const posts = Array.from(document.querySelectorAll<HTMLElement>('.post-item'));
+      posts.forEach(li => {
+        const cats = (li.getAttribute('data-categories') || '').split('|').filter(Boolean);
+        const tags = (li.getAttribute('data-tags') || '').split('|').filter(Boolean);
+
+        const matchCategory =
+          selected.categories.length === 0 ||
+          selected.categories.some((c: string) => cats.includes(c));
+
+        // 标签为“与”关系（如需“或”，将 every 改为 some）
+        const matchTag =
+          selected.tags.length === 0 ||
+          selected.tags.every((t: string) => tags.includes(t));
+
+        const visible = matchCategory && matchTag;
+        li.style.display = visible ? '' : 'none';
+      });
+
+      let totalVisible = 0;
+      yearSections.forEach(section => {
+        const countEl = section.querySelector('.year-count') as HTMLElement | null;
+        const visiblePosts = section.querySelectorAll('.posts-list .post-item:not([style*="display: none"])').length;
+        if (countEl) countEl.textContent = `${visiblePosts} 篇`;
+        section.style.display = visiblePosts ? '' : 'none';
+        totalVisible += visiblePosts;
+      });
+
+      if (emptyEl) emptyEl.hidden = totalVisible !== 0;
+      subtitleEls.forEach(el => {
+        el.textContent = `共 ${totalVisible} 篇文章`;
+      });
+    }
+
+    // 初始根据 URL 参数显示并更新副标题与提示
+    updateVisibility(getSelectedFromURL());
+
+    // 监听筛选变化事件
+    window.addEventListener(
+      'filters:changed',
+      ((e: Event) => {
+        const detail = (e as CustomEvent<{ categories: string[]; tags: string[] }>).detail;
+        updateVisibility(detail || { categories: [], tags: [] });
+      }) as EventListener
+    );
+
+    // 浏览器历史导航时同步可见性
+    window.addEventListener('popstate', () => {
+      updateVisibility(getSelectedFromURL());
+    });
+  });
+</script>

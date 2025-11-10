@@ -1,0 +1,281 @@
+---
+import { getAllCategories, getAllTags } from '../../utils/content-utils';
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  class?: string;
+  defaultExpanded?: boolean;
+}
+
+const { class: className, defaultExpanded = false } = Astro.props;
+const categories = await getAllCategories();
+const tags = await getAllTags();
+---
+
+<div class:list={["category-list-container", className]} data-expanded={defaultExpanded}>
+  <div class="combined-content" data-expanded="true">
+    <div class="section">
+      <h4 class="section-title">
+        <Icon name="material-symbols:folder-outline" class="section-icon" />
+        分类
+        <button class="filters-reset" type="button" aria-label="重置筛选" title="重置筛选">
+          <Icon name="material-symbols:restart-alt" class="filters-reset-icon" />
+        </button>
+      </h4>
+      <div class="simple-list">
+        {categories.map(category => (
+          <a
+            href="#"
+            class="simple-item"
+            data-filter-type="category"
+            data-filter-value={category.name}
+            title={`筛选分类：${category.name}`}
+          >
+            <span class="item-name">{category.name}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <div class="section">
+      <h4 class="section-title">
+        <Icon name="material-symbols:label-outline" class="section-icon" />
+        标签
+      </h4>
+      <div class="simple-list">
+        {tags.map(tag => (
+          <a
+            href="#"
+            class="simple-item"
+            data-filter-type="tag"
+            data-filter-value={tag.name}
+            title={`筛选标签：${tag.name}`}
+          >
+            <span class="item-name">{tag.name}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const items: HTMLElement[] = Array.from(
+      document.querySelectorAll<HTMLElement>('.category-list-container .simple-item')
+    );
+
+    const getSelectedFromURL = (): { categories: string[]; tags: string[] } => {
+      const params = new URLSearchParams(window.location.search);
+      const singleCat = params.get('分类') || '';
+      const cats = singleCat ? [singleCat] : [];
+      const tags = params.getAll('标签'); // 标签多值
+      return { categories: cats, tags };
+    };
+
+    const updateItemTitle = (el: HTMLElement): void => {
+      const type = el.getAttribute('data-filter-type');
+      const value = el.getAttribute('data-filter-value') || '';
+      const isActive = el.classList.contains('active');
+      const prefix =
+        type === 'category'
+          ? (isActive ? '已选分类：' : '筛选分类：')
+          : (isActive ? '已选标签：' : '筛选标签：');
+      el.setAttribute('title', `${prefix}${value}`);
+    };
+
+    const applySelectionFromURL = (): void => {
+      const { categories, tags } = getSelectedFromURL();
+      const singleCategory = categories[0] || '';
+      items.forEach((el: HTMLElement) => {
+        const type = el.getAttribute('data-filter-type');
+        const value = el.getAttribute('data-filter-value') || '';
+        const shouldActive =
+          (type === 'category' && value === singleCategory) ||
+          (type === 'tag' && tags.includes(value));
+        el.classList.toggle('active', shouldActive);
+        updateItemTitle(el);
+      });
+      window.dispatchEvent(new CustomEvent('filters:changed', { detail: { categories, tags } }));
+    };
+
+    const getSelected = (): { categories: string[]; tags: string[] } => {
+      const selectedCategories = Array.from(
+        document.querySelectorAll<HTMLElement>('.category-list-container .simple-item[data-filter-type="category"].active')
+      ).map(n => n.getAttribute('data-filter-value') || '').filter(Boolean);
+      const singleCategory = selectedCategories[0] ? [selectedCategories[0]] : [];
+      const selectedTags = Array.from(
+        document.querySelectorAll<HTMLElement>('.category-list-container .simple-item[data-filter-type="tag"].active')
+      ).map(n => n.getAttribute('data-filter-value') || '').filter(Boolean);
+      return { categories: singleCategory, tags: selectedTags };
+    };
+
+    const updateURL = (categories: string[], tags: string[]): void => {
+      const url = new URL(window.location.href);
+      // 分类单值
+      url.searchParams.delete('分类');
+      if (categories[0]) url.searchParams.set('分类', categories[0]);
+      // 标签多值
+      url.searchParams.delete('标签');
+      tags.forEach((t: string) => url.searchParams.append('标签', t));
+      window.history.replaceState(null, '', url);
+    };
+
+    // 初始根据 URL 恢复选中并触发筛选
+    applySelectionFromURL();
+
+    // 点击交互：分类单选（可取消），标签多选；更新 title、URL、分发事件
+    items.forEach((el: HTMLElement) => {
+      el.addEventListener('click', (e: MouseEvent) => {
+        e.preventDefault();
+        const type = el.getAttribute('data-filter-type');
+
+        if (type === 'category') {
+          const isActive = el.classList.contains('active');
+          // 清空其他分类
+          document
+            .querySelectorAll<HTMLElement>('.category-list-container .simple-item[data-filter-type="category"].active')
+            .forEach(n => n.classList.remove('active'));
+          // 切换当前：未选中则选中；已选中则清空（实现单选+可取消）
+          el.classList.toggle('active', !isActive);
+          // 更新所有分类项的 title
+          document
+            .querySelectorAll<HTMLElement>('.category-list-container .simple-item[data-filter-type="category"]')
+            .forEach(n => updateItemTitle(n));
+        } else {
+          // 标签维持多选切换
+          el.classList.toggle('active');
+          updateItemTitle(el);
+        }
+
+        const { categories, tags } = getSelected();
+        updateURL(categories, tags);
+        window.dispatchEvent(new CustomEvent('filters:changed', { detail: { categories, tags } }));
+      });
+    });
+
+    // 监听浏览器返回/前进，自动同步选中与筛选
+    window.addEventListener('popstate', applySelectionFromURL);
+
+    const resetBtn = document.querySelector<HTMLButtonElement>('.filters-reset');
+    resetBtn && resetBtn.addEventListener('click', () => {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('分类');
+      url.searchParams.delete('标签'); // 清空所有同名标签参数
+      window.history.replaceState(null, '', url);
+
+      // 根据 URL 重新同步选中，并分发 filters:changed
+      // （applySelectionFromURL 内已触发 filters:changed）
+      applySelectionFromURL();
+
+      // 通知时间线按浏览器历史刷新（更新可见数量与“暂无文章”提示）
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  });
+</script>
+
+<style>
+  .category-list-container {
+    background: var(--content-pane-bg);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px 0 rgb(0 0 0 / 0.08);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    max-width: 100%;
+  }
+
+  .combined-content {
+    overflow: hidden;
+    max-height: 1200px;
+    opacity: 1;
+    padding-top: 0.25rem;
+  }
+
+  .section + .section { margin-top: 0.75rem; }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .section-icon {
+    width: 1rem;
+    height: 1rem;
+    color: var(--text-primary);
+    flex-shrink: 0;
+  }
+
+  /* 极简、流式排列 */
+  .simple-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.6rem;
+    align-items: center;
+  }
+
+  .simple-item {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    color: var(--text-primary);
+  }
+
+  .simple-item:hover { color: var(--theme-color); }
+  .simple-item.active {
+    text-decoration-line: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.25em; /* 下划线 */
+    text-decoration-color: var(--theme-color);
+  }
+
+  .item-name {
+    flex: 0 0 auto;
+    font-size: 1rem;
+    font-weight: 500;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @media (max-width: 768px) {
+    .category-list-container { padding: 1rem; }
+    .section-title { font-size: 0.9375rem; gap: 0.4rem; }
+    .section-icon { width: 0.95rem; height: 0.95rem; }
+    .simple-list { gap: 0.3rem 0.5rem; }
+    .item-name { font-size: 0.9375rem; }
+  }
+
+  html.dark .category-list-container { box-shadow: none; }
+
+  .filters-reset {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    background: var(--tag-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+  }
+  .filters-reset:hover {
+    background: var(--hover-bg);
+    color: var(--text-primary);
+  }
+  .filters-reset-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+</style>

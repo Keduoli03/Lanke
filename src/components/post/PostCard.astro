@@ -173,7 +173,7 @@ const categoryStyle = getCategoryStyle(firstCategory);
         <div class="flex flex-wrap items-center gap-3 flex-1 min-w-0">
           {categories && categories.length > 0 && (
             <a
-              href={`/categories/${categories.map((c) => encodeURIComponent(c)).join('/')}/`}
+              href={`/archive/?分类=${categories.map((c) => encodeURIComponent(c)).join('/')}`}
               class="inline-flex items-center gap-0.5 md:gap-1 px-2 py-0.5 md:px-3 md:py-1 rounded-full category-container"
               style="
                 background: color-mix(in srgb, var(--theme-color) 12%, transparent);
@@ -200,7 +200,7 @@ const categoryStyle = getCategoryStyle(firstCategory);
               <span class="text-xs font-medium tag-list">
                 {tags.map((tag) => (
                   <a
-                    href={`/tags/${encodeURIComponent(tag)}/`}
+                    href={`/archive/?标签=${encodeURIComponent(tag)}`}
                     class="hover:underline"
                     aria-label={`查看标签：${tag}`}
                   >{tag}</a>

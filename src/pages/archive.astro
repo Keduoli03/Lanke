@@ -7,15 +7,18 @@ import TimelineArchive from '../components/archive/TimelineArchive.astro';
 const posts = await getSortedPosts();
 ---
 
-<MainLayout title="归档">
+<MainLayout 
+  title="归档"
+  description="所有文章的时间线归档"
+>
   <TimelineArchive 
     posts={posts}
-    title="文章归档"
+    title="归档"
     subtitle={`共 ${posts.length} 篇文章`}
     icon="material-symbols:archive-outline"
-    showCategory={true}
-    showTags={false}
     baseUrl="/posts"
+    showCategory={true}
+    showTags={true}
     showSidebar={true}
   />
 </MainLayout>

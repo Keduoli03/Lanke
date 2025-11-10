@@ -4,10 +4,26 @@ const apiBaseUrl =
 	"https://summary.blueke.top/https/ai-blog-summary-test.lwz2801429414.workers.dev";
 ---
 
-<div id={`ai-summary-${slug}`} class="mb-6 p-4 bg-[var(--card-bg)] rounded-lg border border-[var(--line-divider)] transition">
-  <b class="block mb-2 text-[var(--primary)] transition">AI摘要</b>
-  <p id={`ai-summary-text-${slug}`} class="text-75 transition">正在生成中...</p>
+<div id={`ai-summary-${slug}`} class="mb-6 p-4 bg-[var(--card-bg)] rounded-lg border border-[var(--line-divider)] transition ai-summary-card">
+  <b class="block mb-2 text-[var(--primary)] transition ai-summary-title">AI摘要</b>
+  <p id={`ai-summary-text-${slug}`} class="transition ai-summary-text">正在生成中...</p>
 </div>
+
+<style>
+  .ai-summary {
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .ai-summary-title {
+    font-weight: 600;
+  }
+
+  .ai-summary-text {
+    /* 若想取消缩进，可打开下一行 */
+    /* text-indent: 0; */
+  }
+</style>
 
 <!-- 分割线 -->
 <div class="border-[var(--line-divider)] border-dashed border-b-[3px] mb-6 transition"></div>
