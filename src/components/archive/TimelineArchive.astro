@@ -450,32 +450,25 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
 
   @media (max-width: 768px) {
     .timeline-archive-container {
-      padding: 0.5rem 0.5rem; /* 原 1rem 0.5rem，移动端更紧凑 */
+      padding: 0.5rem 0.5rem;
     }
-
-    /* 移动端进一步收紧标题区块的下间距 */
     .archive-header {
       margin-bottom: 1.25rem;
       padding-bottom: 0.75rem;
     }
-
     .main-content-with-sidebar {
       grid-template-columns: 1fr;
       gap: 2rem;
     }
-
     .archive-sidebar {
       position: static;
       order: -1;
     }
-
     .sidebar-widget {
       padding: 1rem;
     }
-
-    /* 统一标题与图标尺寸（贴近 markdown.css: .prose h1 ≈ text-2xl） */
     .archive-title {
-      font-size: 1.5rem;   /* ≈ text-2xl */
+      font-size: 1.5rem;
       line-height: 1.3;
       gap: 0.5rem;
     }
@@ -483,104 +476,116 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
       width: 1.5rem !important;
       height: 1.5rem !important;
     }
-
     .archive-subtitle {
-      font-size: 0.875rem; /* ≈ text-sm */
+      font-size: 0.875rem;
       line-height: 1.4;
       line-break: anywhere;
       overflow-wrap: anywhere;
       word-break: break-all;
       white-space: normal;
     }
-
     .timeline-archive {
       margin-left: 1rem;
     }
-
     .timeline-line {
       left: -1rem;
       width: 1.5px;
     }
-
     .year-dot {
       width: 14px;
       height: 14px;
       border-width: 3px;
     }
-
     .year-title {
       font-size: 1.5rem;
     }
-
     .posts-list {
       margin-left: calc(1rem - var(--connector-gap));
     }
-
     .post-connector {
       left: calc(-1rem + var(--connector-gap));
       width: 10px;
       top: 1.3rem;
       transform: none;
     }
-
     .post-item:hover .post-connector {
       width: 14px;
     }
-
     .post-item:hover .post-connector::before {
       width: 6px;
       height: 6px;
     }
-
     .post-date {
       min-width: 55px;
       font-size: 0.8rem;
     }
-
     .post-category {
       padding: 0.15rem 0.4rem;
       font-size: 0.7rem;
       margin-right: 0;
     }
 
+    /* 改为两行网格布局，避免三行 */
+    .post-item {
+      display: grid;
+      grid-template-columns: 70px 1fr;           /* 左列时间，右列内容 */
+      grid-template-areas:
+        "date title"
+        "category tags";
+      align-items: center;
+      gap: 0.35rem 0.75rem;                      /* 行间距 / 列间距 */
+      padding: 0.6rem 0;
+      padding-left: 1.25rem;
+    }
+
+    .post-date {
+      grid-area: date;
+      order: initial;                            /* 覆盖之前的 order */
+      width: auto;                               /* 不占满整行 */
+      text-align: left;                          /* 更节省空间 */
+      white-space: nowrap;
+    }
+
     .post-link {
-      white-space: normal;
-      overflow: visible;
-      text-overflow: unset;
+      grid-area: title;
+      order: initial;
+      white-space: nowrap;                       /* 单行显示 */
+      overflow: hidden;
+      text-overflow: ellipsis;                   /* 超长省略 */
       font-size: 0.9rem;
       line-height: 1.4;
     }
 
-    .post-item {
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      padding: 0.7rem 0;
-      padding-left: 1.5rem;
-    }
-
-    .post-date {
-      order: 3;
-      width: 100%;
-    }
-
     .post-category {
-      order: 1;
-    }
-
-    .post-link {
-      order: 2;
+      grid-area: category;
+      order: initial;
+      margin-left: 0;                            /* 放到左侧，不挤占标题行 */
     }
 
     .post-tags {
-      order: 4;
+      grid-area: tags;
+      order: initial;
+      display: flex;
+      flex-wrap: nowrap;                         /* 单行标签 */
+      gap: 0.25rem;
+      overflow: hidden;                          /* 避免挤出第三行 */
       width: 100%;
+    }
+
+    .post-tag,
+    .post-tag-more {
+      white-space: nowrap;
+    }
+
+    /* 移动端最多显示两个标签，其余隐藏 */
+    .post-tags .post-tag:nth-child(n+3) {
+      display: none;
     }
   }
 
   @media (max-width: 640px) {
-    /* 更小屏时进一步压缩标题与图标 */
     .archive-title {
-      font-size: 1.375rem; /* 进一步贴合窄屏 */
+      font-size: 1.375rem;
       line-height: 1.3;
       flex-direction: column;
       gap: 0.4rem;
@@ -589,29 +594,28 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
       width: 1.25rem !important;
       height: 1.25rem !important;
     }
-
     .archive-subtitle {
       font-size: 0.8125rem;
       line-height: 1.35;
     }
-
     .timeline-line {
       left: -0.8rem;
     }
-
     .timeline-archive {
       margin-left: 0.8rem;
     }
-
     .posts-list {
       margin-left: calc(0.8rem - var(--connector-gap));
     }
-
     .post-connector {
       left: calc(-0.8rem + var(--connector-gap));
     }
-  }
 
+    /* 更小屏时压缩左侧日期列宽度 */
+    .post-item {
+      grid-template-columns: 60px 1fr;
+    }
+  }
   /* 深色模式适配 */
   html.dark {
     --hover-bg: var(--dark-hover-bg);
