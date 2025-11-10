@@ -14,7 +14,6 @@ interface Props {
   showTags?: boolean;
   baseUrl?: string; 
   showSidebar?: boolean; 
-  subtitleCountMode?: 'static' | 'filtered';
 }
 
 const { 
@@ -447,197 +446,201 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
       gap: 2rem;
     }
   }
-
-  @media (max-width: 768px) {
-    .timeline-archive-container {
-      padding: 0.5rem 0.5rem;
-    }
-    .archive-header {
-      margin-bottom: 1.25rem;
-      padding-bottom: 0.75rem;
-    }
-    .main-content-with-sidebar {
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-    .archive-sidebar {
-      position: static;
-      order: -1;
-    }
-    .sidebar-widget {
-      padding: 1rem;
-    }
-    .archive-title {
-      font-size: 1.5rem;
-      line-height: 1.3;
-      gap: 0.5rem;
-    }
-    .archive-title :global(svg) {
-      width: 1.5rem !important;
-      height: 1.5rem !important;
-    }
-    .archive-subtitle {
-      font-size: 0.875rem;
-      line-height: 1.4;
-      line-break: anywhere;
-      overflow-wrap: anywhere;
-      word-break: break-all;
-      white-space: normal;
-    }
-    .timeline-archive {
-      margin-left: 1rem;
-    }
-    .timeline-line {
-      left: -1rem;
-      width: 1.5px;
-    }
-    .year-dot {
-      width: 14px;
-      height: 14px;
-      border-width: 3px;
-    }
-    .year-title {
-      font-size: 1.5rem;
-    }
-    .posts-list {
-      margin-left: calc(1rem - var(--connector-gap));
-    }
-    .post-connector {
-      left: calc(-1rem + var(--connector-gap));
-      width: 10px;
-      top: 1.3rem;
-      transform: none;
-    }
-    .post-item:hover .post-connector {
-      width: 14px;
-    }
-    .post-item:hover .post-connector::before {
-      width: 6px;
-      height: 6px;
-    }
-    .post-date {
-      min-width: 55px;
-      font-size: 0.8rem;
-    }
-    .post-category {
-      padding: 0.15rem 0.4rem;
-      font-size: 0.7rem;
-      margin-right: 0;
-    }
-
-    /* 改为两行网格布局，避免三行 */
-    .post-item {
-      display: grid;
-      grid-template-columns: 70px 1fr;           /* 左列时间，右列内容 */
-      grid-template-areas:
-        "date title"
-        "category tags";
-      align-items: center;
-      gap: 0.35rem 0.75rem;                      /* 行间距 / 列间距 */
-      padding: 0.6rem 0;
-      padding-left: 1.25rem;
-    }
-
-    .post-date {
-      grid-area: date;
-      order: initial;                            /* 覆盖之前的 order */
-      width: auto;                               /* 不占满整行 */
-      text-align: left;                          /* 更节省空间 */
-      white-space: nowrap;
-    }
-
-    .post-link {
-      grid-area: title;
-      order: initial;
-      white-space: nowrap;                       /* 单行显示 */
-      overflow: hidden;
-      text-overflow: ellipsis;                   /* 超长省略 */
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-
-    .post-category {
-      grid-area: category;
-      order: initial;
-      margin-left: 0;                            /* 放到左侧，不挤占标题行 */
-    }
-
-    .post-tags {
-      grid-area: tags;
-      order: initial;
-      display: flex;
-      flex-wrap: nowrap;                         /* 单行标签 */
-      gap: 0.25rem;
-      overflow: hidden;                          /* 避免挤出第三行 */
-      width: 100%;
-    }
-
-    .post-tag,
-    .post-tag-more {
-      white-space: nowrap;
-    }
-
-    /* 移动端最多显示两个标签，其余隐藏 */
-    .post-tags .post-tag:nth-child(n+3) {
-      display: none;
-    }
+    @media (max-width: 768px) {
+  /* 页眉左右排：左侧图标+标题，右侧数量 */
+  .archive-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--line-divider);
+  }
+  .archive-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    font-size: 1.4rem;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .archive-title :global(svg) {
+    width: 1.4rem !important;
+    height: 1.4rem !important;
+    flex-shrink: 0;
+  }
+  .archive-subtitle {
+    margin: 0;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--text-secondary);
+    flex-shrink: 0;
   }
 
+  /* 主内容：单列，侧边栏置顶 */
+  .main-content-with-sidebar {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    align-items: start;
+  }
+  .archive-sidebar {
+    position: static;
+    order: -1;
+    width: 100%;
+  }
+
+  /* 时间线与竖线层级、位置 */
+  .timeline-archive {
+    margin-left: 0.75rem;
+    position: relative;
+    z-index: 0;
+  }
+  .timeline-line {
+    position: absolute;
+    left: -0.75rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .timeline-content {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+  }
+  .posts-list {
+    margin-left: calc(0.75rem - var(--connector-gap));
+  }
+
+  /* 列表项两行网格：第1行 时间+标题，第2行 分类+标签 */
+  .timeline-archive .post-item {
+    display: grid !important;
+    grid-template-columns: 72px minmax(0, 1fr) !important;
+    align-items: start !important;     /* 顶部对齐：日期与标题第一行在同一行 */
+    grid-template-areas:
+      "date title"
+      "category tags";
+    column-gap: 0.75rem !important;                        /* 明确列间距，避免贴合 */
+    row-gap: 0.35rem;
+    align-items: center;
+    padding: 0.6rem 0;
+    padding-left: 1.25rem;
+    position: relative;
+  }
+
+  .timeline-archive .post-date {
+    grid-area: date;
+    text-align: left;
+    white-space: nowrap;
+    font-size: 0.85rem;
+    margin-right: 0;
+    position: static !important;                           /* 防止绝对定位覆盖 */
+    z-index: 0;
+  }
+  .timeline-archive .post-link {
+    grid-area: title;
+    min-width: 0;
+    white-space: normal;      /* 允许换行 */
+    overflow: visible;        /* 不裁剪 */
+    text-overflow: clip;      /* 去掉省略号 */
+    overflow-wrap: anywhere;  /* 长词也能断行，避免撑出容器 */
+    font-size: 0.95rem;
+    line-height: 1.4;         /* 多行时的行高更舒适 */
+    position: relative;
+    z-index: 1;
+  }
+
+  /* 分类背景按内容宽度，不拉伸整列 */
+  .timeline-archive .post-category {
+    grid-area: category;
+    justify-self: start;
+    margin: 0;
+    padding: 0.12rem 0.4rem;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    width: auto;
+  }
+
+  /* 标签容器左对齐且可收缩，避免溢出 */
+  .timeline-archive .post-tags {
+    grid-area: tags;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+    overflow: hidden;
+    width: 100%;
+    min-width: 0;
+    justify-self: start;
+  }
+  .timeline-archive .post-tag,
+  .timeline-archive .post-tag-more {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .timeline-archive .post-tags .post-tag:nth-child(n+3) {
+    display: none;         /* 手机端最多显示两个标签 */
+  }
+
+  /* 连接线位置与层级 */
+  .timeline-archive .post-connector {
+    position: absolute;
+    left: calc(-0.75rem + var(--connector-gap));
+    top: 1.2rem;
+    width: 10px;
+    height: 1.5px;
+    transform: none;
+    z-index: 0;
+  }
+  .timeline-archive .post-item:hover .post-connector {
+    width: 14px;
+    background: var(--timeline-color);
+  }
+  .timeline-archive .post-item:hover .post-connector::before {
+    width: 6px;
+    height: 6px;
+    background: var(--timeline-color);
+  }
+}
+
+  /* 更窄屏：≤640px 再微调 */
   @media (max-width: 640px) {
     .archive-title {
-      font-size: 1.375rem;
-      line-height: 1.3;
-      flex-direction: column;
-      gap: 0.4rem;
+      font-size: 1.3rem;
     }
     .archive-title :global(svg) {
       width: 1.25rem !important;
       height: 1.25rem !important;
     }
-    .archive-subtitle {
-      font-size: 0.8125rem;
-      line-height: 1.35;
-    }
-    .timeline-line {
-      left: -0.8rem;
+    .posts-list {
+      margin-left: calc(0.5rem - var(--connector-gap));
     }
     .timeline-archive {
-      margin-left: 0.8rem;
+      margin-left: 0.5rem;
     }
-    .posts-list {
-      margin-left: calc(0.8rem - var(--connector-gap));
+    .timeline-line {
+      left: -0.5rem;
     }
     .post-connector {
-      left: calc(-0.8rem + var(--connector-gap));
+      left: calc(-0.5rem + var(--connector-gap));
     }
-
-    /* 更小屏时压缩左侧日期列宽度 */
     .post-item {
       grid-template-columns: 60px 1fr;
+      column-gap: 0.45rem;
+    }
+    .post-link {
+      font-size: 0.9rem;
     }
   }
-  /* 深色模式适配 */
-  html.dark {
-    --hover-bg: var(--dark-hover-bg);
-    --category-bg: var(--dark-category-bg);
-  }
-
-  html.dark .year-dot {
-    border-color: var(--content-pane-bg);
-  }
-
-  html.dark .post-connector::before {
-    box-shadow: 0 0 0 2px var(--content-pane-bg);
-  }
-
-  html.dark .post-item:hover .post-connector::before {
-    box-shadow: 0 0 0 2px var(--content-pane-bg), 0 0 0 3px rgba(0,0,0,0.05);
-  }
-
-  html.dark .post-item:hover {
-    background-color: var(--dark-hover-bg);
-  }
-</style>
+  </style>
 
 <script>
   document.addEventListener('astro:page-load', () => {
@@ -648,8 +651,8 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
     const getSelectedFromURL = (): { categories: string[]; tags: string[] } => {
       const params = new URLSearchParams(window.location.search);
       const cat = params.get('分类') || '';
-      const cats = cat ? [cat] : [];            // 分类单值
-      const tags = params.getAll('标签');       // 标签多值
+      const cats = cat ? [cat] : [];       // 分类单值
+      const tags = params.getAll('标签');  // 标签多值
       return { categories: cats, tags };
     };
 
@@ -668,8 +671,7 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
           selected.tags.length === 0 ||
           selected.tags.every((t: string) => tags.includes(t));
 
-        const visible = matchCategory && matchTag;
-        li.style.display = visible ? '' : 'none';
+        li.style.display = matchCategory && matchTag ? '' : 'none';
       });
 
       let totalVisible = 0;
@@ -687,10 +689,8 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
       });
     }
 
-    // 初始根据 URL 参数显示并更新副标题与提示
     updateVisibility(getSelectedFromURL());
 
-    // 监听筛选变化事件
     window.addEventListener(
       'filters:changed',
       ((e: Event) => {
@@ -699,7 +699,6 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
       }) as EventListener
     );
 
-    // 浏览器历史导航时同步可见性
     window.addEventListener('popstate', () => {
       updateVisibility(getSelectedFromURL());
     });
