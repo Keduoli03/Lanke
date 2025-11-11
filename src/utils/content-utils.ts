@@ -90,7 +90,15 @@ export async function getAllTags(): Promise<{ name:string; count: number; posts:
   })).sort((a, b) => b.count - a.count);
 }
 
-// 根据分类获取文章
+//纯时间排序
+export async function getDateSortedPosts(): Promise<CollectionEntry<'posts'>[]> {
+  const posts = await getPublishedPosts();
+  return [...posts].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+}
+
+/**
+ * @deprecated 分类获取文章，已经弃用
+ */
 export async function getPostsByCategory(category: string): Promise<CollectionEntry<'posts'>[]> {
   const posts = await getPublishedPosts();
   return posts.filter(post => 
@@ -99,7 +107,9 @@ export async function getPostsByCategory(category: string): Promise<CollectionEn
   );
 }
 
-// 根据标签获取文章
+/**
+ * @deprecated 标签获取文章，已经弃用
+ */
 export async function getPostsByTag(tag: string): Promise<CollectionEntry<'posts'>[]> {
   const posts = await getPublishedPosts();
   return posts.filter(post => post.data.tags?.includes(tag));

@@ -22,11 +22,15 @@ const {
   showSidebar = true 
 } = Astro.props;
 
+const postsByDate = [...posts].sort(
+  (a, b) => new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf()
+);
+
 // 按年份分组
 type GroupedPosts = {
   [year: number]: CollectionEntry<'posts'>[];
 };
-const groupedPosts: GroupedPosts = posts.reduce((acc: GroupedPosts, post) => {
+const groupedPosts: GroupedPosts = postsByDate.reduce((acc: GroupedPosts, post) => {
   const year = new Date(post.data.date).getFullYear();
   if (!acc[year]) acc[year] = [];
   acc[year].push(post);
@@ -36,7 +40,6 @@ const groupedPosts: GroupedPosts = posts.reduce((acc: GroupedPosts, post) => {
 // 年份倒序（最新在前）
 const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
 ---
-
 <div class="timeline-archive-container">
   
 
