@@ -17,6 +17,8 @@ const title = '说说';
     <section class="memos-list">
       <div id="memo-grid" class="memos-grid"></div>
     </section>
+    <div id="memos-comment-global" class="comment-global d-none"></div>
+    <div id="memos-comment-global" class="comment-global d-none"></div>
 
     <!-- 单条说说模板 -->
     <template id="memo-item-template">
@@ -167,31 +169,47 @@ const title = '说说';
         return frag;
       }
 
-      function loadArtalk(btn) {
-        const id = btn.getAttribute('data-id') || '';
-        const artalkDom = document.getElementById(id);
-        if (!artalkDom) return;
-
-        document.querySelectorAll('.comment').forEach(item => item.classList.add('d-none'));
-        const existingArtalk = document.getElementById('artalk');
-        if (existingArtalk) existingArtalk.remove();
-
-        if (artalkDom.classList.contains('d-none')) {
-          artalkDom.insertAdjacentHTML('beforeend', '<div id="artalk"></div>');
-          artalkDom.classList.remove('d-none');
-          if (typeof Artalk !== 'undefined' && Artalk.init) {
-            Artalk.init({
-              el: '#artalk',
-              pageKey: `/m/${id}`,
-              pageTitle: '',
-              site: CONFIG.artalk.site,
-              server: CONFIG.artalk.server,
-              emoticons: false
-            });
-          }
-        } else {
-          artalkDom.classList.add('d-none');
+      async function ensureArtalk() {
+        if (!document.querySelector('link[href="https://unpkg.com/artalk@2.9.1/dist/Artalk.css"]')) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = 'https://unpkg.com/artalk@2.9.1/dist/Artalk.css';
+          document.head.appendChild(link);
         }
+        if (window.__Artalk) return window.__Artalk;
+        const mod = await import('https://esm.sh/artalk@2.9.1');
+        const Artalk = mod.default || mod;
+        window.__Artalk = Artalk;
+        return Artalk;
+      }
+
+      async function loadArtalk(btn) {
+        const id = btn.getAttribute('data-id') || '';
+        const container = document.getElementById('memos-comment-global');
+        if (!container) return;
+
+        if (window.__memosCommentId === id && !container.classList.contains('d-none')) {
+          container.classList.add('d-none');
+          container.innerHTML = '';
+          window.__memosCommentId = null;
+          return;
+        }
+
+        container.classList.remove('d-none');
+        container.innerHTML = '<div id="artalk"></div>';
+
+        const Artalk = await ensureArtalk();
+        Artalk.init({
+          el: '#artalk',
+          pageKey: `/m/${id}`,
+          pageTitle: '',
+          site: CONFIG.artalk.site,
+          server: CONFIG.artalk.server,
+          emoticons: false
+        });
+
+        window.__memosCommentId = id;
+        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
       function updateMemoList(data = []) {
@@ -240,18 +258,29 @@ const title = '说说';
           nextToken = resdata?.nextPageToken || '';
           updateMemoList(list);
           if (!nextToken || list.length < 1) loadMoreContainer.innerHTML = '';
-          if (typeof Artalk !== 'undefined' && Artalk.loadCountWidget) {
-            Artalk.loadCountWidget({
-              server: CONFIG.artalk.server,
-              site: CONFIG.artalk.site,
-              countEl: '.artalk-count'
-            });
-          }
+          const Artalk = await ensureArtalk();
+          Artalk.loadCountWidget({
+            server: CONFIG.artalk.server,
+            site: CONFIG.artalk.site,
+            countEl: '.artalk-count'
+          });
         } catch (err) {
           console.error('分页加载失败:', err);
           loadMoreContainer.innerHTML = '<div class="memo-error">加载更多失败</div>';
         }
       }
+
+      // 点击页面空白处关闭全局评论容器
+      document.addEventListener('click', (e) => {
+        const container = document.getElementById('memos-comment-global');
+        if (!container || container.classList.contains('d-none')) return;
+        const t = e.target;
+        if (t.closest('#memos-comment-global')) return; // 点击容器内部不关闭
+        if (t.closest('.memos-comments')) return;       // 点击按钮交给按钮逻辑处理
+        container.classList.add('d-none');
+        container.innerHTML = '';
+        (window).__memosCommentId = null;
+      });
 
       if (memoGrid && memoTemplate) getFirstPageMemos();
     </script>
@@ -301,6 +330,8 @@ const title = '说说';
     font-size: 0.85rem !important;
     line-height: 1.2 !important;
   }
+
+  .d-none { display: none !important; }
 
   /* 多列布局保持不变 */
   .memos-list {
@@ -399,6 +430,24 @@ const title = '说说';
     font-size: 0.86rem !important; /* 比正文略小 */
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
+  }
+
+  .comment-global {
+    width: 100%;
+    margin: 0.6rem 0;
+    padding: 0.6rem;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-bg-1);
+  }
+
+  .comment-global {
+    width: 100%;
+    margin: 0.6rem 0;
+    padding: 0.6rem;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-bg-1);
   }
 
   /* 底部区域保持不变 */
