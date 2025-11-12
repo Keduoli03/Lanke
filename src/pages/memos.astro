@@ -18,14 +18,17 @@ const title = '说说';
       <div id="memo-grid" class="memos-grid"></div>
     </section>
     <div id="memos-comment-global" class="comment-global d-none"></div>
-    <div id="memos-comment-global" class="comment-global d-none"></div>
+    <div id="memos-reaction-global" class="reaction-global d-none"></div>
 
     <!-- 单条说说模板 -->
     <template id="memo-item-template">
       <article class="memos-item">
         <div class="memos-content prose dark:prose-invert"></div>
+        <!-- 新增反应容器 -->
+        <div class="emaction-container"></div>
         <div class="memos-footer">
           <time class="memos-time"></time>
+          <button class="memos-reactions">反应</button>
           <button class="memos-comments">评论<span class="artalk-count" data-page-key=""></span></button>
         </div>
         <div class="comment d-none"></div>
@@ -35,255 +38,564 @@ const title = '说说';
     <!-- 加载更多按钮 -->
     <div class="bb-load" id="load-more-container"></div>
 
-    <script is:inline>
-      const CONFIG = {
-        memos: {
-          baseUrl: 'https://memos.blueke.top/',
-          limit: 10,
-          creatorId: '1',
-          username: 'lanke',
-          userlink: 'https://memos.blueke.top',
-          commentsShow: true,
-          commentsTitle: '评论'
-        },
-        artalk: {
-          site: 'Memos',
-          server: 'https://artalk.blueke.top',
-          commentsUrl: 'https://memos.blueke.top/m/'
-        },
-        dom: {
-          gridContainer: '#memo-grid',
-          template: '#memo-item-template',
-          loadMore: '#load-more-container'
-        }
-      };
-
-      let nextToken = '';
-      const limit = parseInt(CONFIG.memos.limit, 10);
-      const memoGrid = document.querySelector(CONFIG.dom.gridContainer);
-      const memoTemplate = document.querySelector(CONFIG.dom.template);
-      const loadMoreContainer = document.querySelector(CONFIG.dom.loadMore);
-
-      function formatDate(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hour = String(date.getHours()).padStart(2, '0');
-        const minute = String(date.getMinutes()).padStart(2, '0');
-        return `${year}-${month}-${day} ${hour}:${minute}`;
-      }
-
-      function renderMarkdownBasic(text) {
-        if (!text) return '';
-        let s = text
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;');
-
-        s = s.replace(/```([\s\S]*?)```/g, (_, code) => `<pre><code>${code.replace(/&/g, '&amp;')}</code></pre>`);
-        s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
-        s = s.replace(/^###\s+(.*)$/gm, '<h3>$1</h3>')
-             .replace(/^##\s+(.*)$/gm, '<h2>$1</h2>')
-             .replace(/^#\s+(.*)$/gm, '<h1>$1</h1>');
-        s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-             .replace(/\*([^*]+)\*/g, '<em>$1</em>');
-        s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2" class="memo-img" />');
-        s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="memo-link">$1</a>');
-        s = s.replace(/^>\s+(.*)$/gm, '<blockquote>$1</blockquote>');
-        s = s.replace(/^(?:-\s.*(?:\r?\n|$))+?/gm, (block) => {
-          const items = block.trim().split(/\r?\n/).map(l => l.replace(/^-+\s?/, '').trim());
-          const li = items.filter(Boolean).map(i => `<li>${i}</li>`).join('');
-          return `<ul>${li}</ul>`;
-        });
-        s = s.split(/\n{2,}/).map(chunk => {
-          if (/^\s*(<h\d|<ul|<pre|<blockquote|<img|<p)/.test(chunk)) return chunk;
-          const lines = chunk.split(/\n/).map(l => l.trim()).filter(Boolean);
-          if (!lines.length) return '';
-          return `<p>${lines.join('<br/>')}</p>`;
-        }).join('\n');
-
-        return s;
-      }
-
-      function renderMemoItem(memo) {
-        const isoTime = memo.displayTime || memo.createTime;
-        const createdDate = isoTime ? new Date(isoTime) : new Date();
-        const memoId = (memo.name || '').split('/').pop() || String(memo.id || Date.now());
-
-        const frag = memoTemplate.content.cloneNode(true);
-        const contentEl = frag.querySelector('.memos-content');
-        contentEl.innerHTML = renderMarkdownBasic(memo.content || '');
-        contentEl.querySelectorAll('img').forEach(img => {
-          const src = img.getAttribute('src') || '';
-          if (/^\/(attachments|resources|o)\//.test(src)) {
-            img.src = `${CONFIG.memos.baseUrl}${src.slice(1)}`;
-          } else if (/^(attachments|resources|o)\//.test(src)) {
-            img.src = `${CONFIG.memos.baseUrl}${src}`;
-          }
-        });
-        if (Array.isArray(memo.attachments) && memo.attachments.length) {
-          const wrap = document.createElement('div');
-          wrap.className = 'memos-attachments';
-          memo.attachments.forEach(att => {
-            const id = (att.name || '').split('/').pop();
-            const isImg = (att.type || '').startsWith('image/');
-            if (isImg) {
-              const candidates = [];
-              if (att.externalLink) candidates.push(att.externalLink);
-              if (id) {
-                candidates.push(`${CONFIG.memos.baseUrl}api/v2/attachments/${id}/raw`);
-                candidates.push(`${CONFIG.memos.baseUrl}api/v1/attachments/${id}/raw`);
-                candidates.push(`${CONFIG.memos.baseUrl}o/${id}`);
-              }
-              const img = document.createElement('img');
-              img.className = 'memo-img';
-              let i = 0;
-              const tryNext = () => {
-                if (i >= candidates.length) return;
-                img.src = candidates[i++];
-              };
-              img.addEventListener('error', tryNext);
-              tryNext();
-              wrap.appendChild(img);
-            } else {
-              const a = document.createElement('a');
-              a.href = att.externalLink || (id ? `${CONFIG.memos.baseUrl}api/v1/attachments/${id}/raw` : '#');
-              a.textContent = att.filename || '附件';
-              a.target = '_blank';
-              a.rel = 'noopener noreferrer';
-              a.className = 'memo-link';
-              wrap.appendChild(a);
-            }
-          });
-          contentEl.appendChild(wrap);
-        }
-        frag.querySelector('.memos-time').textContent = formatDate(createdDate);
-        
-        const commentBtn = frag.querySelector('.memos-comments');
-        const commentCount = frag.querySelector('.artalk-count');
-        commentBtn.setAttribute('data-id', memoId);
-        commentCount.setAttribute('data-page-key', `/m/${memoId}`);
-        frag.querySelector('.comment').id = memoId;
-
-        commentBtn.addEventListener('click', () => loadArtalk(commentBtn));
-        return frag;
-      }
-
-      async function ensureArtalk() {
-        if (!document.querySelector('link[href="https://unpkg.com/artalk@2.9.1/dist/Artalk.css"]')) {
-          const link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = 'https://unpkg.com/artalk@2.9.1/dist/Artalk.css';
-          document.head.appendChild(link);
-        }
-        if (window.__Artalk) return window.__Artalk;
-        const mod = await import('https://esm.sh/artalk@2.9.1');
-        const Artalk = mod.default || mod;
-        window.__Artalk = Artalk;
-        return Artalk;
-      }
-
-      async function loadArtalk(btn) {
-        const id = btn.getAttribute('data-id') || '';
-        const container = document.getElementById('memos-comment-global');
-        if (!container) return;
-
-        if (window.__memosCommentId === id && !container.classList.contains('d-none')) {
-          container.classList.add('d-none');
-          container.innerHTML = '';
-          window.__memosCommentId = null;
-          return;
-        }
-
-        container.classList.remove('d-none');
-        container.innerHTML = '<div id="artalk"></div>';
-
-        const Artalk = await ensureArtalk();
-        Artalk.init({
-          el: '#artalk',
-          pageKey: `/m/${id}`,
-          pageTitle: '',
-          site: CONFIG.artalk.site,
-          server: CONFIG.artalk.server,
-          emoticons: false
-        });
-
-        window.__memosCommentId = id;
-        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-
-      function updateMemoList(data = []) {
-        if (!memoGrid || data.length === 0) return;
-        data.forEach(memo => memoGrid.appendChild(renderMemoItem(memo)));
-      }
-
-      function initLoadMoreBtn() {
-        loadMoreContainer.innerHTML = '<button class="load-btn button-load">加载中…</button>';
-        const btn = loadMoreContainer.querySelector('.button-load');
-        btn.addEventListener('click', () => {
-          btn.textContent = '加载中…';
-          getNextPageMemos().then(() => btn.textContent = '加载更多');
-        });
-        return btn;
-      }
-
-      async function getFirstPageMemos() {
-        const btn = initLoadMoreBtn();
-        const url = `${CONFIG.memos.baseUrl}api/v1/memos?creatorId=${CONFIG.memos.creatorId}&rowStatus=NORMAL&limit=${limit}`;
+    <script is:inline>// 反应功能核心类
+class Emaction {
+  constructor(config) {
+    // 合并配置
+    this.config = {
+      emactionApi: 'https://emaction-go.mintimate.cn',
+      memoId: '',
+      ...config
+    };
+    
+    // 表情数据（使用emoji符号作为类型标识，与API的reactionType匹配）
+    this.emojis = [
+      { code: '👍', type: '👍' },
+      { code: '❤️', type: '❤️' },
+      { code: '😄', type: '😄' },
+      { code: '🎉', type: '🎉' },
+      { code: '😕', type: '😕' },
+      { code: '👀', type: '👀' }
+    ];
+    
+    // 初始化状态
+    this.reactions = {};
+    this.userReaction = null;
+    
+    // 绑定上下文
+    this.handleReactionClick = this.handleReactionClick.bind(this);
+  }
+  
+  /**
+   * 初始化反应组件
+   */
+  async init() {
+    if (!this.config.memoId) {
+      console.error('缺少memoId参数');
+      return;
+    }
+    
+    // 加载现有反应数据
+    await this.loadReactions();
+  }
+  
+  /**
+   * 从API加载反应数据
+   */
+  async loadReactions() {
+    try {
+      // 尝试使用memos自身API获取反应
+      const base = CONFIG.memos.baseUrl.replace(/\/$/, '');
+      const urls = [
+        `${base}/api/v1/memos/${this.config.memoId}/reactions`,
+        `${base}/api/v1/memos/${this.config.memoId}/reactions`,
+        `${base}/api/v1/memo/${this.config.memoId}/reactions`,
+      ];
+      
+      let reactionsData = [];
+      for (const u of urls) {
         try {
-          const res = await fetch(url);
-          const resdata = await res.json();
-          const list = Array.isArray(resdata) ? resdata : (resdata.memos || []);
-          nextToken = resdata?.nextPageToken || '';
-          updateMemoList(list);
-          if (!nextToken || list.length < limit) loadMoreContainer.innerHTML = '';
-          else btn.textContent = '加载更多';
-        } catch (err) {
-          console.error('初始加载失败:', err);
-          memoGrid.innerHTML = '<div class="memo-error">加载失败，请检查网络</div>';
-          loadMoreContainer.innerHTML = '';
-        }
-      }
-
-      async function getNextPageMemos() {
-        if (!nextToken) {
-          loadMoreContainer.innerHTML = '';
-          return;
-        }
-        const url = `${CONFIG.memos.baseUrl}api/v1/memos?creatorId=${CONFIG.memos.creatorId}&rowStatus=NORMAL&limit=${limit}&pageToken=${encodeURIComponent(nextToken)}`;
-        try {
-          const res = await fetch(url);
-          const resdata = await res.json();
-          const list = Array.isArray(resdata) ? resdata : (resdata.memos || []);
-          nextToken = resdata?.nextPageToken || '';
-          updateMemoList(list);
-          if (!nextToken || list.length < 1) loadMoreContainer.innerHTML = '';
-          const Artalk = await ensureArtalk();
-          Artalk.loadCountWidget({
-            server: CONFIG.artalk.server,
-            site: CONFIG.artalk.site,
-            countEl: '.artalk-count'
+          const res = await fetch(u, {
+            mode: 'cors',
+            credentials: 'include', // 携带认证Cookie
+            headers: { 'Accept': 'application/json' }
           });
-        } catch (err) {
-          console.error('分页加载失败:', err);
-          loadMoreContainer.innerHTML = '<div class="memo-error">加载更多失败</div>';
-        }
+          // 即使非200状态也尝试解析（服务器可能返回数据）
+          const json = await res.json();
+          reactionsData = Array.isArray(json) ? json : (json.reactions || []);
+          break;
+        } catch (e) {}
       }
-
-      // 点击页面空白处关闭全局评论容器
-      document.addEventListener('click', (e) => {
-        const container = document.getElementById('memos-comment-global');
-        if (!container || container.classList.contains('d-none')) return;
-        const t = e.target;
-        if (t.closest('#memos-comment-global')) return; // 点击容器内部不关闭
-        if (t.closest('.memos-comments')) return;       // 点击按钮交给按钮逻辑处理
-        container.classList.add('d-none');
-        container.innerHTML = '';
-        (window).__memosCommentId = null;
+      
+      // 处理反应数据（优先使用reactionType字段）
+      this.reactions = {};
+      reactionsData.forEach(r => {
+        const t = (r && r.reactionType) || ''; // 匹配API返回的reactionType
+        if (!t) return;
+        this.reactions[t] = (this.reactions[t] || 0) + 1;
       });
+      
+      // 渲染反应组件
+      this.render();
+    } catch (error) {
+      console.error('加载反应时出错:', error);
+    }
+  }
+  
+  /**
+   * 渲染反应组件
+   * @returns {HTMLElement} 反应组件DOM
+   */
+  render() {
+    // 清空容器
+    if (this.container) {
+      this.container.innerHTML = '';
+    } else {
+      // 如果没有容器，尝试查找
+      this.container = document.querySelector(`.memos-item[data-id="${this.config.memoId}"] .emaction-container`);
+      if (!this.container) return;
+    }
+    
+    this.emojis.forEach(emoji => {
+      const count = this.reactions[emoji.type] || 0;
+      const button = document.createElement('button');
+      
+      // 设置按钮样式
+      button.className = `emaction-btn ${this.userReaction === emoji.type ? 'active' : ''}`;
+      button.innerHTML = `${emoji.code} ${count > 0 ? count : ''}`;
+      button.dataset.emoji = emoji.type; // 使用emoji类型作为标识
+      button.addEventListener('click', this.handleReactionClick);
+      
+      this.container.appendChild(button);
+    });
+    
+    return this.container;
+  }
+  
+  /**
+   * 处理反应点击事件
+   */
+  async handleReactionClick(e) {
+    const emojiType = e.currentTarget.dataset.emoji;
+    const isActive = this.userReaction === emojiType;
+    
+    // 更新UI状态
+    this.userReaction = isActive ? null : emojiType;
+    this.reactions[emojiType] = isActive 
+      ? Math.max(0, (this.reactions[emojiType] || 0) - 1)
+      : (this.reactions[emojiType] || 0) + 1;
+    
+    // 重新渲染
+    this.render();
+    
+    // 提交到API
+    if (!isActive) {
+      await this.submitReaction(emojiType);
+    } else {
+      // 移除反应（根据实际API调整删除逻辑）
+      console.log(`移除反应: ${emojiType}`);
+    }
+  }
+  
+  /**
+   * 提交反应到API
+   */
+  async submitReaction(emojiType) {
+    try {
+      const base = CONFIG.memos.baseUrl.replace(/\/$/, '');
+      const urls = [
+        `${base}/api/v1/memos/${this.config.memoId}/reactions`,
+        `${base}/api/v1/memos/${this.config.memoId}/reactions`,
+        `${base}/api/v1/memo/${this.config.memoId}/reactions`,
+      ];
+      
+      for (const u of urls) {
+        try {
+          const res = await fetch(u, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include', // 携带认证Cookie
+            mode: 'cors',
+            body: JSON.stringify({ reactionType: emojiType }) // 匹配API的reactionType字段
+          });
+          if (res.ok) return true;
+        } catch (e) {}
+      }
+      
+      // 提交失败提示登录
+      alert('需要登录才能表态哦~');
+      window.open(`${CONFIG.memos.baseUrl}`, '_blank'); // 跳转到Memos登录页
+      return false;
+    } catch (error) {
+      console.error('提交反应时出错:', error);
+      // 失败时回滚状态
+      await this.loadReactions();
+      return false;
+    }
+  }
+}
 
-      if (memoGrid && memoTemplate) getFirstPageMemos();
-    </script>
+const CONFIG = {
+  memos: {
+    baseUrl: 'https://memos.blueke.top/',
+    limit: 10,
+    creatorId: '1',
+    username: 'lanke',
+    userlink: 'https://memos.blueke.top',
+    commentsShow: true,
+    commentsTitle: '评论'
+  },
+  artalk: {
+    site: 'Memos',
+    server: 'https://artalk.blueke.top',
+    commentsUrl: 'https://memos.blueke.top/m/'
+  },
+  dom: {
+    gridContainer: '#memo-grid',
+    template: '#memo-item-template',
+    loadMore: '#load-more-container'
+  }
+};
+
+let nextToken = '';
+const limit = parseInt(CONFIG.memos.limit, 10);
+const memoGrid = document.querySelector(CONFIG.dom.gridContainer);
+const memoTemplate = document.querySelector(CONFIG.dom.template);
+const loadMoreContainer = document.querySelector(CONFIG.dom.loadMore);
+
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hour = String(date.getHours()).padStart(2, '0');
+  const minute = String(date.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hour}:${minute}`;
+}
+
+function renderMarkdownBasic(text) {
+  if (!text) return '';
+  let s = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  s = s.replace(/```([\s\S]*?)```/g, (_, code) => `<pre><code>${code.replace(/&/g, '&amp;')}</code></pre>`);
+  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+  s = s.replace(/^###\s+(.*)$/gm, '<h3>$1</h3>')
+       .replace(/^##\s+(.*)$/gm, '<h2>$1</h2>')
+       .replace(/^#\s+(.*)$/gm, '<h1>$1</h1>');
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+       .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2" class="memo-img" />');
+  s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="memo-link">$1</a>');
+  s = s.replace(/^>\s+(.*)$/gm, '<blockquote>$1</blockquote>');
+  s = s.replace(/^(?:-\s.*(?:\r?\n|$))+?/gm, (block) => {
+    const items = block.trim().split(/\r?\n/).map(l => l.replace(/^-+\s?/, '').trim());
+    const li = items.filter(Boolean).map(i => `<li>${i}</li>`).join('');
+    return `<ul>${li}</ul>`;
+  });
+  s = s.split(/\n{2,}/).map(chunk => {
+    if (/^\s*(<h\d|<ul|<pre|<blockquote|<img|<p)/.test(chunk)) return chunk;
+    const lines = chunk.split(/\n/).map(l => l.trim()).filter(Boolean);
+    if (!lines.length) return '';
+    return `<p>${lines.join('<br/>')}</p>`;
+  }).join('\n');
+
+  return s;
+}
+
+function renderMemoItem(memo) {
+  const isoTime = memo.displayTime || memo.createTime;
+  const createdDate = isoTime ? new Date(isoTime) : new Date();
+  const memoId = String(memo.id || (memo.name || '').split('/').pop() || Date.now());
+
+  const frag = memoTemplate.content.cloneNode(true);
+  const article = frag.firstElementChild;
+  article.dataset.id = memoId; // 添加data-id用于关联反应组件
+  
+  const contentEl = frag.querySelector('.memos-content');
+  contentEl.innerHTML = renderMarkdownBasic(memo.content || '');
+  contentEl.querySelectorAll('img').forEach(img => {
+    const src = img.getAttribute('src') || '';
+    if (/^\/(attachments|resources|o)\//.test(src)) {
+      img.src = `${CONFIG.memos.baseUrl}${src.slice(1)}`;
+    } else if (/^(attachments|resources|o)\//.test(src)) {
+      img.src = `${CONFIG.memos.baseUrl}${src}`;
+    }
+  });
+  if (Array.isArray(memo.attachments) && memo.attachments.length) {
+    const wrap = document.createElement('div');
+    wrap.className = 'memos-attachments';
+    memo.attachments.forEach(att => {
+      const id = (att.name || '').split('/').pop();
+      const isImg = (att.type || '').startsWith('image/');
+      if (isImg) {
+        const candidates = [];
+        if (att.externalLink) candidates.push(att.externalLink);
+        if (id) {
+          candidates.push(`${CONFIG.memos.baseUrl}api/v1/attachments/${id}/raw`);
+          candidates.push(`${CONFIG.memos.baseUrl}api/v1/attachments/${id}/raw`);
+          candidates.push(`${CONFIG.memos.baseUrl}o/${id}`);
+        }
+        const img = document.createElement('img');
+        img.className = 'memo-img';
+        let i = 0;
+        const tryNext = () => {
+          if (i >= candidates.length) return;
+          img.src = candidates[i++];
+        };
+        img.addEventListener('error', tryNext);
+        tryNext();
+        wrap.appendChild(img);
+      } else {
+        const a = document.createElement('a');
+        a.href = att.externalLink || (id ? `${CONFIG.memos.baseUrl}api/v1/attachments/${id}/raw` : '#');
+        a.textContent = att.filename || '附件';
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.className = 'memo-link';
+        wrap.appendChild(a);
+      }
+    });
+    contentEl.appendChild(wrap);
+  }
+  frag.querySelector('.memos-time').textContent = formatDate(createdDate);
+  
+  const commentBtn = frag.querySelector('.memos-comments');
+  const commentCount = frag.querySelector('.artalk-count');
+  const reactionBtn = frag.querySelector('.memos-reactions');
+  commentBtn.setAttribute('data-id', memoId);
+  commentCount.setAttribute('data-page-key', `/m/${memoId}`);
+  reactionBtn.setAttribute('data-id', memoId);
+  frag.querySelector('.comment').id = memoId;
+
+  commentBtn.addEventListener('click', () => loadArtalk(commentBtn));
+  reactionBtn.addEventListener('click', () => loadReactions(reactionBtn));
+  
+  // 初始化反应组件
+  const emaction = new Emaction({
+    memoId: memoId,
+    emactionApi: CONFIG.memos.baseUrl
+  });
+  emaction.init();
+  
+  return frag;
+}
+
+async function ensureArtalk() {
+  if (!document.querySelector('link[href="https://unpkg.com/artalk@2.9.1/dist/Artalk.css"]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/artalk@2.9.1/dist/Artalk.css';
+    document.head.appendChild(link);
+  }
+  if (window.__Artalk) return window.__Artalk;
+  const mod = await import('https://esm.sh/artalk@2.9.1');
+  const Artalk = mod.default || mod;
+  window.__Artalk = Artalk;
+  return Artalk;
+}
+
+async function loadArtalk(btn) {
+  const id = btn.getAttribute('data-id') || '';
+  const container = document.getElementById('memos-comment-global');
+  if (!container) return;
+
+  if (window.__memosCommentId === id && !container.classList.contains('d-none')) {
+    container.classList.add('d-none');
+    container.innerHTML = '';
+    window.__memosCommentId = null;
+    return;
+  }
+
+  container.classList.remove('d-none');
+  container.innerHTML = '<div id="artalk"></div>';
+
+  const Artalk = await ensureArtalk();
+  Artalk.init({
+    el: '#artalk',
+    pageKey: `/m/${id}`,
+    pageTitle: '',
+    site: CONFIG.artalk.site,
+    server: CONFIG.artalk.server,
+    emoticons: false
+  });
+
+  window.__memosCommentId = id;
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+const REACTIONS = [
+  {type:'👍', emoji:'👍'},
+  {type:'❤️', emoji:'❤️'},
+  {type:'😄', emoji:'😄'},
+  {type:'🎉', emoji:'🎉'},
+  {type:'😕', emoji:'😕'},
+  {type:'👀', emoji:'👀'}
+];
+
+async function fetchReactions(id) {
+  const base = CONFIG.memos.baseUrl.replace(/\/$/, '');
+  const urls = [
+    `${base}/api/v1/memos/${id}/reactions`,
+    `${base}/api/v1/memos/${id}/reactions`,
+    `${base}/api/v1/memo/${id}/reactions`,
+  ];
+  for (const u of urls) {
+    try {
+      const res = await fetch(u, {
+        mode: 'cors',
+        credentials: 'include', // 携带认证Cookie
+        headers: { 'Accept': 'application/json' }
+      });
+      const json = await res.json();
+      const reactions = Array.isArray(json) ? json : (json.reactions || []);
+      return { reactions };
+    } catch (e) {}
+  }
+  return { reactions: [] };
+}
+
+async function postReaction(id, reactionType) {
+  const base = CONFIG.memos.baseUrl.replace(/\/$/, '');
+  const urls = [
+    `${base}/api/v1/memos/${id}/reactions`,
+    `${base}/api/v1/memos/${id}/reactions`,
+    `${base}/api/v1/memo/${id}/reactions`,
+  ];
+  for (const u of urls) {
+    try {
+      const res = await fetch(u, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        credentials: 'include', // 携带认证Cookie
+        mode: 'cors',
+        body: JSON.stringify({ reactionType }) // 匹配API的reactionType字段
+      });
+      if (res.ok) return true;
+    } catch (e) {}
+  }
+  return false;
+}
+
+async function loadReactions(btn) {
+  const id = btn.getAttribute('data-id') || '';
+  const container = document.getElementById('memos-reaction-global');
+  if (!container) return;
+  if (window.__memosReactionId === id && !container.classList.contains('d-none')) {
+    container.classList.add('d-none');
+    container.innerHTML = '';
+    window.__memosReactionId = null;
+    return;
+  }
+  container.classList.remove('d-none');
+  container.innerHTML = '<div class="reaction-bar"></div>';
+  const bar = container.querySelector('.reaction-bar');
+  const data = await fetchReactions(id);
+  const counts = {};
+  if (data && Array.isArray(data.reactions)) {
+    data.reactions.forEach(r => {
+      const t = (r && r.reactionType) || ''; // 匹配API的reactionType
+      if (!t) return;
+      counts[t] = (counts[t] || 0) + 1;
+    });
+  }
+  const types = Object.keys(counts);
+  if (!types.length) {
+    const link = document.createElement('a');
+    link.href = `${CONFIG.memos.userlink}/m/${id}`;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.className = 'memo-link';
+    link.textContent = '暂无表态，前往 Memos 表态';
+    bar.appendChild(link);
+  } else {
+    const emojiMap = { '👍':'👍', '❤️':'❤️', '😄':'😄', '🎉':'🎉', '😕':'😕', '👀':'👀' };
+    types.forEach(t => {
+      const btnEl = document.createElement('button');
+      btnEl.className = 'reaction-chip';
+      btnEl.textContent = `${(emojiMap[t]||'🙂')} ${counts[t]}`;
+      btnEl.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const ok = await postReaction(id, t);
+        if (!ok) {
+          alert('需要登录才能表态哦~');
+          window.open(`${CONFIG.memos.baseUrl}`, '_blank');
+          return;
+        }
+        const latest = await fetchReactions(id);
+        const n = latest && Array.isArray(latest.reactions)
+          ? latest.reactions.filter(x => x.reactionType === t).length
+          : counts[t]+1;
+        btnEl.textContent = `${(emojiMap[t]||'🙂')} ${n}`;
+      });
+      bar.appendChild(btnEl);
+    });
+  }
+  window.__memosReactionId = id;
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function updateMemoList(data = []) {
+  if (!memoGrid || data.length === 0) return;
+  data.forEach(memo => memoGrid.appendChild(renderMemoItem(memo)));
+  ensureArtalk().then(Artalk => {
+    Artalk.loadCountWidget({
+      server: CONFIG.artalk.server,
+      site: CONFIG.artalk.site,
+      countEl: '.artalk-count'
+    });
+  });
+}
+
+function initLoadMoreBtn() {
+  loadMoreContainer.innerHTML = '<button class="load-btn button-load">加载中…</button>';
+  const btn = loadMoreContainer.querySelector('.button-load');
+  btn.addEventListener('click', () => {
+    btn.textContent = '加载中…';
+    getNextPageMemos().then(() => btn.textContent = '加载更多');
+  });
+  return btn;
+}
+
+async function getFirstPageMemos() {
+  const btn = initLoadMoreBtn();
+  const url = `${CONFIG.memos.baseUrl}api/v1/memos?creatorId=${CONFIG.memos.creatorId}&rowStatus=NORMAL&limit=${limit}`;
+  try {
+    const res = await fetch(url);
+    const resdata = await res.json();
+    const list = Array.isArray(resdata) ? resdata : (resdata.memos || []);
+    nextToken = resdata?.nextPageToken || '';
+    updateMemoList(list);
+    if (!nextToken || list.length < limit) loadMoreContainer.innerHTML = '';
+    else btn.textContent = '加载更多';
+  } catch (err) {
+    console.error('初始加载失败:', err);
+    memoGrid.innerHTML = '<div class="memo-error">加载失败，请检查网络</div>';
+    loadMoreContainer.innerHTML = '';
+  }
+}
+
+async function getNextPageMemos() {
+  if (!nextToken) {
+    loadMoreContainer.innerHTML = '';
+    return;
+  }
+  const url = `${CONFIG.memos.baseUrl}api/v1/memos?creatorId=${CONFIG.memos.creatorId}&rowStatus=NORMAL&limit=${limit}&pageToken=${encodeURIComponent(nextToken)}`;
+  try {
+    const res = await fetch(url);
+    const resdata = await res.json();
+    const list = Array.isArray(resdata) ? resdata : (resdata.memos || []);
+    nextToken = resdata?.nextPageToken || '';
+    updateMemoList(list);
+    if (!nextToken || list.length < 1) loadMoreContainer.innerHTML = '';
+    const Artalk = await ensureArtalk();
+    Artalk.loadCountWidget({
+      server: CONFIG.artalk.server,
+      site: CONFIG.artalk.site,
+      countEl: '.artalk-count'
+    });
+  } catch (err) {
+    console.error('分页加载失败:', err);
+    loadMoreContainer.innerHTML = '<div class="memo-error">加载更多失败</div>';
+  }
+}
+
+// 点击页面空白处关闭评论容器与反应浮层
+document.addEventListener('click', (e) => {
+  const t = e.target;
+  const c1 = document.getElementById('memos-comment-global');
+  const pop = document.getElementById('memos-reaction-popover');
+  const insideComment = !!t.closest('#memos-comment-global');
+  const insidePopover = !!t.closest('#memos-reaction-popover');
+  const isBtn = !!t.closest('.memos-comments') || !!t.closest('.memos-reactions') || !!t.closest('.emaction-btn');
+  if (insideComment || insidePopover || isBtn) return;
+  if (c1 && !c1.classList.contains('d-none')) { c1.classList.add('d-none'); c1.innerHTML=''; (window).__memosCommentId=null; }
+  if (pop && !pop.classList.contains('d-none')) { pop.classList.add('d-none'); pop.innerHTML=''; }
+});
+
+if (memoGrid && memoTemplate) getFirstPageMemos();
+</script>
   </div>
 </MainLayout>
 
@@ -364,8 +676,8 @@ const title = '说说';
 
   /* 内容区域：缩小整体字体基数 */
   .memos-content.prose {
-    font-size: 1rem !important; /* 从0.92rem缩小到0.88rem */
-    line-height: 1.5 !important; /* 轻微降低行高，更紧凑 */
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
     color: var(--text-primary) !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -379,15 +691,15 @@ const title = '说说';
   .memos-content.prose h1,
   .memos-content.prose h2,
   .memos-content.prose h3 {
-    margin: 0.3rem 0 0.15rem !important; /* 缩小上下间距 */
-    font-size: 1.1rem !important; /* 从1.05rem缩小到0.92rem，仅比正文略大 */
-    font-weight: 500 !important; /* 降低字体权重，不那么厚重 */
+    margin: 0.3rem 0 0.15rem !important;
+    font-size: 1.1rem !important;
+    font-weight: 500 !important;
     line-height: 1.4 !important;
   }
 
   /* 段落样式：同步缩小间距 */
   .memos-content.prose p {
-    margin: 0.2rem 0 !important; /* 从0.25rem缩小 */
+    margin: 0.2rem 0 !important;
   }
 
   .memos-content.prose ul {
@@ -405,13 +717,13 @@ const title = '说说';
 }
 
 .memos-content.prose li::marker {
-  font-size: 0.9em !important; /* 符号大小稍调小，视觉上更紧凑 */
+  font-size: 0.9em !important;
 }
 
   .memos-content.prose blockquote {
-    margin: 0.3rem 0 !important; /* 从0.4rem缩小 */
-    padding: 0.2rem 0.5rem !important; /* 缩小内边距 */
-    font-size: 0.84rem !important; /* 比正文略小 */
+    margin: 0.3rem 0 !important;
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.84rem !important;
   }
 
   /* 图片样式保持不变 */
@@ -419,7 +731,7 @@ const title = '说说';
     max-width: 100% !important;
     height: auto !important;
     border-radius: 6px !important;
-    margin: 0.3rem 0 !important; /* 缩小上下间距 */
+    margin: 0.3rem 0 !important;
   }
 
   /* 链接样式：同步缩小 */
@@ -427,12 +739,13 @@ const title = '说说';
     color: var(--color-link) !important;
     text-decoration: underline !important;
     display: inline-block !important;
-    font-size: 0.86rem !important; /* 比正文略小 */
+    font-size: 0.86rem !important;
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
   }
 
-  .comment-global {
+  .comment-global,
+  .reaction-global {
     width: 100%;
     margin: 0.6rem 0;
     padding: 0.6rem;
@@ -441,13 +754,67 @@ const title = '说说';
     background: var(--color-bg-1);
   }
 
-  .comment-global {
-    width: 100%;
-    margin: 0.6rem 0;
-    padding: 0.6rem;
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
-    background: var(--color-bg-1);
+  .reaction-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    margin: 4px 6px 0 0;
+    border: 1px solid var(--line-divider);
+    border-radius: 999px;
+    background: var(--tag-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+  .reaction-chip:hover {
+    background: var(--theme-color);
+    border-color: var(--theme-color);
+    color: #fff;
+  }
+
+  /* 反应组件样式 */
+  .emaction-container {
+    display: flex;
+    gap: 0.3rem;
+    margin: 0.5rem 0;
+    flex-wrap: wrap;
+  }
+
+  .emaction-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    border: 1px solid transparent;
+  }
+
+  .emaction-btn:hover {
+    background: rgba(102, 126, 234, 0.05);
+    border-color: rgba(102, 126, 234, 0.2);
+  }
+
+  .emaction-btn.active {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    border-color: rgba(102, 126, 234, 0.3);
+  }
+
+  [data-user-color-scheme="dark"] .emaction-btn.active {
+    background: rgba(21, 137, 233, 0.2);
+    color: var(--post-link-color);
+    border-color: rgba(21, 137, 233, 0.4);
+  }
+
+  [data-user-color-scheme="dark"] .emaction-btn:hover {
+    background: rgba(21, 137, 233, 0.1);
+    border-color: rgba(21, 137, 233, 0.2);
   }
 
   /* 底部区域保持不变 */
@@ -468,46 +835,45 @@ const title = '说说';
     white-space: nowrap;
   }
 
-  /* 彻底解决左右内边距不一致：用flex布局+强制样式覆盖 */
-.memos-comments {
-  display: flex !important; /* 替换inline-flex，避免父元素text-align干扰 */
-  align-items: center !important;
-  justify-content: center !important; /* 内部内容绝对居中 */
-  font-size: 0.75rem !important;
-  color: var(--theme-color);
-  background: var(--tag-bg);
-  border: 1px solid var(--line-divider);
-  /* 强制统一左右内边距（数值可按需调整，这里用8px保持原大小） */
-  padding-left: 8px !important;
-  padding-right: 8px !important;
-  padding-top: 4px !important;
-  padding-bottom: 4px !important;
-  margin: 0 !important;
-  margin-left: auto !important; /* 保持靠右对齐 */
-  border-radius: 8px !important;
-  cursor: pointer;
-  transition: all 0.2s ease !important;
-  box-sizing: border-box !important; /* 内边距不影响宽度 */
-  white-space: nowrap !important; /* 内容不换行 */
-  text-align: center !important; /* 文字绝对居中，消除偏移 */
-  outline: none !important; /* 清除默认轮廓 */
-  appearance: none !important; /* 清除浏览器默认样式 */
-}
+  /* 按钮样式 */
+  .memos-reactions,
+  .memos-comments {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.75rem !important;
+    color: var(--theme-color);
+    background: var(--tag-bg);
+    border: 1px solid var(--line-divider);
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    margin: 0 !important;
+    margin-left: auto !important;
+    border-radius: 8px !important;
+    cursor: pointer;
+    transition: all 0.2s ease !important;
+    box-sizing: border-box !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+    outline: none !important;
+    appearance: none !important;
+  }
 
-/* 计数元素：仅保留必要间距，不干扰内边距 */
-.memos-comments .artalk-count {
-  margin-left: 3px !important; /* 文字和计数的间距 */
-  margin-right: 0 !important; /* 强制清除右边间距 */
-  padding: 0 !important;
-}
+  .memos-comments .artalk-count {
+    margin-left: 3px !important;
+    margin-right: 0 !important;
+    padding: 0 !important;
+  }
 
-.memos-comments:hover {
-  background: var(--theme-color);
-  border-color: var(--theme-color);
-  color: #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-}
-
+  .memos-comments:hover,
+  .memos-reactions:hover {
+    background: var(--theme-color);
+    border-color: var(--theme-color);
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  }
 
   /* 加载更多按钮保持不变 */
   .bb-load {
@@ -570,8 +936,13 @@ const title = '说说';
       font-size: 0.9rem !important;
     }
 
-    .memos-time, .memos-comments {
+    .memos-time, .memos-comments, .memos-reactions {
       font-size: 0.68rem !important;
+    }
+
+    .emaction-btn {
+      font-size: 0.8rem;
+      padding: 0.15rem 0.35rem;
     }
   }
 </style>
