@@ -61,9 +61,9 @@ const title = '说说';
 
       let nextToken = '';
       const limit = parseInt(CONFIG.memos.limit, 10);
-      const memoGrid = document.querySelector(CONFIG.dom.gridContainer);
-      const memoTemplate = document.querySelector(CONFIG.dom.template);
-      const loadMoreContainer = document.querySelector(CONFIG.dom.loadMore);
+      let memoGrid = document.querySelector(CONFIG.dom.gridContainer);
+      let memoTemplate = document.querySelector(CONFIG.dom.template);
+      let loadMoreContainer = document.querySelector(CONFIG.dom.loadMore);
 
       function formatDate(date) {
         const year = date.getFullYear();
@@ -293,6 +293,20 @@ const title = '说说';
           c1.innerHTML=''; 
           window.__memosCommentId=null; 
         }
+      });
+
+      document.addEventListener('astro:page-load', () => {
+        memoGrid = document.querySelector(CONFIG.dom.gridContainer);
+        memoTemplate = document.querySelector(CONFIG.dom.template);
+        loadMoreContainer = document.querySelector(CONFIG.dom.loadMore);
+        if (!memoGrid || !memoTemplate) return;
+        nextToken = '';
+        memoGrid.innerHTML = '';
+        if (loadMoreContainer) loadMoreContainer.innerHTML = '';
+        const c1 = document.getElementById('memos-comment-global');
+        if (c1) { c1.classList.add('d-none'); c1.innerHTML = ''; }
+        window.__memosCommentId = null;
+        getFirstPageMemos();
       });
 
       if (memoGrid && memoTemplate) getFirstPageMemos();
