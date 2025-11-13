@@ -21,17 +21,16 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
 <head>
   <BaseHead title={title} description={description} />
   <script is:inline set:html={themeScript} />
+  <ClientRouter />
 </head>
 <body class="bg-page text-primary" style={`
   --primary-hue: ${siteConfig.themeColor.hue};
   --page-width: ${siteConfig.pageWidth}; 
   --sidebar-width: ${siteConfig.sidebarWidth}; 
 `}>
-
-  <ClientRouter />
+	<Sidebar transition:persist />
+  <MobileNav transition:persist class="mobile-nav" />
   <div class="layout-container">
-	<Sidebar />
-    <MobileNav class="mobile-nav" />
     <main class="main-content">
       <div class="page-outer-container">
         <div class="content-pane">
