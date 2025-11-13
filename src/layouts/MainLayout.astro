@@ -58,7 +58,6 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
       flex: 1;
       background-color: var(--page-bg);
       min-height: 100vh;
-      padding: 2rem 1rem; 
     }
 
 
@@ -71,16 +70,15 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
    
     .content-pane {
       width: 100%;
-      max-width: var(--page-width); /* 宽度限制与PostLayout完全一致 */
-      padding: 2rem; /* 内边距与PostLayout一致（影响视觉宽度） */
+      max-width: var(--page-width);
     }
 
     @media (min-width: 1024px) {
       .main-content {
-        padding: 2rem;
+        padding: 1rem;
       }
       .content-pane {
-        padding: 2rem;
+        padding: 0rem;
       }
     }
 
@@ -88,7 +86,7 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
       .main-content {
         margin-left: 0 !important; 
         padding: 1rem; 
-        padding-top: 3rem; 
+        padding-top: 4rem; 
       }
       .content-pane {
         padding: 0; 

@@ -32,6 +32,21 @@
   .prose h5 { @apply text-sm; }
   .prose h6 { @apply text-xs; }
 }
+
+.prose {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+}
+
+.prose pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
 /* 
   干掉一些样式
   =============================================================================

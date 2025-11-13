@@ -1,12 +1,11 @@
 ---
 import PageHeader from '@/components/page/PageHeader.astro';
-import MainLayout from '../layouts/MainLayout.astro';
 import { Icon } from 'astro-icon/components';
-import Markdown from '@/components/util/Markdown.astro';
+import PostLayout from '@/layouts/PostLayout.astro';
 
 const title = '说说';
 ---
-<MainLayout title={title}>
+<PostLayout title={title}>
   <div class="memos">
     <!-- 头部区域 -->
     <PageHeader title="说说" subtitle="记录瞬间">
@@ -317,7 +316,7 @@ const title = '说说';
 
     </script>
   </div>
-</MainLayout>
+</PostLayout>
 
 <style is:inline>
   :root {

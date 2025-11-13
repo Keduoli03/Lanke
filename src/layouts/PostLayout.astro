@@ -157,14 +157,20 @@ const {
         margin-left: 0 !important; 
         padding: 1rem; 
         padding-top: 4rem; 
-        padding-right: 0;
+        overflow-x: hidden;
       }
       .page-outer-container {
         max-width: 100%;
       }
+      .post-main-container {
+        overflow-x: hidden;
+      }
       .content-pane {
-        padding: 0; 
+        padding: 1rem; 
         max-width: 100%; 
+        min-width: 0;
+        flex-shrink: 1;
+        overflow-x: hidden;
       }
     }
   </style>
