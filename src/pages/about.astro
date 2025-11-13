@@ -1,11 +1,15 @@
 ---
 import Markdown from '@/components/util/Markdown.astro';
-import MainLayout from '../layouts/MainLayout.astro';
+import PostLayout from '../layouts/PostLayout.astro';
 import { getEntry } from 'astro:content';
 import { render } from 'astro:content';
 import Artalk from '@/components/util/Artalk.astro';
 import PageHeader from '@/components/page/PageHeader.astro';
 import { Icon } from 'astro-icon/components';
+import ScrollToTop from '@/components/util/ScrollToTop.astro';
+import ScrollToComment from '@/components/util/ScrollToComment.astro';
+import Toc from '@/components/post/Toc.astro';
+import { siteConfig } from '@/config';
 
 const aboutPost = await getEntry("pages", "about");
 
@@ -16,25 +20,28 @@ if (!aboutPost) {
 
 const { Content } = await render(aboutPost);
 ---
-<MainLayout 
-    title={aboutPost.data.title}>
-    <div class="about-container">
+<PostLayout title='关于'}>
+  <div class="about-container">
       <PageHeader title={aboutPost.data.title} subtitle={`关于我~`}>
     <Icon slot="icon" name="material-symbols:person-outline" class="w-11 h-11" />
   </PageHeader>
-
-    <Markdown>
-        <Content />
-    </Markdown>
-
-    <div id="comment-section">
+  <div class="w-full flex justify-center px-2 sm:px-3 md:px-4 py-4 md:py-8">
+    <div class="w-full max-w-7xl">
+      <article class="min-w-0">
+      
+        <Markdown>
+          <Content />
+        </Markdown>
+      </article>
+    </div>
+  </div>
+  <div id="comment-section">
     <Artalk />
   </div>
-    </div>
-    
-    
-</MainLayout>
+</PostLayout>
 
 <style>
-      
+  @media (max-width: 640px) {
+    :global(.content-pane) { padding-top: 1rem; }
+  }
 </style>

@@ -3,16 +3,17 @@ import PageHeader from "@/components/page/PageHeader.astro";
 import Artalk from "@/components/util/Artalk.astro";
 import BangumiComponent from "@/components/util/Bangumi.astro";
 import MainLayout from "@/layouts/MainLayout.astro";
+import PostLayout from "@/layouts/PostLayout.astro";
 import { Icon } from "astro-icon/components";
 ---
-<MainLayout title="番剧">
+<PostLayout title="番剧">
   <div class="bangumi-container">
     <PageHeader title="番剧" subtitle="追番记录">
       <Icon slot="icon" name="material-symbols:movie-outline-rounded" class="w-11 h-11" />
     </PageHeader>
     <BangumiComponent />
   </div>
-</MainLayout>
+</PostLayout>
 
 <style is:inline>
   .bangumi-container {

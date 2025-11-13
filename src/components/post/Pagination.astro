@@ -8,7 +8,6 @@ interface Props {
 
 const { page, baseUrl } = Astro.props;
 
-// 生成页码数组（处理大量页码时显示省略号）
 const generatePageNumbers = (current: number, total: number) => {
   if (total <= 7) {
     return Array.from({ length: total }, (_, i) => i + 1);

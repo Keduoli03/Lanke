@@ -19,45 +19,113 @@ const url = `/posts/${slug}/`;
 const { wordCount, readingTime } = remarkPluginFrontmatter;
 const minutes = Math.ceil(readingTime) || 1;
 
-// 封面判断：仅有效http链接视为有封面
-const hasCover = typeof cover === 'string' && (cover as string).trim().startsWith('http');
+const coverUrl = typeof cover === 'string' ? cover : '';
+const hasCover = typeof coverUrl === 'string' && coverUrl.startsWith('http');
 const firstCategory = categories && categories.length > 0 ? categories[0] : '文章';
+
+// --- 动态分类样式 ---
+const colorGradients = [
+  'from-red-100 to-red-200', 'from-orange-100 to-orange-200', 'from-amber-100 to-amber-200',
+  'from-yellow-100 to-yellow-200', 'from-lime-100 to-lime-200', 'from-green-100 to-green-200',
+  'from-emerald-100 to-emerald-200', 'from-teal-100 to-teal-200', 'from-cyan-100 to-cyan-200',
+  'from-sky-100 to-sky-200', 'from-blue-100 to-blue-200', 'from-indigo-100 to-indigo-200',
+  'from-violet-100 to-violet-200', 'from-purple-100 to-purple-200', 'from-fuchsia-100 to-fuchsia-200',
+  'from-pink-100 to-pink-200', 'from-rose-100 to-rose-200',
+];
+
+const materialIcons = [
+  'article', 'code', 'home', 'lightbulb', 'map', 'book', 'camera', 'music_note', 
+  'palette', 'anchor', 'work', 'build', 'explore', 'favorite', 'rocket_launch', 
+  'star', 'psychology', 'eco', 'pets', 'movie', 'school', 'science', 'biotech'
+];
+
+function simpleHash(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+const getCategoryStyle = (category: string) => {
+  if (category === '文章') {
+    return { color: 'from-gray-100 to-gray-200', icon: 'article' };
+  }
+  
+  const hash = simpleHash(category);
+  const color = colorGradients[hash % colorGradients.length];
+  const icon = materialIcons[hash % materialIcons.length];
+  
+  return { color, icon };
+};
+
+const categoryStyle = getCategoryStyle(firstCategory);
+
 ---
 
 <article class:list={[
-  "w-full group overflow-hidden rounded-lg bg-[var(--content-pane-bg)] shadow-sm hover:shadow-lg transition-all duration-300",
-  "transform hover:-translate-y-1",
+  "group overflow-hidden rounded-lg bg-[var(--content-pane-bg)] shadow-sm hover:shadow-lg transition-all duration-300",
+  "transform hover:-translate-y-1", // 添加整体上浮效果
   className
 ]} style={`${style || ''} contain: paint;`}>
   
-  <!-- 核心修改：小屏幕垂直排列（flex-col），大屏幕水平排列（md:flex-row） -->
-  <div class="w-full flex flex-col md:flex-row h-full">
-    {/* 封面区域：大屏幕占1/3宽度，flex-shrink-0避免被压缩 */}
-    {hasCover && (
-      <div class="w-full md:w-1/3 flex-shrink-0 px-2 py-3 md:px-0 md:pt-6 md:pb-6">
-        <a 
-          href={url} 
-          class="block relative overflow-hidden rounded-lg shadow-inner h-full"
-          transition:name={`hero-${slug}`}
-        >
-          <div class="pt-[56.25%] bg-gray-100 dark:bg-gray-700"></div>
+  <div class="flex flex-col md:flex-row h-full">
+    {/* ================================= */}
+    {/*  1. 封面区域                     */}
+    {/* ================================= */}
+    <div class={`w-full md:w-1/3 flex-shrink-0 p-3 ${hasCover ? '' : 'hidden md:block'}`}>
+      <a 
+        href={url} 
+        class="block relative overflow-hidden rounded-lg shadow-inner"
+        transition:name={`hero-${slug}`}
+      >
+        <div class="pt-[45%] sm:pt-[56.25%] bg-gray-100 dark:bg-gray-700"></div>
+        {hasCover ? (
           <img 
-            src={cover} 
+            src={coverUrl} 
             alt={title || "文章封面"} 
             class="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
             loading="lazy"
             onerror="this.onerror=null; this.src='/assets/blog-placeholder-1.jpg';"
           />
-        </a>
-      </div>
-    )}
+        ) : (
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <div class={`absolute inset-0 bg-gradient-to-br ${categoryStyle.color} opacity-60 dark:opacity-40`}></div>
+            <div class="absolute inset-0 bg-black/40 hidden dark:block"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.4)_0%,transparent_50%)] dark:bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.1)_0%,transparent_50%)]"></div>
+            <div class="absolute w-24 h-24 rounded-full bg-white/30 dark:bg-white/5 backdrop-blur-sm 
+              transition-transform duration-1000 group-hover:scale-125"></div>
+            <div class="relative z-10 text-center p-6 w-full">
+              <div class="inline-flex items-center justify-center w-16 h-16 rounded-full 
+                  bg-white/50 dark:bg-white/10 backdrop-blur-sm mb-4
+                  transition-all duration-500 group-hover:bg-white/70 dark:group-hover:bg-white/20">
+                  <Icon 
+                    name={`material-symbols:${categoryStyle.icon}`} 
+                    class="h-8 w-8 text-gray-700 dark:text-gray-300 transition-transform duration-500 group-hover:scale-110" 
+                  />
+                </div>
+                <span 
+                  class="inline-block text-gray-800 dark:text-gray-200 font-bold tracking-wide drop-shadow-sm
+                  text-lg sm:text-xl md:text-2xl max-w-[80%] truncate
+                  transition-all duration-500 group-hover:scale-105"
+                  transition:name={`category-${slug}`}
+                >
+                  {firstCategory}
+                </span>
+                <div class="w-10 h-0.5 bg-gray-300 dark:bg-gray-600 mt-3 rounded-full
+                  transition-all duration-500 group-hover:w-16"></div>
+            </div>
+          </div>
+        )}
+      </a>
+    </div>
 
-    <!-- 内容区域：大屏幕占2/3宽度，和封面并排 -->
-    <div class:list={[
-      "w-full flex flex-col px-3 py-4 md:p-6",
-      hasCover ? "md:w-2/3" : "md:w-full",
-      hasCover ? "md:pt-6 md:pb-6" : "" // 大屏幕下和封面上下内边距对齐
-    ]}>
+    {/* ================================= */}
+    {/*  2. 内容区域       */}
+    {/* ================================= */}
+    <div class="flex flex-col p-4 md:p-6 w-full md:w-2/3">
       <div class="flex items-start justify-between mb-3">
         <h3 class="flex-grow text-xl md:text-2xl font-bold">
           <a
@@ -98,7 +166,9 @@ const firstCategory = categories && categories.length > 0 ? categories[0] : '文
         {description || "暂无描述..."}
       </p>
 
-      <!-- 底部区域：分类标签 + 阅读全文 -->
+      {/* ================================= */}
+      {/*  底部区域：分类标签 + 阅读全文     */}
+      {/* ================================= */}
       <div class="mt-auto flex items-end gap-2">
         <div class="flex flex-wrap items-center gap-3 flex-1 min-w-0">
           {categories && categories.length > 0 && (
@@ -177,7 +247,7 @@ const firstCategory = categories && categories.length > 0 ? categories[0] : '文
   .tag-container .tag-list span,
   .tag-container .tag-list a,
   .tag-container .tag-list .sep {
-    font-size: 0.75rem;
+    font-size: 0.75rem; /* 等同于 text-xs */
     line-height: 1rem;
   }
   .tag-container .tag-list .sep {

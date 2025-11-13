@@ -19,7 +19,6 @@ const {
   showCategory = true, 
   showTags = false, 
   baseUrl = '/posts',
-  showSidebar = true 
 } = Astro.props;
 
 const postsByDate = [...posts].sort(
@@ -44,7 +43,7 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
   
 
   <!-- 主要内容区域 - 时间线和侧边栏的两列布局 -->
-  <div class={showSidebar ? "main-content-with-sidebar" : "main-content-full-width"}>
+  <div class="main-content-full-width">
     <!-- 左侧：时间线内容 -->
     <div class="timeline-section">
       <!-- 时间线内容 -->
@@ -112,12 +111,7 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
       </div>
     </div>
 
-    <!-- 右侧：分类和标签侧边栏（可选） -->
-    {showSidebar && (
-      <aside class="archive-sidebar">
-          <ArchiveFilters defaultExpanded={true}/>
-      </aside>
-    )}
+    
   </div>
 </div>
 
@@ -134,10 +128,7 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
 
   /* 主要内容区域 - 时间线和侧边栏的两列布局 */
   .main-content-with-sidebar {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 3rem;
-    align-items: start;
+    width: 100%;
   }
 
   .main-content-full-width {
@@ -357,48 +348,9 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
     font-style: italic;
   }
 
-  /* 侧边栏样式 */
-  .archive-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    position: sticky;
-    top: 2rem;
-  }
+  
 
-  .sidebar-widget {
-    background: var(--color-bg-secondary);
-    border-radius: 12px;
-    padding: 1.5rem;
-    border: 1px solid var(--color-border);
-    transition: all 0.3s ease;
-  }
-
-  .sidebar-widget:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    border-color: var(--color-primary);
-  }
-
-  .widget-title {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0 0 1rem 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--color-text-primary);
-  }
-
-  /* 响应式调整 */
-  @media (max-width: 1024px) {
-    .main-content-with-sidebar {
-      grid-template-columns: 1fr 250px;
-      gap: 2rem;
-    }
-  }
-    @media (max-width: 768px) {
-  /* 页眉左右排：左侧图标+标题，右侧数量 */
+  @media (max-width: 768px) {
   .archive-header {
     display: flex;
     align-items: center;

@@ -3,125 +3,98 @@ import { ClientRouter } from 'astro:transitions';
 import { siteConfig } from '../config';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
-import Sidebar from '../components/Sidebar.astro';
-import MobileNav from '../components/MobileNav.astro';
-import themeScript from '../utils/theme-script.ts?raw';
 import LightboxDialog from '../components/util/Lightbox.astro';
+import themeScript from '../utils/theme-script.ts?raw';
+import MobileNav from '@/components/MobileNav.astro';
+import Sidebar from '@/components/Sidebar.astro';
 
 export interface Props {
   title: string;
   description?: string;
-  useContentPane?: boolean;
 }
 
-const { title=siteConfig.title, description = siteConfig.description, useContentPane = true } = Astro.props;
+const { title = siteConfig.title, description = siteConfig.description } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="zh-CN">
-	<head>
-		<BaseHead title={title} description={description} />
-		<script is:inline set:html={themeScript} />
-	</head>
-	<body class="bg-page text-primary" style={`
-		--primary-hue: ${siteConfig.themeColor.hue};
-		--page-width: ${siteConfig.pageWidth}; 
-		--sidebar-width: ${siteConfig.sidebarWidth};
-	`}>
-	
-		<ClientRouter />
-		<div class="layout-container">
-			<Sidebar transition:persist />
-            <MobileNav /> 
-			<main class="main-content">
-				{useContentPane ? (
-					<div class="content-pane">
-						<slot />
-					</div>
-				) : (
-					<div class="content-wrapper">
-						<slot />
-					</div>
-				)}
-			</main>
-		</div>
+<head>
+  <BaseHead title={title} description={description} />
+  <script is:inline set:html={themeScript} />
+</head>
+<body class="bg-page text-primary" style={`
+  --primary-hue: ${siteConfig.themeColor.hue};
+  --page-width: ${siteConfig.pageWidth}; /* 与PostLayout共用同一个宽度变量 */
+  --sidebar-width: ${siteConfig.sidebarWidth}; /* 保持变量名一致，避免冲突 */
+`}>
 
-		<Footer />
-		<LightboxDialog />
-		<style is:global>
-			* {
-				box-sizing: border-box;
-			}
+  <ClientRouter />
+  <div class="layout-container">
+	<Sidebar />
+    <MobileNav class="mobile-nav" />
+    <main class="main-content">
+      <div class="page-outer-container">
+        <div class="content-pane">
+          <slot />
+        </div>
+      </div>
+    </main>
+  </div>
 
-			.layout-container {
-				display: flex;
-				min-height: 100vh;
-			}
-			
-			.main-content {
-				flex: 1;
-				background-color: var(--page-bg);
-				min-height: 100vh;
-				/* transition: margin-left 0.3s ease; */
-			}
+  <Footer />
+  <LightboxDialog />
 
-			/* 用于首页列表等无面板页面：仅居中和限制宽度 */
-			.content-wrapper {
-				max-width: var(--page-width);
-				width: 100%;
-				margin: 0 auto;
-				padding: 2rem 1rem;
-			}
+  <style is:global>
+    * {
+      box-sizing: border-box;
+    }
+
+    .layout-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .main-content {
+      flex: 1;
+      background-color: var(--page-bg);
+      min-height: 100vh;
+      padding: 2rem 1rem; 
+    }
 
 
-			.content-pane {
-				max-width: var(--page-width);
-				width: 100%;
-				margin: 2rem auto;
-				background-color: var(--content-pane-bg);
-				border-radius: 0.75rem;
-				box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.08);
-			}
+    .page-outer-container {
+      max-width: var(--page-width); 
+      margin: 0 auto; 
+      width: 100%;
+    }
 
-			html.dark .content-pane {
-				background-color: var(--content-pane-bg);
-				border: 1px solid var(--line-divider);
-				box-shadow: none;
-			}
+   
+    .content-pane {
+      width: 100%;
+      max-width: var(--page-width); /* 宽度限制与PostLayout完全一致 */
+      padding: 2rem; /* 内边距与PostLayout一致（影响视觉宽度） */
+    }
 
-			@media (min-width: 1024px) {
-				:global(#sidebar) {
-					width: var(--sidebar-width) !important;
-				}
-				
-				.main-content {
-					margin-left: var(--sidebar-width);
-					padding: 0 2rem;
-				}
+    @media (min-width: 1024px) {
+      .main-content {
+        padding: 2rem;
+      }
+      .content-pane {
+        padding: 2rem;
+      }
+    }
 
-				.content-wrapper, .content-pane {
-					padding: 2rem;
-				}
-			}
-			
-			/* 移动端适配（<1024px） */
-			@media (max-width: 1023px) {
-				.main-content {
-					margin-left: 0 !important;
-					padding-top: 3.5rem;
-				}
-
-				.content-wrapper {
-					padding: 1rem;
-				}
-				
-				.content-pane {
-					margin: 1rem auto;
-					padding: 1.5rem;
-					border-radius: 0.5rem;
-					max-width: calc(100vw - 2rem);
-				}
-			}
-			</style>
-	</body>
+    @media (max-width: 1023px) {
+      .main-content {
+        margin-left: 0 !important; 
+        padding: 1rem; 
+        padding-top: 3rem; 
+      }
+      .content-pane {
+        padding: 0; 
+        max-width: 100%; 
+      }
+    }
+  </style>
+</body>
 </html>

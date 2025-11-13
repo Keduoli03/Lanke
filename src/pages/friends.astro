@@ -1,41 +1,39 @@
 ---
 import Artalk from '@/components/util/Artalk.astro';
-import MainLayout from '../layouts/MainLayout.astro';
 import { items as friends } from './page_data/friend.ts';
 import Markdown from '@/components/util/Markdown.astro';
 import { getEntry } from 'astro:content';
 import { render } from 'astro:content';
 import PageHeader from '@/components/page/PageHeader.astro';
 import { Icon } from 'astro-icon/components';
+import PostLayout from '@/layouts/PostLayout.astro';
 
 const title = "友链";
 const description = "一些朋友们的网站";
 const friendPost = await getEntry("pages", "friend");
-// 添加类型检查
 if (!friendPost) {
   throw new Error('Friend page not found');
 }
 const { Content } = await render(friendPost);
-
 ---
-<MainLayout title={title}>
-  
+
+<PostLayout title={title}>
   <div class="friend-container">
     <PageHeader title={title} subtitle={description}>
-    <Icon slot="icon" name="material-symbols:handshake-outline-rounded" class="w-11 h-11" />
-  </PageHeader>
+      <Icon slot="icon" name="material-symbols:handshake-outline-rounded" class="w-11 h-11" />
+    </PageHeader>
 
-    <!-- 优化网格布局：调整间距和响应式列数 -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <!-- 修复核心：网格容器添加 max-w-full 和 px-2 限制宽度，防止溢出 -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-w-full px-2">
       {friends.map((friend, index) => (
         <a 
           href={friend.siteurl}
           target="_blank"
           rel="noopener noreferrer"
-          class="flex flex-col p-6 bg-[var(--page-bg)] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+          class="flex flex-col p-4 sm:p-6 bg-[var(--page-bg)] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 w-full"
+          style="box-sizing: border-box;"
         >
           <div class="flex items-center mb-3">
-            {/* 缩小头像尺寸，优化圆角和边框 */}
             {friend.imgurl && (
               <img 
                 src={friend.imgurl} 
@@ -45,18 +43,20 @@ const { Content } = await render(friendPost);
                 onerror="this.onerror=null; this.src='/assets/default-avatar.png';"
               />
             )}
-            <!-- 缩小标题字体，优化权重 -->
             <h2 class="text-lg font-medium text-[var(--text-primary)] truncate">{friend.title}</h2>
           </div>
-          <!-- 优化描述文本：缩小字体、限制行数、调整间距 -->
-          <p class="text-[var(--text-secondary)] text-sm mb-3 line-clamp-2 leading-relaxed flex-1">
+          
+          <!-- 强制长文本换行，避免撑开宽度 -->
+          <p class="text-[var(--text-secondary)] text-sm mb-3 line-clamp-2 leading-relaxed flex-1" 
+             style="overflow-wrap: break-word; word-break: break-all;">
             {friend.desc || '暂无描述'}
           </p>
-          <!-- 优化标签样式：更小尺寸、更精致圆角，始终在底部 -->
+          
           <div class="flex flex-wrap gap-1.5 mt-auto">
             {friend.tags?.map((tag, tagIndex) => (
               <span 
-                class="px-2 py-0.5 bg-[var(--tag-bg)] text-xs rounded-full text-[var(--text-tertiary)]"
+                class="px-2 py-0.5 bg-[var(--tag-bg)] text-xs rounded-full text-[var(--text-tertiary)]" 
+                style="overflow-wrap: break-word; word-break: break-all;"
               >
                 {tag}
               </span>
@@ -66,12 +66,12 @@ const { Content } = await render(friendPost);
       ))}
     </div>
 
-    <!-- 分隔区块优化 -->
     <div class="friend-notes-separator"></div>
 
     <Markdown>
       <Content />
     </Markdown>
+    
     <section class="comments-section" aria-labelledby="comments-title">
       <h2 id="comments-title" class="comments-title">评论</h2>
       <div id="comment-section">
@@ -79,18 +79,20 @@ const { Content } = await render(friendPost);
       </div>
     </section>
   </div>
+
   <style>
     .friend-container {
       max-width: var(--page-width);
       margin-left: 1rem;
       margin-right: 1rem;
     }
-    /* 评论区样式 */
+
     .comments-section {
       margin-top: 2.5rem;
       padding-top: 1.5rem;
       border-top: 1px solid var(--line-divider);
     }
+
     .comments-title {
       text-align: center;
       font-size: 1.25rem;
@@ -98,15 +100,18 @@ const { Content } = await render(friendPost);
       color: var(--text-primary);
       margin-bottom: 1rem;
     }
+
     #comment-section {
       max-width: var(--page-width);
       margin: 0 auto;
     }
+
     .link-requirements {
       margin-top: 2rem;
       padding-top: 1.25rem;
       border-top: 1px solid var(--line-divider);
     }
+
     .section-title {
       text-align: center;
       font-size: 1.25rem;
@@ -114,6 +119,7 @@ const { Content } = await render(friendPost);
       color: var(--text-primary);
       margin-bottom: 0.75rem;
     }
+
     .requirements-code {
       background: var(--content-pane-bg);
       border: 1px solid var(--line-divider);
@@ -122,29 +128,35 @@ const { Content } = await render(friendPost);
       white-space: pre-wrap;
       line-height: 1.5;
     }
+
     .requirements-list {
       margin-top: 0.75rem;
       color: var(--text-secondary);
       font-size: 0.9rem;
     }
+
     .requirements-list .link {
       color: var(--theme-color);
       text-decoration: none;
     }
+
     .requirements-list .link:hover {
       text-decoration: underline;
     }
+
     .friend-notes-separator {
-      margin-top: 1.5rem; /* 缩小间距 */
+      margin-top: 1.5rem;
       padding-top: 1rem;
       border-top: 1px solid var(--line-divider);
     }
-    /* 响应式优化 */
+
+    /* 响应式优化：根据屏幕尺寸动态调整列数 */
     @media (max-width: 1279px) {
       .grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
+
     @media (max-width: 1023px) {
       .grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -158,10 +170,35 @@ const { Content } = await render(friendPost);
         padding-top: 0.75rem;
       }
     }
+
+    /* 移动端核心修复：彻底限制宽度，消除水平滚动 */
     @media (max-width: 639px) {
       .grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr; /* 移动端强制单列 */
       }
+
+      .friend-container {
+        max-width: 100vw !important; /* 限制最大宽度为视口宽度 */
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        box-sizing: border-box; /* 确保内边距不增加总宽度 */
+      }
+
+      #comment-section {
+        max-width: 100vw !important;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        box-sizing: border-box;
+      }
+
+      /* 紧急防护：禁止页面水平滚动 */
+      html, body {
+        overflow-x: hidden !important;
+      }
+
+      /* 优化移动端内边距，减少宽度压力 */
       .about-title {
         font-size: 1.75rem;
       }
@@ -169,7 +206,7 @@ const { Content } = await render(friendPost);
         margin-bottom: 1.5rem;
       }
     }
-    /* 新增：文本行数限制样式 */
+
     .line-clamp-2 {
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -177,4 +214,4 @@ const { Content } = await render(friendPost);
       overflow: hidden;
     }
   </style>
-</MainLayout>
+</PostLayout>
