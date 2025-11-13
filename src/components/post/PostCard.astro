@@ -34,10 +34,10 @@ const firstCategory = categories && categories.length > 0 ? categories[0] : '文
   <div class="w-full flex flex-col md:flex-row h-full">
     {/* 封面区域：大屏幕占1/3宽度，flex-shrink-0避免被压缩 */}
     {hasCover && (
-      <div class="w-full md:w-1/3 flex-shrink-0 px-2 py-3 md:px-0 md:pt-6 md:pb-6">
+      <div class="w-full md:w-2/5 flex-shrink-0 px-2 py-3 md:px-3 md:pt-6 md:pb-6">
         <a 
           href={url} 
-          class="block relative overflow-hidden rounded-lg shadow-inner h-full"
+          class="block relative overflow-hidden rounded-lg shadow-inner h-full border border-[var(--line-divider)]"
           transition:name={`hero-${slug}`}
         >
           <div class="pt-[56.25%] bg-gray-100 dark:bg-gray-700"></div>
@@ -54,9 +54,9 @@ const firstCategory = categories && categories.length > 0 ? categories[0] : '文
 
     <!-- 内容区域：大屏幕占2/3宽度，和封面并排 -->
     <div class:list={[
-      "w-full flex flex-col px-3 py-4 md:p-6",
-      hasCover ? "md:w-2/3" : "md:w-full",
-      hasCover ? "md:pt-6 md:pb-6" : "" // 大屏幕下和封面上下内边距对齐
+      "w-full flex flex-col px-3 py-4 md:p-5",
+      hasCover ? "md:w-3/5" : "md:w-full",
+      hasCover ? "md:pt-6 md:pb-6" : ""
     ]}>
       <div class="flex items-start justify-between mb-3">
         <h3 class="flex-grow text-xl md:text-2xl font-bold">
