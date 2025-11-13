@@ -10,7 +10,7 @@ series: 博客
 cover:
 status: 已完成
 date: 2025-04-23 00:47
-updated: 2025-10-08 17:18
+updated: 2025-11-13 20:02
 slug: "303355"
 pinned: true
 ---
@@ -58,6 +58,7 @@ pinned: true
 ---
 
 ### 自定义标题
+
 可以在 callout 类型后添加自定义标题，格式为 `> [!类型] 自定义标题`：
 
 ```markdown
@@ -126,9 +127,24 @@ pinned: true
 
 ## 代码块
 
-通过安装 [Expressive Code](https://expressive-code.com/installation/#astro) 增强 Astro 的代码块
+通过安装 [Expressive Code](https://expressive-code.com/installation/#astro) 增强 Astro 的代码块，拥有更多主题样式，使用 [expressive-code-file-icons](https://github.com/xt0rted/expressive-code-file-icons) 可以为不同类型的代码块加上图标。更多写法可以参考官方文档，不多做展示：
+
+```Python
+a = 1
+b = 2
+print(a+b)
+```
+
+也可以带标题
+
+```python title="测试"
+a = 1
+b = 2
+print(a+b)
+```
 
 ## 音乐卡片
+
 根据 remark 写的卡片，支持外部音乐链接。没有使用 meetingjs，因为我不相信国内的音乐平台
 
 具体可见[博客美化记录](https://blog.blueke.top/posts/bo-ke-mei-hua-ji-lu/#aplayer-%E7%BB%84%E4%BB%B6%E5%B0%81%E8%A3%85)
