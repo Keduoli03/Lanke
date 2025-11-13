@@ -64,6 +64,7 @@ const title = '说说';
       let memoGrid = document.querySelector(CONFIG.dom.gridContainer);
       let memoTemplate = document.querySelector(CONFIG.dom.template);
       let loadMoreContainer = document.querySelector(CONFIG.dom.loadMore);
+      let isLoadingFirst = false;
 
       function formatDate(date) {
         const year = date.getFullYear();
@@ -239,6 +240,8 @@ const title = '说说';
       }
 
       async function getFirstPageMemos() {
+        if (isLoadingFirst) return;
+        isLoadingFirst = true;
         const btn = initLoadMoreBtn();
         const url = `${CONFIG.memos.baseUrl}api/v1/memos?creatorId=${CONFIG.memos.creatorId}&rowStatus=NORMAL&limit=${limit}`;
         try {
@@ -253,6 +256,8 @@ const title = '说说';
           console.error('初始加载失败:', err);
           memoGrid.innerHTML = '<div class="memo-error">加载失败，请检查网络</div>';
           loadMoreContainer.innerHTML = '';
+        } finally {
+          isLoadingFirst = false;
         }
       }
 
@@ -309,7 +314,7 @@ const title = '说说';
         getFirstPageMemos();
       });
 
-      if (memoGrid && memoTemplate) getFirstPageMemos();
+
     </script>
   </div>
 </MainLayout>
