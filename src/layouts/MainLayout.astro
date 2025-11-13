@@ -24,8 +24,8 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
 </head>
 <body class="bg-page text-primary" style={`
   --primary-hue: ${siteConfig.themeColor.hue};
-  --page-width: ${siteConfig.pageWidth}; /* 与PostLayout共用同一个宽度变量 */
-  --sidebar-width: ${siteConfig.sidebarWidth}; /* 保持变量名一致，避免冲突 */
+  --page-width: ${siteConfig.pageWidth}; 
+  --sidebar-width: ${siteConfig.sidebarWidth}; 
 `}>
 
   <ClientRouter />
@@ -75,10 +75,10 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
 
     @media (min-width: 1024px) {
       .main-content {
-        padding: 1rem;
+        padding: 0rem;
       }
       .content-pane {
-        padding: 0rem;
+        padding: 2rem;
       }
     }
 
