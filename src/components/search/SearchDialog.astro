@@ -3,12 +3,17 @@
 
 <div id="sd-overlay" class="sd-overlay" style="display:none">
   <div class="sd-modal" role="dialog" aria-modal="true" aria-label="搜索">
-    <div class="sd-bar">
-      <input id="sd-input" class="sd-input" type="text" placeholder="搜索关键词" />
-      <button id="sd-close" class="sd-close">×</button>
+    <div class="sd-header">
+      <div class="sd-topbar">
+        <input id="sd-input" class="sd-input" type="text" placeholder="搜索关键词" />
+        <button id="sd-search" class="sd-search">搜索</button>
+        <button id="sd-close" class="sd-close">×</button>
+      </div>
+      <div id="sd-status" class="sd-status"></div>
     </div>
-    <div id="sd-status" class="sd-status"></div>
-    <ul id="sd-list" class="sd-list"></ul>
+    <div class="sd-body">
+      <ul id="sd-list" class="sd-list"></ul>
+    </div>
   </div>
   
   <script>
@@ -16,7 +21,9 @@
     let selected = -1;
      let t = 0;
     async function ensurePagefind(){
-      try { return await (new Function('return import("/pagefind/pagefind.js")'))(); } catch { return null; }
+      const base = document.documentElement.getAttribute('data-base') || '/';
+      const url = (base.endsWith('/') ? base : base + '/') + 'pagefind/pagefind.js';
+      try { return await (new Function(`return import("${url}")`))(); } catch { return null; }
     }
     function lockScroll(){ document.documentElement.style.overflow = 'hidden'; }
     function unlockScroll(){ document.documentElement.style.overflow = ''; }
@@ -53,15 +60,25 @@
       const mod = await ensurePagefind();
       if (!mod){ s.textContent = '索引未就绪'; return; }
       const res = await mod.search(q || '');
-      s.textContent = `共 ${res.results.length} 条结果`;
-      for (let idx = 0; idx < Math.min(res.results.length, 50); idx++){
-        const d = await res.results[idx].data();
+      const datas = [];
+      for (let idx = 0; idx < res.results.length; idx++) {
+        datas.push(await res.results[idx].data());
+      }
+      const posts = datas
+        .filter(d => typeof d.url === 'string' && d.url.includes('/posts/'))
+        .sort((a, b) => {
+          const tb = Date.parse((b.meta && (b.meta.updated || b.meta.date)) || '');
+          const ta = Date.parse((a.meta && (a.meta.updated || a.meta.date)) || '');
+          return (isNaN(tb) ? 0 : tb) - (isNaN(ta) ? 0 : ta);
+        });
+      s.textContent = `共 ${posts.length} 条结果`;
+      posts.slice(0, 50).forEach(d => {
         const li = document.createElement('li');
         li.className = 'sd-item';
         li.innerHTML = `<a class=\"sd-title\" href=\"${d.url}\">${d.meta?.title || d.url}</a>${d.excerpt ? `<div class=\"sd-excerpt\">${d.excerpt}</div>` : ''}`;
         li.addEventListener('click', () => { window.location.href = d.url; });
         l.appendChild(li);
-      }
+      });
     };
     function updateSelected(){
       const l = document.getElementById('sd-list');
@@ -73,12 +90,14 @@
     (function(){
       const i = document.getElementById('sd-input');
       const c = document.getElementById('sd-close');
+      const b = document.getElementById('sd-search');
       if (!(i instanceof HTMLInputElement) || !c) return;
       i.addEventListener('input', () => {
         clearTimeout(t);
         t = window.setTimeout(() => runSearch(), 200);
       });
-      c.addEventListener('click', () => closeDialog());
+      if (b) { b.addEventListener('click', () => runSearch()); }
+      c.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); closeDialog(); });
       // 无遮罩点击关闭
       window.addEventListener('search:open', () => openDialog());
       window.addEventListener('search:close', () => closeDialog());
@@ -111,19 +130,159 @@
 </div>
 
 <style>
-  .sd-overlay { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 2147483646; }
-  /* 移除遮罩背景，保持屏幕不变暗 */
-  .sd-modal { position: relative; width: min(720px, 92vw); max-height: 80vh; overflow: auto; border: 1px solid var(--line-divider); border-radius: .875rem; background: var(--content-pane-bg); box-shadow: 0 10px 30px rgba(0,0,0,.18); padding: 1rem; }
-  .sd-bar { display: flex; gap: .5rem; align-items: center; }
-  .sd-input { flex: 1; padding: .6rem .8rem; border: 1px solid var(--line-divider); border-radius: .6rem; background: var(--page-bg); color: var(--text-primary); }
-  .sd-close { width: 2.2rem; height: 2.2rem; border: 1px solid var(--line-divider); border-radius: .6rem; background: var(--tag-bg); color: var(--text-primary); }
-  .sd-close { cursor: pointer; }
-  .sd-status { margin-top: .6rem; font-size: .9rem; color: var(--text-secondary); }
-  .sd-list { list-style: none; margin: .6rem 0 0; padding: 0; display: grid; gap: .5rem; }
-  .sd-item { border: 1px solid var(--line-divider); border-radius: .6rem; padding: .6rem .75rem; background: var(--content-pane-bg); cursor: pointer; }
-  .sd-item.is-selected { outline: 2px solid color-mix(in srgb, var(--theme-color) 40%, transparent); }
-  .sd-title { font-weight: 600; color: var(--text-primary); }
-  .sd-excerpt { font-size: .9rem; color: var(--text-secondary); margin-top: .2rem; }
-  mark { background: color-mix(in srgb, var(--theme-color) 25%, transparent); color: var(--text-primary); }
-  @media (max-width: 640px) { .sd-modal { width: 100vw; height: 100vh; max-height: 100vh; border-radius: 0; } }
+  .sd-overlay { 
+  position: fixed; 
+  inset: 0; 
+  display: none; 
+  align-items: center; 
+  justify-content: center; 
+  z-index: 2147483646; 
+}
+
+  .sd-modal { 
+    position: relative; 
+    width: min(720px, 92vw); 
+    max-height: 80vh; /* 模态框整体最大高度 */
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden; /* 隐藏溢出内容，避免整体滚动 */
+    border: 1px solid var(--line-divider); 
+    border-radius: .875rem; 
+    background: var(--content-pane-bg); 
+    box-shadow: 0 10px 30px rgba(0,0,0,.18); 
+    padding: 1rem; 
+    --sd-control-h: 2.6rem;
+  }
+
+/* 搜索头部（搜索框+关闭按钮）固定在顶部 */
+ .sd-header { 
+    position: sticky; /* 关键：相对父元素固定在顶部 */
+    top: 0; /* 贴紧顶部 */
+    z-index: 10; /* 确保在内容上方，不被覆盖 */
+    display: flex; 
+    flex-direction: column;
+    gap: .25rem; 
+    align-items: stretch; 
+    padding: .25rem 0; 
+    background: var(--content-pane-bg); /* 必须设置背景色，覆盖下方滚动内容 */
+    border-bottom: 1px solid var(--line-divider); 
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+  }
+
+  .sd-topbar { display: flex; gap: .5rem; align-items: center; }
+
+/* 搜索内容区：单独滚动，不影响头部 */
+.sd-body { 
+  flex: 1; /* 占满剩余高度 */
+  overflow-y: auto; /* 只纵向滚动 */
+  -webkit-overflow-scrolling: touch; /* 移动端平滑滚动 */
+  /* 增加顶部间距，避免内容紧贴头部边框 */
+  padding-top: .5rem;
+}
+
+  .sd-input { 
+    flex: 1; 
+    height: var(--sd-control-h);
+    box-sizing: border-box;
+    padding: 0 .8rem; 
+    border: 1px solid var(--line-divider); 
+    border-radius: .6rem; 
+    background: var(--page-bg); 
+    color: var(--text-primary); 
+    outline: none;
+  }
+  .sd-input:focus, .sd-input:focus-visible {
+    outline: none;
+    box-shadow: none;
+    border-color: var(--line-divider);
+  }
+
+  .sd-search {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--sd-control-h);
+    padding: 0 .9rem;
+    border: 1px solid var(--line-divider);
+    border-radius: .6rem;
+    background: var(--tag-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .sd-search:focus, .sd-search:focus-visible {
+    outline: none;
+    box-shadow: none;
+    border-color: var(--line-divider);
+  }
+
+  .sd-close { 
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--sd-control-h); 
+    height: var(--sd-control-h); 
+    border: 1px solid var(--line-divider); 
+    border-radius: .6rem; 
+    background: var(--tag-bg); 
+    color: var(--text-primary); 
+    cursor: pointer; 
+  }
+  .sd-close:focus, .sd-close:focus-visible {
+    outline: none;
+    box-shadow: none;
+    border-color: var(--line-divider);
+  }
+
+.sd-status { 
+  margin-top: .6rem; 
+  font-size: .9rem; 
+  color: var(--text-secondary); 
+}
+
+.sd-list { 
+  list-style: none; 
+  margin: .6rem 0 0; 
+  padding: 0; 
+  display: grid; 
+  gap: .5rem; 
+}
+
+.sd-item { 
+  border: 1px solid var(--line-divider); 
+  border-radius: .6rem; 
+  padding: .6rem .75rem; 
+  background: var(--content-pane-bg); 
+  cursor: pointer; 
+}
+
+.sd-item.is-selected { 
+  outline: 2px solid color-mix(in srgb, var(--theme-color) 40%, transparent); 
+}
+
+.sd-title { 
+  font-weight: 600; 
+  color: var(--text-primary); 
+}
+
+.sd-excerpt { 
+  font-size: .9rem; 
+  color: var(--text-secondary); 
+  margin-top: .2rem; 
+}
+
+mark { 
+  background: color-mix(in srgb, var(--theme-color) 25%, transparent); 
+  color: var(--text-primary); 
+}
+
+@media (max-width: 640px) { 
+  .sd-modal { 
+    width: 100vw; 
+    height: 100vh; 
+    max-height: 100vh; 
+    border-radius: 0; 
+  } 
+}
 </style>

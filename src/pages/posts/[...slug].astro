@@ -48,6 +48,12 @@ const fullPostUrl = Astro.url.href;
   )}
   
   <PostHeader post={entry} transition:name={`title-${entry.data.slug}`} />
+  <div style="display:none">
+    <span data-pagefind-meta={`date:${new Date(entry.data.date).toISOString()}`}></span>
+    {entry.data.updated && (
+      <span data-pagefind-meta={`updated:${new Date(entry.data.updated).toISOString()}`}></span>
+    )}
+  </div>
   
   {entry.data.aiSummary && (
     <AiSummary 
