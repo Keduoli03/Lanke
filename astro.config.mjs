@@ -20,6 +20,7 @@ import rehypeCallouts from "rehype-callouts";
 import remarkAplayer from './src/plugins/rehype-component-aplayer.mjs';
 // 删除：import remarkImageWrapper from './src/plugins/remark-image-wrapper.mjs'
 import rehypeImageLightbox from './src/plugins/rehype-image-lightbox.mjs';
+import pagefind from 'astro-pagefind';
 
 import vercel from '@astrojs/vercel';
 // https://astro.build/config
@@ -60,6 +61,7 @@ export default defineConfig({
   integrations: [
     
     sitemap(),
+    pagefind(),
     icon({
     include: {
       'material-symbols': ['*'],
