@@ -130,9 +130,8 @@ const extendedLinks: ExtendedLink[] = [...links];
     transform: none !important;
   }
 
-  /* 展开状态 */
-  html[data-sidebar-open="true"] #sidebar,
-  #sidebar[data-open="1"] {
+  /* 展开状态：仅依赖 html 属性，避免 dataset 切换导致宽度抖动 */
+  html[data-sidebar-open="true"] #sidebar {
     width: var(--sidebar-width-wide);
   }
 
@@ -279,8 +278,16 @@ const extendedLinks: ExtendedLink[] = [...links];
 
 <script>
   function setSidebarOpen(next: boolean) {
-    document.documentElement.setAttribute('data-sidebar-open', next ? 'true' : 'false');
+    const root = document.documentElement;
     const sidebar = document.getElementById('sidebar');
+    root.classList.remove('no-sidebar-transition');
+    const end = () => {
+      root.classList.add('no-sidebar-transition');
+      if (sidebar) sidebar.removeEventListener('transitionend', end);
+    };
+    if (sidebar) sidebar.addEventListener('transitionend', end);
+    setTimeout(end, 400);
+    root.setAttribute('data-sidebar-open', next ? 'true' : 'false');
     if (sidebar) sidebar.dataset.open = next ? '1' : '0';
     try { localStorage.setItem('sidebarOpen', next.toString()); } catch {}
     try { document.cookie = `sidebarOpen=${next}; path=/; max-age=31536000`; } catch {}

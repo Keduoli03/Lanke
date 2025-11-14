@@ -59,10 +59,10 @@ const firstCategory = categories && categories.length > 0 ? categories[0] : '文
       hasCover ? "md:pt-6 md:pb-6" : ""
     ]}>
       <div class="flex items-start justify-between mb-3">
-        <h3 class="flex-grow text-xl md:text-2xl font-bold">
+        <h3 class="post-card-title flex-grow text-xl md:text-2xl font-bold">
           <a
             href={url}
-            class="!text-black dark:!text-white transition-colors duration-300 break-all"
+            class="transition-colors duration-300 break-all"
             style="line-break: anywhere; overflow-wrap: anywhere; view-transition-name: none;"
           >
             {title}
@@ -182,4 +182,8 @@ const firstCategory = categories && categories.length > 0 ? categories[0] : '文
   .tag-container .tag-list .sep {
     margin: 0;
   }
+
+  /* 标题颜色：浅色黑、深色白，强制覆盖全局链接色 */
+  .post-card-title a { color: black !important; }
+  html.dark .post-card-title a { color: white !important; }
 </style>

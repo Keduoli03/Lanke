@@ -71,6 +71,9 @@ function freezeSidebarVars() {
     var root = document.documentElement;
     var sb = document.getElementById('sidebar');
     if (!sb) return;
+    var csb = getComputedStyle(sb);
+    sb.style.width = csb.width;
+    sb.style.transition = 'none';
     var cs = getComputedStyle(root);
     var vars = ['--sidebar-bg','--sidebar-icon-bg','--sidebar-icon-symbol','--theme-color','--theme-color-light','--text-secondary','--text-primary','--line-divider'];
     for (var i=0;i<vars.length;i++) {
@@ -115,6 +118,8 @@ function unfreezeSidebarVars() {
   try {
     var sb = document.getElementById('sidebar');
     if (sb) {
+      sb.style.width = '';
+      sb.style.transition = '';
       var vars = ['--sidebar-bg','--sidebar-icon-bg','--sidebar-icon-symbol','--theme-color','--theme-color-light','--text-secondary','--text-primary','--line-divider'];
       for (var i=0;i<vars.length;i++) { sb.style.removeProperty(vars[i]); }
       var icons = sb.querySelectorAll('.icon-container');
@@ -150,7 +155,6 @@ function unfreezeSidebarVars() {
 setNoSidebarTransition(true);
 applyThemeAndHue();
 applySidebarOpen();
-requestAnimationFrame(() => setNoSidebarTransition(false));
 
 // 客户端路由切换：在切换前禁用过渡并冻结变量，切换后应用状态并解冻
 document.addEventListener('astro:before-swap', () => { setNoSidebarTransition(true); freezeRootVars(); freezeSidebarVars(); });
@@ -159,7 +163,7 @@ document.addEventListener('astro:after-swap', function(){
   applySidebarOpen();
   unfreezeRootVars();
   unfreezeSidebarVars();
-  requestAnimationFrame(() => setNoSidebarTransition(false));
+  setNoSidebarTransition(true);
 });
 
 // 预先拦截内部链接的点击/按下，尽早冻结，避免首帧闪白
