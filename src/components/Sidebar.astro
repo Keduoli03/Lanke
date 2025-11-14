@@ -15,11 +15,11 @@ const extendedLinks: ExtendedLink[] = [...links];
 ---
 
 
-<div
-  id="sidebar"
-  class="relative h-full bg-[var(--sidebar-bg)] flex-col transition-all duration-300 ease lg:flex hidden"
-  style="--sidebar-width-narrow: 64px; --sidebar-width-wide: 250px;"
->
+  <div
+    id="sidebar"
+    class="relative h-full bg-[var(--sidebar-bg)] flex-col transition-all duration-300 ease lg:flex hidden"
+    style={`--sidebar-width-narrow: 64px; --sidebar-width-wide: ${siteConfig.sidebarExtendWidth};`}
+  >
   <!-- 顶部Logo + 展开收起按钮：重点修改布局逻辑 -->
   <div class="sidebar-header p-2 border-b border-[var(--line-divider)] flex items-center justify-center relative" transition:persist="sidebar-logo">
     <!-- Logo容器：折叠/展开时都保持居中对齐 -->
@@ -35,8 +35,8 @@ const extendedLinks: ExtendedLink[] = [...links];
     </button>
   </div>
 
-  <nav class="flex-1 p-2 overflow-y-auto" style="scrollbar-width: none;">
-    <ul class="space-y-3 py-2">
+  <nav class="p-2 overflow-y-scroll" style="scrollbar-width: none;">
+    <ul class="space-y-2 py-1">
       {extendedLinks.map((l) => {
         const linkPath = l.external ? l.url : url(l.url);
         const isActive = !l.external && (linkPath === '/' ? currentPath === '/' : currentPath.startsWith(linkPath));
@@ -51,14 +51,14 @@ const extendedLinks: ExtendedLink[] = [...links];
               rel={l.external ? "noopener noreferrer" : ""}
               data-astro-prefetch={l.external ? "false" : "viewport"}
               class:list={[
-                "group flex items-center p-2 nav-link rounded-lg transition-all duration-300",
+                "group flex items-center p-1 nav-link rounded-lg transition-all duration-300",
                 { "is-active": isActive },
               ]}
             >
-              <div class="icon-container w-10 h-10 rounded-lg flex items-center justify-center transition-transform relative shadow-md group-hover:border-2 group-hover:border-[var(--theme-color-light)] group-hover:scale-110" style="background-color: var(--sidebar-icon-bg)">
-                {l.icon && <Icon name={l.icon} class="icon h-6 w-6" />}
+              <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center relative shadow-md border-2 border-transparent group-hover:border-[var(--theme-color-light)]" style="background-color: var(--sidebar-icon-bg)">
+                {l.icon && <Icon name={l.icon} class="icon h-5 w-5" />}
               </div>
-              <span class="text-sm text-[var(--text-secondary)] font-medium sidebar-text ml-3">
+              <span class="text-xs text-[var(--text-secondary)] font-medium sidebar-text ml-2">
                 {l.name}
               </span>
               {l.external && (
@@ -75,21 +75,31 @@ const extendedLinks: ExtendedLink[] = [...links];
   </nav>
 
   <aside class="p-2 border-t border-[var(--line-divider)]">
-    <div class="flex flex-col items-center gap-3 sidebar-text">
-      <button id="open-search-btn" class="w-full flex items-center p-2 nav-link rounded-lg transition-all duration-300">
-        <div class="icon-container w-10 h-10 rounded-lg flex items-center justify-center relative shadow-md" style="background-color: var(--sidebar-icon-bg)">
-          <Icon name="ri:search-line" class="icon h-6 w-6" />
+    <div class="flex flex-col items-center gap-2 sidebar-text">
+      <button id="open-search-btn" class="w-full flex items-center p-1 nav-link rounded-lg">
+        <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center relative shadow-md" style="background-color: var(--sidebar-icon-bg)">
+          <Icon name="ri:search-line" class="icon h-5 w-5" />
         </div>
-        <span class="text-sm text-[var(--text-secondary)] font-medium sidebar-text ml-3">搜索</span>
+        <span class="text-xs text-[var(--text-secondary)] font-medium sidebar-text ml-2">搜索</span>
       </button>
-      <LightDarkSwitch client:load transition:persist>
-        <Icon slot="dark-icon" name="material-symbols:dark-mode-outline" class="bottom-bar-icon h-6 w-6 cursor-pointer" />
-        <Icon slot="light-icon" name="material-symbols:light-mode-outline" class="bottom-bar-icon h-6 w-6 cursor-pointer" />
-      </LightDarkSwitch>
-      <ThemeSwitch client:load transition:persist isMobile={false}>
-        <Icon slot="palette-icon" name="material-symbols:palette-outline" class="bottom-bar-icon h-6 w-6 cursor-pointer" />
-        <Icon slot="reset-icon" name="fa6-solid:arrow-rotate-left" class="text-xs" />
-      </ThemeSwitch>
+      <div id="theme-mode-item" class="w-full flex items-center p-1 nav-link rounded-lg">
+        <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center relative shadow-md" style="background-color: var(--sidebar-icon-bg)">
+          <LightDarkSwitch client:load transition:persist>
+            <Icon slot="dark-icon" name="material-symbols:dark-mode-outline" class="icon h-5 w-5 cursor-pointer" />
+            <Icon slot="light-icon" name="material-symbols:light-mode-outline" class="icon h-5 w-5 cursor-pointer" />
+          </LightDarkSwitch>
+        </div>
+        <span id="theme-mode-label" class="text-xs text-[var(--text-secondary)] font-medium sidebar-text ml-2">模式</span>
+      </div>
+      <div id="theme-color-item" class="w-full flex items-center p-1 nav-link rounded-lg">
+        <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center relative shadow-md" style="background-color: var(--sidebar-icon-bg)">
+          <ThemeSwitch client:load transition:persist isMobile={false}>
+            <Icon slot="palette-icon" name="material-symbols:palette-outline" class="icon h-5 w-5 cursor-pointer" />
+            <Icon slot="reset-icon" name="fa6-solid:arrow-rotate-left" class="text-xs" />
+          </ThemeSwitch>
+        </div>
+        <span class="text-xs text-[var(--text-secondary)] font-medium sidebar-text ml-2">配色</span>
+      </div>
     </div>
   </aside>
 </div>
@@ -103,7 +113,10 @@ const extendedLinks: ExtendedLink[] = [...links];
     height: 100%;
     z-index: 10;
     box-shadow: 2px 0 10px -5px rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.3s ease;
+    transition: width 300ms ease, box-shadow 0.3s ease;
+    display: grid;
+    grid-template-rows: 60px 1fr auto;
+    --bottom-bar-height: 14rem;
   }
 
   html.no-sidebar-transition #sidebar {
@@ -183,22 +196,22 @@ const extendedLinks: ExtendedLink[] = [...links];
   .icon-container {
     background-color: var(--sidebar-icon-bg);
     will-change: transform;
-    contain: paint;
     transition: transform 150ms ease, border-color 150ms ease;
     cursor: pointer;
+    border: 2px solid transparent;
   }
 
   /* 折叠状态下：导航项整体居中，和Logo对齐 */
   html[data-sidebar-open="false"] #sidebar .nav-link {
     flex-direction: column;
     align-items: center;
-    padding: 0.5rem;
+    padding: 0.25rem;
     width: auto;
     background: transparent;
     box-shadow: none;
   }
   html[data-sidebar-open="false"] #sidebar .nav-link span {
-    margin-top: 0.25rem;
+    margin-top: 0.5rem;
     margin-left: 0;
     font-size: 0.75rem;
     text-align: center;
@@ -223,12 +236,12 @@ const extendedLinks: ExtendedLink[] = [...links];
     background-color: transparent;
   }
   html[data-sidebar-open="false"] #sidebar .nav-link:hover .icon-container {
-    border: 2px solid var(--theme-color);
+    border-color: var(--theme-color);
   }
 
   .nav-link.is-active .icon-container {
     transform: scale(1.06);
-    border: 2px solid var(--theme-color);
+    border-color: var(--theme-color);
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
   }
 
@@ -256,10 +269,12 @@ const extendedLinks: ExtendedLink[] = [...links];
     outline: none;
   }
 
-  /* 滚动条隐藏 */
   #sidebar nav::-webkit-scrollbar {
     display: none;
   }
+  #sidebar nav { scrollbar-gutter: stable; min-height: 0; padding-bottom: var(--bottom-bar-height); }
+  #sidebar aside { position: absolute; bottom: 0; left: 0; right: 0; height: var(--bottom-bar-height); background-color: var(--sidebar-bg); }
+  #sidebar aside * { transition: none !important; }
 </style>
 
 <script>
@@ -269,8 +284,6 @@ const extendedLinks: ExtendedLink[] = [...links];
     if (sidebar) sidebar.dataset.open = next ? '1' : '0';
     try { localStorage.setItem('sidebarOpen', next.toString()); } catch {}
     try { document.cookie = `sidebarOpen=${next}; path=/; max-age=31536000`; } catch {}
-    document.documentElement.classList.add('no-sidebar-transition');
-    requestAnimationFrame(() => document.documentElement.classList.remove('no-sidebar-transition'));
   }
 
   function bindDelegates() {
@@ -310,6 +323,58 @@ const extendedLinks: ExtendedLink[] = [...links];
     }
 
     bindDelegates();
+
+    try {
+      const label = document.getElementById('theme-mode-label');
+      const update = () => {
+        if (!label) return;
+        const isDark = document.documentElement.classList.contains('dark');
+        label.textContent = isDark ? '深色' : '浅色';
+      };
+      update();
+      const mo = new MutationObserver(update);
+      mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class','data-theme'] });
+      window.addEventListener('storage', update);
+      document.addEventListener('astro:after-swap', update);
+    } catch {}
+
+    try {
+      const item = document.getElementById('theme-mode-item');
+      if (item) {
+        item.addEventListener('click', (e) => {
+          const target = e.target as Element | null;
+          if (target && target.closest('.icon-container button')) return;
+          const w = window as any;
+          if (typeof w.__toggleTheme === 'function') {
+            e.stopPropagation();
+            w.__toggleTheme(e);
+            if (w.__themeStore && typeof w.__themeStore.update === 'function') {
+              w.__themeStore.update((cur: 'light'|'dark') => cur === 'light' ? 'dark' : 'light');
+            }
+          } else {
+            const c = item.querySelector('.icon-container');
+            const btn = c ? (c.querySelector('button') as HTMLElement | null) : null;
+            if (btn) {
+              btn.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: (e as MouseEvent).clientX, clientY: (e as MouseEvent).clientY }));
+            }
+          }
+        });
+      }
+    } catch {}
+
+    try {
+      const item = document.getElementById('theme-color-item');
+      if (item) {
+        item.addEventListener('click', (e) => {
+          const target = e.target as Element | null;
+          if (target && target.closest('.icon-container button')) return;
+          e.stopPropagation();
+          e.preventDefault();
+          const btn = item.querySelector('.icon-container button') as HTMLElement | null;
+          if (btn) btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        });
+      }
+    } catch {}
   }
 
   document.addEventListener('astro:page-load', initSidebar);

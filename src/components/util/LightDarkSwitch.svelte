@@ -20,10 +20,9 @@
     }
   });
 
-  function handleToggle(event: MouseEvent) {
-    toggleTheme(event); // 这个函数负责更新 DOM 和 localStorage
-    // 3. 更新全局 store，所有订阅者（其他按钮）都会收到通知
-    theme.update(current => current === 'light' ? 'dark' : 'light');
+  async function handleToggle(event: MouseEvent) {
+    const newTheme = await toggleTheme(event);
+    theme.set(newTheme);
   }
 </script>
 

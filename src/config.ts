@@ -21,7 +21,8 @@ export const siteConfig: SiteConfig = {
   },
   
   pageWidth: "60rem", // 内容区域最大宽度
-  sidebarWidth: "4rem", // 侧边栏宽度
+  sidebarWidth: "4rem", // 侧边栏默认宽度
+  sidebarExtendWidth: "8rem", // 侧边栏展开宽度
   tocWidth: "12rem", // 目录宽度 (224px)
   tocMaxDepth: 3, // 目录最大显示深度
 };

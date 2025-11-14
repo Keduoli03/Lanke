@@ -23,6 +23,7 @@ export interface SiteConfig {
 	};
 	pageWidth: string;
 	sidebarWidth: string;
+	sidebarExtendWidth: string;
 	tocWidth: string; // 新增：目录宽度
 	tocMaxDepth: number; // 新增：目录最大深度
 }

@@ -150,35 +150,22 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 	background-color: hsl(var(--primary-hue), 15%, 45%);
 }
 
-html.no-sidebar-transition #sidebar,
-html.no-sidebar-transition #sidebar *,
-html.no-sidebar-transition .main-content,
-html.no-sidebar-transition .post-rail,
-html.no-sidebar-transition body,
-html.no-sidebar-transition .content-pane {
-	transition: none !important;
-	animation: none !important;
-}
-
 /* --- 主题切换动画 --- */
-/* 基础设置：禁用默认动画，确保混合模式正常 */
+/* 基础设置：规范混合模式，不再全局禁用动画 */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation: none;
   mix-blend-mode: normal;
 }
 
-html.no-sidebar-transition, html.no-sidebar-transition body { view-transition-name: none; }
-
-html.to-dark .vt-page, html.to-light .vt-page { view-transition-name: none; }
 
 .vt-page { view-transition-name: page; will-change: transform; backface-visibility: hidden; transform: translateZ(0); }
+html.to-dark .vt-page, html.to-light .vt-page { view-transition-name: none !important; }
 
-::view-transition-new(page) { 
+html:not(.to-dark):not(.to-light) ::view-transition-new(page) { 
   animation: page-rise-in 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both; 
   transform-origin: 50% 50%;
 }
-::view-transition-old(page) { 
+html:not(.to-dark):not(.to-light) ::view-transition-old(page) { 
   animation: page-rise-out 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both; 
   transform-origin: 50% 50%;
 }
@@ -224,13 +211,13 @@ html.dark .content-pane { border: 1px solid var(--line-divider); box-shadow: non
 
 /* 切换到深色模式时：新视图(深色)执行“展开”动画 */
 html.to-dark::view-transition-new(root) {
-  animation: reveal 0.5s ease-out forwards; /* 关键：保持动画结束状态 */
+  animation: reveal 0.5s ease-out forwards !important;
   z-index: 1;
 }
 
 /* 切换到浅色模式时：旧视图(深色)执行“收缩”动画 */
 html.to-light::view-transition-old(root) {
-  animation: conceal 0.5s ease-in forwards; /* 关键：保持动画结束状态 */
+  animation: conceal 0.5s ease-in forwards !important;
   z-index: 1;
 }
 
