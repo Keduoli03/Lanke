@@ -9,12 +9,9 @@ import ThemeSwitch from "./util/ThemeSwitch.svelte";
 let links: NavBarLink[] = Object.values(navBarConfig.links);
 const currentPath = Astro.url.pathname;
 
-type ExtendedLink = NavBarLink & { isSearch?: boolean };
+type ExtendedLink = NavBarLink;
 
-const extendedLinks: ExtendedLink[] = [
-  { name: "搜索", icon: "ri:search-line", url: "#search", isSearch: true, external: false },
-  ...links
-];
+const extendedLinks: ExtendedLink[] = [...links];
 ---
 
 
@@ -42,23 +39,9 @@ const extendedLinks: ExtendedLink[] = [
     <ul class="space-y-3 py-2">
       {extendedLinks.map((l) => {
         const linkPath = l.external ? l.url : url(l.url);
-        const isActive = !l.external && !l.isSearch && (linkPath === '/' ? currentPath === '/' : currentPath.startsWith(linkPath));
+        const isActive = !l.external && (linkPath === '/' ? currentPath === '/' : currentPath.startsWith(linkPath));
         
-        if (l.isSearch) {
-          return (
-            <li class="flex justify-center px-2">
-              <div class="w-full bg-[var(--sidebar-icon-bg)] rounded-lg p-1 flex items-center">
-                <Icon name={l.icon} class="icon text-sm ml-2 text-[var(--text-secondary)]" />
-                <input 
-                  type="text" 
-                  placeholder="搜索..." 
-                  class="bg-transparent outline-none border-none flex-1 ml-2 text-sm text-[var(--text-primary)] sidebar-text"
-                  style="width: calc(100% - 40px);"
-                />
-              </div>
-            </li>
-          );
-        }
+        
 
         return (
           <li class="flex justify-center">
@@ -93,6 +76,12 @@ const extendedLinks: ExtendedLink[] = [
 
   <aside class="p-2 border-t border-[var(--line-divider)]">
     <div class="flex flex-col items-center gap-3 sidebar-text">
+      <button id="open-search-btn" class="w-full flex items-center p-2 nav-link rounded-lg transition-all duration-300">
+        <div class="icon-container w-10 h-10 rounded-lg flex items-center justify-center relative shadow-md" style="background-color: var(--sidebar-icon-bg)">
+          <Icon name="ri:search-line" class="icon h-6 w-6" />
+        </div>
+        <span class="text-sm text-[var(--text-secondary)] font-medium sidebar-text ml-3">搜索</span>
+      </button>
       <LightDarkSwitch client:load transition:persist>
         <Icon slot="dark-icon" name="material-symbols:dark-mode-outline" class="bottom-bar-icon h-6 w-6 cursor-pointer" />
         <Icon slot="light-icon" name="material-symbols:light-mode-outline" class="bottom-bar-icon h-6 w-6 cursor-pointer" />
@@ -205,6 +194,8 @@ const extendedLinks: ExtendedLink[] = [
     align-items: center;
     padding: 0.5rem;
     width: auto;
+    background: transparent;
+    box-shadow: none;
   }
   html[data-sidebar-open="false"] #sidebar .nav-link span {
     margin-top: 0.25rem;
@@ -293,9 +284,10 @@ const extendedLinks: ExtendedLink[] = [
         setSidebarOpen(!current);
         return;
       }
-      const search = t.closest('input[placeholder="搜索..."]');
-      if (search) {
-        setSidebarOpen(true);
+      const openSearch = t.closest('#open-search-btn');
+      if (openSearch) {
+        window.dispatchEvent(new CustomEvent('search:open'));
+        return;
       }
     });
     (window as any).__sidebarBound = true;

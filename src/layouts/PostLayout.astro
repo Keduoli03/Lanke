@@ -7,6 +7,7 @@ import Sidebar from '../components/Sidebar.astro';
 import MobileNav from '../components/MobileNav.astro';
 import themeScript from '../utils/theme-script.ts?raw';
 import LightboxDialog from '../components/util/Lightbox.astro';
+import SearchDialog from '@/components/search/SearchDialog.astro';
 
 export interface Props {
   title: string;
@@ -55,7 +56,7 @@ const {
       <div class="page-outer-container">
         <div class="post-main-container">
           <!-- 主内容区：宽度固定，单独居中 -->
-          <div class="content-pane vt-page">
+          <div class="content-pane vt-page" data-pagefind-body>
             <slot />
           </div>
 
@@ -71,6 +72,7 @@ const {
   </div>
 
   <Footer />
+  <SearchDialog client:load />
   <LightboxDialog />
 
   <style is:global>

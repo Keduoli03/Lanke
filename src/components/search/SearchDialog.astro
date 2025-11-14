@@ -1,0 +1,129 @@
+---
+---
+
+<div id="sd-overlay" class="sd-overlay" style="display:none">
+  <div class="sd-modal" role="dialog" aria-modal="true" aria-label="搜索">
+    <div class="sd-bar">
+      <input id="sd-input" class="sd-input" type="text" placeholder="搜索关键词" />
+      <button id="sd-close" class="sd-close">×</button>
+    </div>
+    <div id="sd-status" class="sd-status"></div>
+    <ul id="sd-list" class="sd-list"></ul>
+  </div>
+  
+  <script>
+    
+    let selected = -1;
+     let t = 0;
+    async function ensurePagefind(){
+      try { return await (new Function('return import("/pagefind/pagefind.js")'))(); } catch { return null; }
+    }
+    function lockScroll(){ document.documentElement.style.overflow = 'hidden'; }
+    function unlockScroll(){ document.documentElement.style.overflow = ''; }
+    function openDialog(){
+      const o = document.getElementById('sd-overlay');
+      const i = document.getElementById('sd-input');
+      if (!o || !(i instanceof HTMLInputElement)) return;
+      o.style.display = 'flex';
+      lockScroll();
+      setTimeout(() => i.focus(), 0);
+    }
+    function closeDialog(){
+      const o = document.getElementById('sd-overlay');
+      const s = document.getElementById('sd-status');
+      const l = document.getElementById('sd-list');
+      const i = document.getElementById('sd-input');
+      if (!o || !s || !l || !(i instanceof HTMLInputElement)) return;
+      o.style.display = 'none';
+      unlockScroll();
+      i.value = '';
+      s.textContent = '';
+      l.innerHTML = '';
+      selected = -1;
+    }
+    const runSearch = async () => {
+      const s = document.getElementById('sd-status');
+      const l = document.getElementById('sd-list');
+      const i = document.getElementById('sd-input');
+      if (!(s instanceof HTMLElement) || !(l instanceof HTMLElement)) return;
+      const q = (i instanceof HTMLInputElement) ? (i.value || '') : '';
+      l.innerHTML = '';
+      selected = -1;
+      s.textContent = '搜索中…';
+      const mod = await ensurePagefind();
+      if (!mod){ s.textContent = '索引未就绪'; return; }
+      const res = await mod.search(q || '');
+      s.textContent = `共 ${res.results.length} 条结果`;
+      for (let idx = 0; idx < Math.min(res.results.length, 50); idx++){
+        const d = await res.results[idx].data();
+        const li = document.createElement('li');
+        li.className = 'sd-item';
+        li.innerHTML = `<a class=\"sd-title\" href=\"${d.url}\">${d.meta?.title || d.url}</a>${d.excerpt ? `<div class=\"sd-excerpt\">${d.excerpt}</div>` : ''}`;
+        li.addEventListener('click', () => { window.location.href = d.url; });
+        l.appendChild(li);
+      }
+    };
+    function updateSelected(){
+      const l = document.getElementById('sd-list');
+      if (!l) return;
+      Array.from(l.children).forEach((el, i) => {
+        if (i === selected) el.classList.add('is-selected'); else el.classList.remove('is-selected');
+      });
+    }
+    (function(){
+      const i = document.getElementById('sd-input');
+      const c = document.getElementById('sd-close');
+      if (!(i instanceof HTMLInputElement) || !c) return;
+      i.addEventListener('input', () => {
+        clearTimeout(t);
+        t = window.setTimeout(() => runSearch(), 200);
+      });
+      c.addEventListener('click', () => closeDialog());
+      // 无遮罩点击关闭
+      window.addEventListener('search:open', () => openDialog());
+      window.addEventListener('search:close', () => closeDialog());
+      window.addEventListener('keydown', (e) => {
+        const o = document.getElementById('sd-overlay');
+        const l = document.getElementById('sd-list');
+        if (!o || o.style.display === 'none') return;
+        // 移除 ESC 关闭，避免误触
+        if (e.key === 'ArrowDown'){
+          const count = l ? l.children.length : 0;
+          selected = Math.min(selected + 1, count - 1);
+          updateSelected();
+          e.preventDefault();
+        }
+        if (e.key === 'ArrowUp'){
+          selected = Math.max(selected - 1, -1);
+          updateSelected();
+          e.preventDefault();
+        }
+        if (e.key === 'Enter'){
+          if (selected >= 0 && l && l.children[selected]){
+            const a = l.children[selected].querySelector('a');
+            const href = a && a.getAttribute('href') ? a.getAttribute('href') : '';
+            if (href) window.location.href = href;
+          }
+        }
+      }, { capture: true });
+    })();
+  </script>
+</div>
+
+<style>
+  .sd-overlay { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 2147483646; }
+  /* 移除遮罩背景，保持屏幕不变暗 */
+  .sd-modal { position: relative; width: min(720px, 92vw); max-height: 80vh; overflow: auto; border: 1px solid var(--line-divider); border-radius: .875rem; background: var(--content-pane-bg); box-shadow: 0 10px 30px rgba(0,0,0,.18); padding: 1rem; }
+  .sd-bar { display: flex; gap: .5rem; align-items: center; }
+  .sd-input { flex: 1; padding: .6rem .8rem; border: 1px solid var(--line-divider); border-radius: .6rem; background: var(--page-bg); color: var(--text-primary); }
+  .sd-close { width: 2.2rem; height: 2.2rem; border: 1px solid var(--line-divider); border-radius: .6rem; background: var(--tag-bg); color: var(--text-primary); }
+  .sd-close { cursor: pointer; }
+  .sd-status { margin-top: .6rem; font-size: .9rem; color: var(--text-secondary); }
+  .sd-list { list-style: none; margin: .6rem 0 0; padding: 0; display: grid; gap: .5rem; }
+  .sd-item { border: 1px solid var(--line-divider); border-radius: .6rem; padding: .6rem .75rem; background: var(--content-pane-bg); cursor: pointer; }
+  .sd-item.is-selected { outline: 2px solid color-mix(in srgb, var(--theme-color) 40%, transparent); }
+  .sd-title { font-weight: 600; color: var(--text-primary); }
+  .sd-excerpt { font-size: .9rem; color: var(--text-secondary); margin-top: .2rem; }
+  mark { background: color-mix(in srgb, var(--theme-color) 25%, transparent); color: var(--text-primary); }
+  @media (max-width: 640px) { .sd-modal { width: 100vw; height: 100vh; max-height: 100vh; border-radius: 0; } }
+</style>

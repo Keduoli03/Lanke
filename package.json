@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && pagefind --source dist",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -28,6 +28,7 @@
     "astro": "^5.13.7",
     "astro-expressive-code": "^0.40.2",
     "astro-icon": "^1.1.5",
+    "astro-pagefind": "^1.8.5",
     "bilibili-bangumi-component": "^0.3.1",
     "hastscript": "^9.0.1",
     "mdast-util-to-string": "^4.0.0",
@@ -48,6 +49,7 @@
     "@types/hast": "^3.0.4",
     "@types/mdast": "^4.0.4",
     "@types/unist": "^3.0.3",
+    "pagefind": "^1.4.0",
     "typescript": "^5.9.3"
   },
   "packageManager": "pnpm@10.18.1+sha512.77a884a165cbba2d8d1c19e3b4880eee6d2fcabd0d879121e282196b80042351d5eb3ca0935fa599da1dc51265cc68816ad2bddd2a2de5ea9fdf92adbec7cd34"

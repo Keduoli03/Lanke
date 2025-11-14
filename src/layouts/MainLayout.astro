@@ -7,6 +7,7 @@ import LightboxDialog from '../components/util/Lightbox.astro';
 import themeScript from '../utils/theme-script.ts?raw';
 import MobileNav from '@/components/MobileNav.astro';
 import Sidebar from '@/components/Sidebar.astro';
+import SearchDialog from '@/components/search/SearchDialog.astro';
 
 export interface Props {
   title: string;
@@ -43,7 +44,7 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
   <div class="layout-container">
     <main class="main-content">
       <div class="page-outer-container">
-        <div class="content-pane vt-page">
+        <div class="content-pane vt-page" data-pagefind-body>
           <slot />
         </div>
       </div>
@@ -52,6 +53,7 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
 
   <Footer />
   <LightboxDialog />
+  <SearchDialog client:load />
 
   <style is:global>
     * {
