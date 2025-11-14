@@ -141,6 +141,9 @@ code::after {
 .prose h5,
 .prose h6 {
   @apply relative;
+  overflow-wrap: normal;
+  word-break: normal;
+  white-space: normal;
 }
 
 .prose h1::before,

@@ -45,9 +45,6 @@ textarea,
 }
 
 :root {
-	/* --primary-hue 由 MainLayout.astro 注入 */
-
-	/* 浅色模式 */
 	--page-bg: hsl(var(--primary-hue), 45%, 96%); 
 	--sidebar-bg: hsl(var(--primary-hue), 15%, 99.5%); 
 	--content-pane-bg: hsl(0, 0%, 100%);
@@ -101,6 +98,7 @@ html {
 	font-family: "Atkinson Hyperlegible", sans-serif;
 	scroll-behavior: smooth;
 	-webkit-tap-highlight-color: transparent; 
+	background-color: var(--page-bg);
 }
 
 body {
@@ -152,12 +150,64 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 	background-color: hsl(var(--primary-hue), 15%, 45%);
 }
 
+html.no-sidebar-transition #sidebar,
+html.no-sidebar-transition #sidebar *,
+html.no-sidebar-transition .main-content,
+html.no-sidebar-transition .post-rail,
+html.no-sidebar-transition body,
+html.no-sidebar-transition .content-pane {
+	transition: none !important;
+	animation: none !important;
+}
+
 /* --- 主题切换动画 --- */
 /* 基础设置：禁用默认动画，确保混合模式正常 */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
+}
+
+html.no-sidebar-transition, html.no-sidebar-transition body { view-transition-name: none; }
+
+html.to-dark .vt-page, html.to-light .vt-page { view-transition-name: none; }
+
+.vt-page { view-transition-name: page; will-change: transform; backface-visibility: hidden; transform: translateZ(0); }
+
+::view-transition-new(page) { 
+  animation: page-rise-in 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both; 
+  transform-origin: 50% 50%;
+}
+::view-transition-old(page) { 
+  animation: page-rise-out 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both; 
+  transform-origin: 50% 50%;
+}
+
+@keyframes page-rise-in {
+  0%   { transform: scale(0.96); }
+  60%  { transform: translateY(-12px) scale(1); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes page-rise-out {
+  from { transform: translateY(0) scale(1); }
+  to   { transform: translateY(-12px) scale(0.985); }
+}
+
+/* Layout baseline moved to global to avoid FOUC on navigation */
+.layout-container { display: flex; min-height: 100vh; }
+.main-content { flex: 1; min-height: 100vh; padding: 2rem 1rem; }
+.page-outer-container { max-width: var(--page-width); margin: 0 auto; width: 100%; position: relative; }
+.content-pane { width: 100%; max-width: var(--page-width); background-color: var(--content-pane-bg); border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.08); padding: 2rem; flex-shrink: 0; }
+html.dark .content-pane { border: 1px solid var(--line-divider); box-shadow: none; }
+@media (min-width: 1024px) {
+  .main-content { padding: 2rem; }
+  html[data-sidebar-open="true"] .main-content { margin-left: var(--sidebar-width); }
+  html[data-sidebar-open="false"] .main-content { margin-left: 0; }
+  .content-pane { padding: 2rem; }
+}
+@media (max-width: 1023px) {
+  .main-content { margin-left: 0 !important; padding: 1rem; padding-top: 4rem; }
+  .content-pane { padding: 1rem; max-width: 100%; }
 }
 
 /* 向外扩散动画（出现） */

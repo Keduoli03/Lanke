@@ -19,21 +19,31 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <BaseHead title={title} description={description} />
   <script is:inline set:html={themeScript} />
-  <ClientRouter />
+  <script is:inline>
+    (function(){
+      try {
+        var s = localStorage.getItem('sidebarOpen');
+        document.documentElement.setAttribute('data-sidebar-open', s === 'true' ? 'true' : 'false');
+      } catch(e) {
+        document.documentElement.setAttribute('data-sidebar-open','false');
+      }
+    })();
+  </script>
+  <BaseHead title={title} description={description} />
 </head>
 <body class="bg-page text-primary" style={`
   --primary-hue: ${siteConfig.themeColor.hue};
   --page-width: ${siteConfig.pageWidth}; 
   --sidebar-width: ${siteConfig.sidebarWidth}; 
 `}>
+  <ClientRouter />
 	<Sidebar transition:persist />
   <MobileNav transition:persist class="mobile-nav" />
   <div class="layout-container">
     <main class="main-content">
       <div class="page-outer-container">
-        <div class="content-pane">
+        <div class="content-pane vt-page">
           <slot />
         </div>
       </div>
@@ -71,6 +81,7 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
     .content-pane {
       width: 100%;
       max-width: var(--page-width);
+      background-color: var(--content-pane-bg);
       border-radius: 0.75rem;
       box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.08);
       padding: 2rem;
@@ -83,13 +94,10 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
     }
 
     @media (min-width: 1024px) {
-      .main-content {
-        padding: 2rem;
-        margin-left: var(--sidebar-width);
-      }
-      .content-pane {
-        padding: 2rem;
-      }
+      .main-content { padding: 2rem; }
+      html[data-sidebar-open="true"] .main-content { margin-left: var(--sidebar-width); }
+      html[data-sidebar-open="false"] .main-content { margin-left: 0; }
+      .content-pane { padding: 2rem; }
     }
 
     @media (max-width: 1023px) {

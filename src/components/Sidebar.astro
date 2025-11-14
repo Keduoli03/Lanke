@@ -8,63 +8,97 @@ import ThemeSwitch from "./util/ThemeSwitch.svelte";
 
 let links: NavBarLink[] = Object.values(navBarConfig.links);
 const currentPath = Astro.url.pathname;
+
+type ExtendedLink = NavBarLink & { isSearch?: boolean };
+
+const extendedLinks: ExtendedLink[] = [
+  { name: "搜索", icon: "ri:search-line", url: "#search", isSearch: true, external: false },
+  ...links
+];
 ---
+
 
 <div
   id="sidebar"
-  class="relative h-full bg-[var(--sidebar-bg)] w-16 flex-col transition-colors lg:flex hidden"
+  class="relative h-full bg-[var(--sidebar-bg)] flex-col transition-all duration-300 ease lg:flex hidden"
+  style="--sidebar-width-narrow: 64px; --sidebar-width-wide: 250px;"
 >
-  <!-- 网站Logo -->
-  <div class="p-2 border-b border-[var(--line-divider)] flex justify-center" transition:persist="sidebar-logo">
-    <a href={url("/")} class="hover:opacity-80 transition-opacity">
-      <img src="/logo.png" alt={siteConfig.title} class="w-6 h-6" />
+  <!-- 顶部Logo + 展开收起按钮：重点修改布局逻辑 -->
+  <div class="sidebar-header p-2 border-b border-[var(--line-divider)] flex items-center justify-center relative" transition:persist="sidebar-logo">
+    <!-- Logo容器：折叠/展开时都保持居中对齐 -->
+    <a href={url("/")} class="hover:opacity-80 transition-opacity flex items-center justify-center">
+      <img src="/logo.png" alt={siteConfig.title} class="sidebar-logo w-10 h-10" />
+      <span class="text-sm font-semibold text-[var(--text-primary)] sidebar-text ml-2">
+        {siteConfig.title}
+      </span>
     </a>
+    <!-- 展开按钮：固定在右侧，不影响Logo -->
+    <button id="sidebar-toggle" class="sidebar-toggle toggle-pill">
+      <Icon name="ri:arrow-right-s-line" class="h-3 w-3 text-black" />
+    </button>
   </div>
 
-  <nav class="flex-1 p-2">
-    <ul class="space-y-3">
-      {links.map((l) => {
+  <nav class="flex-1 p-2 overflow-y-auto" style="scrollbar-width: none;">
+    <ul class="space-y-3 py-2">
+      {extendedLinks.map((l) => {
         const linkPath = l.external ? l.url : url(l.url);
-        const isActive = !l.external && (linkPath === '/' ? currentPath === '/' : currentPath.startsWith(linkPath));
+        const isActive = !l.external && !l.isSearch && (linkPath === '/' ? currentPath === '/' : currentPath.startsWith(linkPath));
+        
+        if (l.isSearch) {
+          return (
+            <li class="flex justify-center px-2">
+              <div class="w-full bg-[var(--sidebar-icon-bg)] rounded-lg p-1 flex items-center">
+                <Icon name={l.icon} class="icon text-sm ml-2 text-[var(--text-secondary)]" />
+                <input 
+                  type="text" 
+                  placeholder="搜索..." 
+                  class="bg-transparent outline-none border-none flex-1 ml-2 text-sm text-[var(--text-primary)] sidebar-text"
+                  style="width: calc(100% - 40px);"
+                />
+              </div>
+            </li>
+          );
+        }
+
         return (
-        <li class="flex justify-center">
-          <a
-            href={linkPath}
-            target={l.external ? "_blank" : "_self"}
-            rel={l.external ? "noopener noreferrer" : ""}
-            data-astro-prefetch={l.external ? "false" : "viewport"}
-            class:list={[
-                "group flex flex-col items-center p-1 w-auto nav-link",
+          <li class="flex justify-center">
+            <a
+              href={linkPath}
+              target={l.external ? "_blank" : "_self"}
+              rel={l.external ? "noopener noreferrer" : ""}
+              data-astro-prefetch={l.external ? "false" : "viewport"}
+              class:list={[
+                "group flex items-center p-2 nav-link rounded-lg transition-all duration-300",
                 { "is-active": isActive },
-            ]}
-          >
-            <div class="icon-container w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-transform relative shadow-md bg-[var(--content-bg)] group-hover:border-2 group-hover:border-[var(--theme-color-light)] group-hover:scale-110">
-              {l.icon && <Icon name={l.icon} class="icon text-sm" />}
-            </div>
-            <span class="text-xs text-center leading-tight text-[var(--text-secondary)] font-medium">
-              {l.name}
-            </span>
-            {l.external && (
-              <Icon
-                name="fa6-solid:arrow-up-right-from-square"
-                class="text-xs text-[var(--text-secondary)]/70 mt-1"
-              />
-            )}
-          </a>
-        </li>
-      )})}
+              ]}
+            >
+              <div class="icon-container w-10 h-10 rounded-lg flex items-center justify-center transition-transform relative shadow-md group-hover:border-2 group-hover:border-[var(--theme-color-light)] group-hover:scale-110" style="background-color: var(--sidebar-icon-bg)">
+                {l.icon && <Icon name={l.icon} class="icon h-6 w-6" />}
+              </div>
+              <span class="text-sm text-[var(--text-secondary)] font-medium sidebar-text ml-3">
+                {l.name}
+              </span>
+              {l.external && (
+                <Icon
+                  name="ri:arrow-right-s-line"
+                  class="text-xs text-[var(--text-secondary)]/70 ml-auto sidebar-text"
+                />
+              )}
+            </a>
+          </li>
+        );
+      })}
     </ul>
   </nav>
 
-  <!-- 底部区域 -->
   <aside class="p-2 border-t border-[var(--line-divider)]">
-    <div class="flex flex-col items-center gap-2">
+    <div class="flex flex-col items-center gap-3 sidebar-text">
       <LightDarkSwitch client:load transition:persist>
-        <Icon slot="dark-icon" name="material-symbols:dark-mode-outline" class="h-5 w-5 cursor-pointer" />
-        <Icon slot="light-icon" name="material-symbols:light-mode-outline" class="h-5 w-5 cursor-pointer" />
+        <Icon slot="dark-icon" name="material-symbols:dark-mode-outline" class="h-6 w-6 cursor-pointer" />
+        <Icon slot="light-icon" name="material-symbols:light-mode-outline" class="h-6 w-6 cursor-pointer" />
       </LightDarkSwitch>
       <ThemeSwitch client:load transition:persist isMobile={false}>
-        <Icon slot="palette-icon" name="material-symbols:palette-outline" class="bottom-bar-icon h-5 w-5 cursor-pointer" />
+        <Icon slot="palette-icon" name="material-symbols:palette-outline" class="bottom-bar-icon h-6 w-6 cursor-pointer" />
         <Icon slot="reset-icon" name="fa6-solid:arrow-rotate-left" class="text-xs" />
       </ThemeSwitch>
     </div>
@@ -73,39 +107,156 @@ const currentPath = Astro.url.pathname;
 
 <style>
   #sidebar {
-    width: var(--sidebar-width);
+    width: var(--sidebar-width-narrow);
     position: fixed;
     top: 0;
     left: 0;
     height: 100%;
     z-index: 10;
     box-shadow: 2px 0 10px -5px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease;
+  }
+
+  html.no-sidebar-transition #sidebar {
+    transition: none !important;
+  }
+  html.no-sidebar-transition #sidebar * {
+    transition: none !important;
+    animation: none !important;
+  }
+  html.no-sidebar-transition #sidebar .icon-container {
+    transform: none !important;
+  }
+
+  /* 展开状态 */
+  html[data-sidebar-open="true"] #sidebar,
+  #sidebar[data-open="1"] {
+    width: var(--sidebar-width-wide);
   }
 
   html.dark #sidebar {
     box-shadow: 2px 0 12px -5px rgba(0, 0, 0, 0.2);
   }
 
+  /* 头部关键样式：固定高度+两端对齐，确保Logo和按钮不重合 */
+  .sidebar-header {
+    height: 60px; /* 和菜单图标行高一致 */
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* 折叠/展开文本切换：仅影响头部标题文本 */
+  .sidebar-header .sidebar-text {
+    display: none;
+    transition: opacity 0.3s ease;
+  }
+  html[data-sidebar-open="true"] #sidebar .sidebar-header .sidebar-text,
+  #sidebar[data-open="1"] .sidebar-header .sidebar-text {
+    display: inline;
+    opacity: 1;
+  }
+
+  /* Logo样式：和菜单icon-container尺寸完全一致，确保对齐 */
+  .sidebar-logo {
+    width: 2.5rem; /* 等于w-10 */
+    height: 2.5rem;
+    flex-shrink: 0;
+  }
+
+  /* 展开收起按钮：固定右侧间距，不挤压Logo */
+  #sidebar-toggle {
+    border: none;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  .toggle-pill {
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--theme-color) 20%, white);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px -2px rgba(0,0,0,0.2);
+    z-index: 20;
+  }
+
+  html[data-sidebar-open="true"] #sidebar #sidebar-toggle {
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+  /* 菜单图标容器：和Logo尺寸统一，折叠时居中 */
   .icon-container {
     background-color: var(--sidebar-icon-bg);
     will-change: transform;
+    contain: paint;
     transition: transform 150ms ease, border-color 150ms ease;
+    cursor: pointer;
+  }
+
+  /* 折叠状态下：导航项整体居中，和Logo对齐 */
+  html[data-sidebar-open="false"] #sidebar .nav-link {
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+    width: auto;
+  }
+  html[data-sidebar-open="false"] #sidebar .nav-link span {
+    margin-top: 0.25rem;
+    margin-left: 0;
+    font-size: 0.75rem;
+    text-align: center;
+  }
+
+  /* 展开状态下：导航项横向排列 */
+  html[data-sidebar-open="true"] #sidebar .nav-link {
+    width: 100%;
+  }
+
+  /* 复用hover高亮逻辑 */
+  .nav-link:hover {
+    background-color: var(--theme-color-light);
+  }
+
+  .nav-link:hover .icon,
+  .nav-link:hover span {
+    color: var(--theme-color);
+  }
+
+  html[data-sidebar-open="false"] #sidebar .nav-link:hover {
+    background-color: transparent;
+  }
+  html[data-sidebar-open="false"] #sidebar .nav-link:hover .icon-container {
+    border: 2px solid var(--theme-color);
   }
 
   .nav-link.is-active .icon-container {
-    transform: scale(1.1);
-    border: 2px solid var(--theme-color-light);
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    transform: scale(1.06);
+    border: 2px solid var(--theme-color);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
   }
 
   .icon, .bottom-bar-icon {
     color: var(--sidebar-icon-symbol);
+    transition: color 0.3s ease;
   }
 
-  /* 修复导航链接下划线问题 */
+  /* 搜索框样式优化 */
+  input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+  }
+
+  /* 导航链接基础样式 */
   .nav-link {
     text-decoration: none !important;
     color: inherit;
+    cursor: pointer;
   }
 
   .nav-link:hover,
@@ -113,4 +264,61 @@ const currentPath = Astro.url.pathname;
     text-decoration: none !important;
     outline: none;
   }
+
+  /* 滚动条隐藏 */
+  #sidebar nav::-webkit-scrollbar {
+    display: none;
+  }
 </style>
+
+<script>
+  function setSidebarOpen(next: boolean) {
+    document.documentElement.setAttribute('data-sidebar-open', next ? 'true' : 'false');
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.dataset.open = next ? '1' : '0';
+    try { localStorage.setItem('sidebarOpen', next.toString()); } catch {}
+    try { document.cookie = `sidebarOpen=${next}; path=/; max-age=31536000`; } catch {}
+    document.documentElement.classList.add('no-sidebar-transition');
+    requestAnimationFrame(() => document.documentElement.classList.remove('no-sidebar-transition'));
+  }
+
+  function bindDelegates() {
+    if ((window as any).__sidebarBound) return;
+    document.addEventListener('click', (e) => {
+      const t = e.target as Element | null;
+      if (!t) return;
+      const toggle = t.closest('#sidebar-toggle');
+      if (toggle) {
+        const current = document.documentElement.getAttribute('data-sidebar-open') === 'true';
+        setSidebarOpen(!current);
+        return;
+      }
+      const search = t.closest('input[placeholder="搜索..."]');
+      if (search) {
+        setSidebarOpen(true);
+      }
+    });
+    (window as any).__sidebarBound = true;
+  }
+
+  function initSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    try {
+      const savedState = localStorage.getItem('sidebarOpen');
+      if (savedState === 'true' || savedState === 'false') {
+        document.cookie = `sidebarOpen=${savedState}; path=/; max-age=31536000`;
+        sidebar.dataset.open = savedState === 'true' ? '1' : '0';
+      } else {
+        sidebar.dataset.open = (document.documentElement.getAttribute('data-sidebar-open') === 'true') ? '1' : '0';
+      }
+    } catch {
+      sidebar.dataset.open = (document.documentElement.getAttribute('data-sidebar-open') === 'true') ? '1' : '0';
+    }
+
+    bindDelegates();
+  }
+
+  document.addEventListener('astro:page-load', initSidebar);
+</script>
