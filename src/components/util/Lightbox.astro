@@ -191,6 +191,7 @@ function initLightbox() {
     const rel = (a.getAttribute('rel') || '').toLowerCase();
     if (target === '_blank' || rel.includes('noopener') || rel.includes('noreferrer')) return false;
     if (a.getAttribute('data-no-lightbox') === 'true') return false;
+    if (a.closest('#sidebar') || a.closest('.sidebar-header') || a.closest('.mobile-nav') || a.closest('.md-lightbox-exclude')) return false;
 
     const href = a.getAttribute('href') || '';
     const classes = a.classList;
@@ -207,17 +208,16 @@ function initLightbox() {
   const resolveClickTarget = (t) => {
     if (!(t instanceof Element)) return null;
 
-    // 排除评论容器（根据你的结构同时匹配 #comment-section 与 .artalk）
     if (t.closest('#comment-section') || t.closest('.artalk')) return null;
+    if (t.closest('#sidebar') || t.closest('.sidebar-header') || t.closest('.mobile-nav') || t.closest('.md-lightbox-exclude')) return null;
 
-    // 优先识别链接
     const a = t.closest('a');
     if (a && isLightboxLink(a)) return { type: 'a', el: a };
 
-    // 兜底识别图片（再次排除评论容器与表情）
     const imgEl = t.closest('img');
     if (imgEl) {
       if (imgEl.closest('#comment-section') || imgEl.closest('.artalk')) return null;
+      if (imgEl.closest('#sidebar') || imgEl.closest('.sidebar-header') || imgEl.closest('.mobile-nav') || imgEl.closest('.md-lightbox-exclude')) return null;
 
       const altLower = (imgEl.getAttribute('alt') || '').toLowerCase();
       const isEmoji =
@@ -225,7 +225,8 @@ function initLightbox() {
         imgEl.classList.contains('atk-emoji') ||
         imgEl.hasAttribute('data-emoji') ||
         /emoji|表情/.test(altLower);
-      if (isEmoji) return null;
+      const isUiIcon = /logo|icon|avatar|徽标|图标/.test(altLower) || imgEl.classList.contains('logo') || imgEl.classList.contains('icon') || imgEl.classList.contains('avatar');
+      if (isEmoji || isUiIcon || imgEl.hasAttribute('data-no-lightbox') || imgEl.classList.contains('no-lightbox')) return null;
 
       return { type: 'img', el: imgEl };
     }

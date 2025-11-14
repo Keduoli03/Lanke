@@ -24,26 +24,25 @@ const { Content } = await render(friendPost);
     </PageHeader>
 
     <!-- 修复核心：网格容器添加 max-w-full 和 px-2 限制宽度，防止溢出 -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-w-full px-2">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
       {friends.map((friend, index) => (
         <a 
           href={friend.siteurl}
           target="_blank"
           rel="noopener noreferrer"
-          class="flex flex-col p-4 sm:p-6 bg-[var(--page-bg)] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 w-full"
-          style="box-sizing: border-box;"
+          class="group flex flex-col p-4 sm:p-6 rounded-xl bg-[var(--content-pane-bg)] border border-[var(--line-divider)] shadow-sm hover:shadow-md transition-all duration-300 w-full hover:-translate-y-0.5 hover:ring-1 hover:ring-[var(--theme-color)]/20"
         >
           <div class="flex items-center mb-3">
             {friend.imgurl && (
               <img 
                 src={friend.imgurl} 
                 alt={friend.title} 
-                class="w-10 h-10 rounded-full mr-3 object-cover border border-[var(--border-color)]" 
+                class="w-10 h-10 rounded-full mr-3 object-cover ring-2 ring-[var(--line-divider)] group-hover:ring-[var(--theme-color)]/50" 
                 loading="lazy"
                 onerror="this.onerror=null; this.src='/assets/default-avatar.png';"
               />
             )}
-            <h2 class="text-lg font-medium text-[var(--text-primary)] truncate">{friend.title}</h2>
+            <h2 class="text-lg font-semibold text-[var(--text-primary)] truncate group-hover:text-[var(--theme-color)]">{friend.title}</h2>
           </div>
           
           <!-- 强制长文本换行，避免撑开宽度 -->
@@ -55,7 +54,7 @@ const { Content } = await render(friendPost);
           <div class="flex flex-wrap gap-1.5 mt-auto">
             {friend.tags?.map((tag, tagIndex) => (
               <span 
-                class="px-2 py-0.5 bg-[var(--tag-bg)] text-xs rounded-full text-[var(--text-tertiary)]" 
+                class="px-2 py-0.5 bg-[var(--tag-bg)] text-xs rounded-full text-[var(--text-secondary)] ring-1 ring-[var(--line-divider)]" 
                 style="overflow-wrap: break-word; word-break: break-all;"
               >
                 {tag}
