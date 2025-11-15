@@ -38,8 +38,9 @@ const extendedLinks: ExtendedLink[] = [...links];
   <nav class="p-2 overflow-y-scroll" style="scrollbar-width: none;">
     <ul class="space-y-2 py-1">
       {extendedLinks.map((l) => {
-        const linkPath = l.external ? l.url : url(l.url);
-        const isActive = !l.external && (linkPath === '/' ? currentPath === '/' : currentPath.startsWith(linkPath));
+        const isExternal = !!l.external || /^https?:\/\//.test(l.url);
+        const linkPath = isExternal ? l.url : url(l.url);
+        const isActive = !isExternal && (linkPath === '/' ? currentPath === '/' : currentPath.startsWith(linkPath));
         
         
 
@@ -47,9 +48,9 @@ const extendedLinks: ExtendedLink[] = [...links];
           <li class="flex justify-center">
             <a
               href={linkPath}
-              target={l.external ? "_blank" : "_self"}
-              rel={l.external ? "noopener noreferrer" : ""}
-              data-astro-prefetch={l.external ? "false" : "viewport"}
+              target={isExternal ? "_blank" : "_self"}
+              rel={isExternal ? "noopener noreferrer" : ""}
+              data-astro-prefetch={isExternal ? "false" : "viewport"}
               class:list={[
                 "group flex items-center p-1 nav-link rounded-lg transition-all duration-300",
                 { "is-active": isActive },
@@ -61,10 +62,10 @@ const extendedLinks: ExtendedLink[] = [...links];
               <span class="text-xs text-[var(--text-secondary)] font-medium sidebar-text ml-2">
                 {l.name}
               </span>
-              {l.external && (
+              {isExternal && (
                 <Icon
-                  name="ri:arrow-right-s-line"
-                  class="text-xs text-[var(--text-secondary)]/70 ml-auto sidebar-text"
+                  name="material-symbols:link"
+                  class="external-indicator h-4 w-4 text-[var(--text-secondary)]/70 ml-auto"
                 />
               )}
             </a>
@@ -215,6 +216,10 @@ const extendedLinks: ExtendedLink[] = [...links];
     font-size: 0.75rem;
     text-align: center;
   }
+
+  /* 折叠状态隐藏外链指示，避免跑到文字右下角 */
+  .external-indicator { flex-shrink: 0; }
+  html[data-sidebar-open="false"] #sidebar .external-indicator { display: none; }
 
   /* 展开状态下：导航项横向排列 */
   html[data-sidebar-open="true"] #sidebar .nav-link {

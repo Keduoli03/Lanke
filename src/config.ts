@@ -59,6 +59,11 @@ export const navBarConfig: NavBarConfig = {
       url: "/about",
       icon: "material-symbols:person-outline",
     },
+    traveling: {
+      name: "开往",
+      url: "https://www.travellings.cn/typewriter.html",
+      icon: "material-symbols:train-outline",
+    },
     
     
   },
