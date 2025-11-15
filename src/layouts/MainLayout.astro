@@ -39,7 +39,9 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
   --sidebar-width: ${siteConfig.sidebarWidth}; 
 `}>
   <ClientRouter />
-	<Sidebar transition:persist />
+	<div class="hidden lg:block">
+		<Sidebar transition:persist />
+	</div>
   <MobileNav transition:persist class="mobile-nav" />
   <div class="layout-container">
     <main class="main-content">

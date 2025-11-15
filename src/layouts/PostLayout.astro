@@ -48,7 +48,9 @@ const {
 
   <ClientRouter />
   <div class="layout-container">
-    <Sidebar transition:persist />
+    <div class="hidden lg:block">
+		<Sidebar transition:persist />
+	</div>
     <MobileNav transition:persist class="mobile-nav" />
     
     <main class="main-content">
