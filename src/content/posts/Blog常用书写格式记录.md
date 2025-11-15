@@ -129,7 +129,7 @@ pinned: true
 
 通过安装 [Expressive Code](https://expressive-code.com/installation/#astro) 增强 Astro 的代码块，拥有更多主题样式，使用 [expressive-code-file-icons](https://github.com/xt0rted/expressive-code-file-icons) 可以为不同类型的代码块加上图标。更多写法可以参考官方文档，不多做展示：
 
-```Python
+```python
 a = 1
 b = 2
 print(a+b)
