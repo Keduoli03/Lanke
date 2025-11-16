@@ -31,7 +31,7 @@ const firstCategory = categories && categories.length > 0 ? categories[0] : '文
 ]} style={`${style || ''} contain: paint;`}>
   
   <!-- 核心修改：小屏幕垂直排列（flex-col），大屏幕水平排列（md:flex-row） -->
-  <div class="w-full flex flex-col md:flex-row h-full">
+  <div class="w-full flex flex-col md:flex-row h-full min-w-0">
     {/* 封面区域：大屏幕占1/3宽度，flex-shrink-0避免被压缩 */}
     {hasCover && (
       <div class="w-full md:w-2/5 flex-shrink-0 px-2 py-3 md:px-3 md:pt-6 md:pb-6">
@@ -54,7 +54,7 @@ const firstCategory = categories && categories.length > 0 ? categories[0] : '文
 
     <!-- 内容区域：大屏幕占2/3宽度，和封面并排 -->
     <div class:list={[
-      "w-full flex flex-col px-3 py-4 md:p-5",
+      "w-full flex flex-col px-3 py-4 md:p-5 min-w-0",
       hasCover ? "md:w-3/5" : "md:w-full",
       hasCover ? "md:pt-6 md:pb-6" : ""
     ]}>
@@ -167,6 +167,9 @@ const firstCategory = categories && categories.length > 0 ? categories[0] : '文
     display: inline-flex;
     align-items: baseline;
     gap: 0;
+    flex-wrap: wrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
   .tag-container .tag-list a + a::before {
     content: "/";
@@ -181,6 +184,17 @@ const firstCategory = categories && categories.length > 0 ? categories[0] : '文
   }
   .tag-container .tag-list .sep {
     margin: 0;
+  }
+
+  .category-container,
+  .tag-container {
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+  .category-container span {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   /* 标题颜色：浅色黑、深色白，强制覆盖全局链接色 */
