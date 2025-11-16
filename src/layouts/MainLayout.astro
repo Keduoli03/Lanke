@@ -109,7 +109,10 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
         margin-left: 0 !important; 
         padding: 1rem; 
         padding-top: 4rem; 
+        overflow-x: hidden;
       }
+      .layout-container { overflow-x: hidden; }
+      .page-outer-container { max-width: 100%; width: 100%; overflow-x: hidden; }
       .content-pane {
         padding: 1rem; 
         max-width: 100%; 
