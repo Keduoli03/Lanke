@@ -45,14 +45,14 @@ textarea,
 }
 
 :root {
-	--page-bg: hsl(var(--primary-hue), 45%, 96%); 
-	--sidebar-bg: hsl(var(--primary-hue), 15%, 99.5%); 
-	--content-pane-bg: hsl(0, 0%, 100%);
-	--text-primary: hsl(var(--primary-hue), 20%, 18%); 
-	--text-secondary: hsl(var(--primary-hue), 12%, 42%);
-	--text-link: hsl(var(--primary-hue), 75%, 44%);
-	--line-divider: hsl(var(--primary-hue), 20%, 88%);
-	--tag-bg: hsl(var(--primary-hue), 40%, 92%);
+  --page-bg: hsl(var(--primary-hue), 45%, 96%); 
+  --sidebar-bg: hsl(var(--primary-hue), 15%, 99.5%); 
+  --content-pane-bg: hsl(0, 0%, 100%);
+  --text-primary: hsl(var(--primary-hue), 20%, 18%); 
+  --text-secondary: hsl(var(--primary-hue), 12%, 42%);
+  --text-link: hsl(var(--primary-hue), 75%, 44%);
+  --line-divider: hsl(var(--primary-hue), 20%, 88%);
+  --tag-bg: hsl(var(--primary-hue), 40%, 92%);
 
 	/* 主题色 */
 	--theme-color: hsl(var(--primary-hue), 75%, 44%);
@@ -64,8 +64,28 @@ textarea,
 	--color-selection-bar: linear-gradient(to right, oklch(0.80 0.10 0), oklch(0.80 0.10 30), oklch(0.80 0.10 60), oklch(0.80 0.10 90), oklch(0.80 0.10 120), oklch(0.80 0.10 150), oklch(0.80 0.10 180), oklch(0.80 0.10 210), oklch(0.80 0.10 240), oklch(0.80 0.10 270), oklch(0.80 0.10 300), oklch(0.80 0.10 330), oklch(0.80 0.10 360));
 	
 	/* 侧边栏图标颜色 */
-	--sidebar-icon-bg: hsl(var(--primary-hue), 25%, 94%);
-	--sidebar-icon-symbol: hsl(var(--primary-hue), 12%, 35%);
+  --sidebar-icon-bg: hsl(var(--primary-hue), 25%, 94%);
+  --sidebar-icon-symbol: hsl(var(--primary-hue), 12%, 35%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page-bg: hsl(var(--primary-hue), 18%, 12%);
+    --sidebar-bg: hsl(var(--primary-hue), 16%, 16%);
+    --content-pane-bg: hsl(var(--primary-hue), 15%, 20%);
+    --text-primary: hsl(var(--primary-hue), 18%, 88%);
+    --text-secondary: hsl(var(--primary-hue), 12%, 65%);
+    --text-link: hsl(var(--primary-hue), 80%, 75%);
+    --line-divider: hsl(var(--primary-hue), 15%, 28%);
+    --tag-bg: hsl(var(--primary-hue), 22%, 26%);
+    --theme-color: hsl(var(--primary-hue), 80%, 75%);
+    --theme-color-rgb: var(--primary-hue), 80%, 75%;
+    --theme-color-light: hsl(var(--primary-hue), 80%, 85%);
+    --float-panel-bg: hsl(var(--primary-hue), 15%, 20%);
+    --color-selection-bar: linear-gradient(to right, oklch(0.70 0.10 0), oklch(0.70 0.10 30), oklch(0.70 0.10 60), oklch(0.70 0.10 90), oklch(0.70 0.10 120), oklch(0.70 0.10 150), oklch(0.70 0.10 180), oklch(0.70 0.10 210), oklch(0.70 0.10 240), oklch(0.70 0.10 270), oklch(0.70 0.10 300), oklch(0.70 0.10 330));
+    --sidebar-icon-bg: hsl(var(--primary-hue), 15%, 24%);
+    --sidebar-icon-symbol: hsl(var(--primary-hue), 18%, 88%);
+  }
 }
 
 html.dark {
@@ -95,10 +115,11 @@ html.dark {
 
 /* --- Base Styles --- */
 html {
-	font-family: "Atkinson Hyperlegible", sans-serif;
-	scroll-behavior: smooth;
-	-webkit-tap-highlight-color: transparent; 
-	background-color: var(--page-bg);
+  font-family: "Atkinson Hyperlegible", sans-serif;
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent; 
+  background-color: var(--page-bg);
+  color-scheme: light dark;
 }
 
 body {

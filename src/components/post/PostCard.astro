@@ -25,8 +25,8 @@ const firstCategory = categories && categories.length > 0 ? categories[0] : '文
 ---
 
 <article class:list={[
-  "w-full group overflow-hidden rounded-lg bg-[var(--content-pane-bg)] shadow-sm hover:shadow-lg transition-all duration-300",
-  "transform hover:-translate-y-1",
+  "w-full group overflow-hidden rounded-lg bg-[var(--content-pane-bg)] shadow-sm hover:shadow-lg",
+  "transform hover:-translate-y-1 transition-transform duration-300",
   className
 ]} style={`${style || ''} contain: paint;`}>
   
@@ -40,7 +40,7 @@ const firstCategory = categories && categories.length > 0 ? categories[0] : '文
           class="block relative overflow-hidden rounded-lg shadow-inner h-full border border-[var(--line-divider)]"
           transition:name={`hero-${slug}`}
         >
-          <div class="pt-[56.25%] bg-gray-100 dark:bg-gray-700"></div>
+          <div class="pt-[56.25%] bg-[var(--content-pane-bg)]"></div>
           <img 
             src={cover} 
             alt={title || "文章封面"} 
@@ -62,7 +62,7 @@ const firstCategory = categories && categories.length > 0 ? categories[0] : '文
         <h3 class="post-card-title flex-grow text-xl md:text-2xl font-bold">
           <a
             href={url}
-            class="transition-colors duration-300 break-all"
+            class="break-all"
             style="line-break: anywhere; overflow-wrap: anywhere; view-transition-name: none;"
           >
             {title}
@@ -198,6 +198,5 @@ const firstCategory = categories && categories.length > 0 ? categories[0] : '文
   }
 
   /* 标题颜色：浅色黑、深色白，强制覆盖全局链接色 */
-  .post-card-title a { color: black !important; }
-  html.dark .post-card-title a { color: white !important; }
+  .post-card-title a { color: var(--text-primary) !important; }
 </style>

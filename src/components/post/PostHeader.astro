@@ -75,13 +75,14 @@ const minutes = Math.ceil(readingTime) || 0;
     font-size: 0.875rem;
     padding: 0.25rem 0.75rem;
     border-radius: 9999px;
-    transition: all 0.2s ease-in-out;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
     border: 1px solid transparent;
   }
 
   .category-badge {
     background-color: hsl(var(--primary-hue), 80%, 92%);
     color: hsl(var(--primary-hue), 60%, 35%);
+    transition-delay: 0.2s;
   }
   .category-badge:hover {
     transform: translateY(-1px);

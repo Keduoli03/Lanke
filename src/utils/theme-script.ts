@@ -111,6 +111,7 @@ function freezeSidebarVars() {
       el.style.backgroundColor = cse.backgroundColor;
       el.style.transition = 'none';
     });
+
   } catch(e) {}
 }
 

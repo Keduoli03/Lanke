@@ -8,7 +8,7 @@ function ensureStyles(){
     st.textContent='\
 .content-pane.vt-page{position:relative}\
 html.layout-loading:not(.dark) .content-pane.vt-page::before{content:"";position:absolute;inset:0;background:rgba(255,255,255,0.6);backdrop-filter:blur(1px);pointer-events:none;z-index:9998}\
-html.dark.layout-loading .content-pane.vt-page::before{content:"";position:absolute;inset:0;background:color-mix(in srgb, var(--theme-color) 25%, black);backdrop-filter:blur(1px);pointer-events:none;z-index:9998}\
+html.dark.layout-loading .content-pane.vt-page::before{content:"";position:absolute;inset:0;background:color-mix(in srgb, var(--theme-color) 20%, transparent);opacity:.6;backdrop-filter:blur(1px);pointer-events:none;z-index:9998}\
 #layout-spinner{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:2rem;height:2rem;border:3px solid var(--line-divider);border-top-color:var(--theme-color);border-radius:9999px;animation:spin .8s linear infinite;z-index:9999;display:none;pointer-events:none}\
 @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}\
 html.layout-loading #layout-spinner{display:block}\
