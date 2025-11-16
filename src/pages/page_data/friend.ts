@@ -89,8 +89,8 @@ export const items = [
 	},
 	{
 		title: "記緒漂流",
-		imgurl: "https://ttio.cc/apple-touch-icon.png",
-		desc: "記憶の川に、思いで漂う",
+		imgurl: "https://ttio.cc/favicon.svg",
+		desc: "于记忆之川，泛思绪之舟",
 		siteurl: "https://ttio.cc",
 		tags: ["友链"],
 	},
