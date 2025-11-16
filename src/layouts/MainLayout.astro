@@ -115,6 +115,10 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
         max-width: 100%; 
       }
     }
+
+    @media (max-width: 1023px) {
+      html, body { touch-action: pan-y; }
+    }
   </style>
 </body>
 </html>
