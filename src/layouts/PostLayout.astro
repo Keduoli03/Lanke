@@ -6,6 +6,7 @@ import Footer from '../components/Footer.astro';
 import Sidebar from '../components/Sidebar.astro';
 import MobileNav from '../components/MobileNav.astro';
 import themeScript from '../utils/theme-script.ts?raw';
+import pageTransitionScript from '../utils/page-transition.ts?raw';
 import LightboxDialog from '../components/util/Lightbox.astro';
 import SearchDialog from '@/components/search/SearchDialog.astro';
 
@@ -37,6 +38,7 @@ const {
   </script>
   <BaseHead title={title} description={description} />
   <script is:inline set:html={themeScript} />
+  <script is:inline set:html={pageTransitionScript} />
 </head>
 <body class="bg-page text-primary" style={`
   --primary-hue: ${siteConfig.themeColor.hue};
