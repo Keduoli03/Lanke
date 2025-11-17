@@ -216,7 +216,11 @@ html.dark .content-pane { border: 1px solid var(--line-divider); box-shadow: non
   .main-content { padding: 2rem; }
   html[data-sidebar-open="true"] .main-content { margin-left: var(--sidebar-width); }
   html[data-sidebar-open="false"] .main-content { margin-left: 0; }
-  .content-pane { padding: 2rem; margin-right: calc(var(--rail-width, 0px) + var(--content-rail-gap, 0px)); }
+  .content-pane { padding: 2rem; }
+}
+@media (min-width: 1024px) and (max-width: 1440px) {
+  html[data-sidebar-open="true"] .main-content { padding-left: 1rem; }
+  html[data-sidebar-open="true"] .content-pane { padding-left: 1rem; }
 }
 @media (max-width: 1023px) {
   .main-content { margin-left: 0 !important; padding: 1rem; padding-top: 4rem; }
