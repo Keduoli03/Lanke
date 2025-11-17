@@ -299,6 +299,10 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
     text-overflow: ellipsis;
   }
 
+  @media (max-width: 640px) {
+    .year-title { font-size: 1.25rem; }
+  }
+
   .post-link:hover {
     color: var(--timeline-color);
     text-decoration: none;
