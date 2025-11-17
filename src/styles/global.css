@@ -224,7 +224,7 @@ html.dark .content-pane { border: 1px solid var(--line-divider); box-shadow: non
 
 @media (min-width: 1024px) and (max-width: 1920px) {
   :root { 
-    --sidebar-width: 3rem; 
+    --sidebar-width: 2.5rem; 
     --page-width: clamp(48rem, calc(100vw - var(--sidebar-width) - var(--rail-width, 0px) - var(--content-rail-gap, 0px) - 4rem), 60rem); 
   }
 }
