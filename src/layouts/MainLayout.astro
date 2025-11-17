@@ -137,11 +137,8 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
     }
 
 
-    /* 桌面端窄屏（例如 1280–1440px）：收缩主内容宽度为“视口减去侧边栏与目录宽度”以留出右侧栏空间 */
     @media (min-width: 1024px) and (max-width: 1440px) {
-      :root {
-        --page-width: min(60rem, calc(100vw - var(--sidebar-width) - var(--rail-width) - var(--content-rail-gap) - 2rem));
-      }
+      :root { --rail-width: 18rem; --content-rail-gap: 1rem; }
     }
 
     @media (max-width: 1023px) {
