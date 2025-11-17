@@ -136,9 +136,7 @@ const {
       padding-top: 2rem;
       position: fixed;
       left: min(
-        calc(
-          var(--sidebar-width) + ((100vw - var(--sidebar-width)) / 2) + (var(--page-width) / 2) + var(--content-rail-gap)
-        ),
+        calc(((100vw - var(--page-width)) / 2) + var(--page-width) + var(--content-rail-gap)),
         calc(100vw - var(--rail-width) - 1rem)
       );
       top: 2rem;
@@ -195,10 +193,8 @@ const {
     }
 
     /* 桌面端窄屏（例如 1280–1440px）：收缩主内容宽度为“视口减去侧边栏与目录宽度”以留出右侧栏空间 */
-    @media (min-width: 1024px) and (max-width: 1440px) {
-      :root {
-        --page-width: min(60rem, calc(100vw - var(--sidebar-width) - var(--rail-width) - var(--content-rail-gap) - 2rem));
-      }
+    @media (min-width: 1024px) and (max-width: 1920px) {
+      :root { --page-width: min(60rem, calc(100vw - var(--sidebar-width) - var(--rail-width) - var(--content-rail-gap) - 2rem)); }
     }
   </style>
 </body>
