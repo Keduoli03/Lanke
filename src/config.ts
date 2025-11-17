@@ -32,7 +32,7 @@ export const siteConfig: SiteConfig = {
   tabletSidebarExtendWidth: "8rem", // 平板横屏侧栏展开宽度
   
   contentLeftMarginBase: "-2rem", // 主容器左外边距（桌面）
-  contentLeftMarginTablet: "1rem", // 主容器左外边距（平板横屏）
+  contentLeftMarginTablet: "-1rem", // 主容器左外边距（平板横屏）
 };
 
 export const navBarConfig: NavBarConfig = {
