@@ -213,14 +213,11 @@ html:not(.to-dark):not(.to-light) ::view-transition-old(page) {
 .content-pane { width: 100%; max-width: var(--page-width); background-color: var(--content-pane-bg); border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.08); padding: 2rem; flex-shrink: 0; }
 html.dark .content-pane { border: 1px solid var(--line-divider); box-shadow: none; }
 @media (min-width: 1024px) {
-  .main-content { padding: 2rem; }
-  html[data-sidebar-open="true"] .main-content { margin-left: var(--sidebar-width); }
-  html[data-sidebar-open="false"] .main-content { margin-left: 0; }
+  .main-content { padding: 2rem; margin-left: var(--content-left-margin-base); }
   .content-pane { padding: 2rem; }
 }
 @media (min-width: 1024px) and (max-width: 1440px) {
-  html[data-sidebar-open="true"] .main-content { padding-left: 1rem; }
-  html[data-sidebar-open="true"] .content-pane { padding-left: 1rem; }
+  .main-content { margin-left: var(--content-left-margin-tablet); }
 }
 @media (max-width: 1023px) {
   .main-content { margin-left: 0 !important; padding: 1rem; padding-top: 4rem; }

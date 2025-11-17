@@ -25,6 +25,14 @@ export const siteConfig: SiteConfig = {
   sidebarExtendWidth: "8rem", // 侧边栏展开宽度
   tocWidth: "12rem", // 目录宽度 (224px)
   tocMaxDepth: 3, // 目录最大显示深度
+  // 新增：全局变量便于统一管理
+  contentRailGap: "1.5rem", // 正文与右侧栏间距
+  tabletMaxWidth: "1440px", // 平板横屏最大宽度断点
+  tabletSidebarWidth: "2.5rem", // 平板横屏侧栏窄宽
+  tabletSidebarExtendWidth: "8rem", // 平板横屏侧栏展开宽度
+  
+  contentLeftMarginBase: "-2rem", // 主容器左外边距（桌面）
+  contentLeftMarginTablet: "1rem", // 主容器左外边距（平板横屏）
 };
 
 export const navBarConfig: NavBarConfig = {

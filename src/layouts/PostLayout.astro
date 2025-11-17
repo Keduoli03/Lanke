@@ -45,7 +45,9 @@ const {
   --sidebar-width: ${siteConfig.sidebarWidth};
   --sidebar-extend-width: ${siteConfig.sidebarExtendWidth};
   --rail-width: ${railWidth};
-  --content-rail-gap: 1.5rem; /* 主内容和侧边栏的间距 */
+  --content-rail-gap: ${siteConfig.contentRailGap}; /* 主内容和侧边栏的间距 */
+  --content-left-margin-base: ${siteConfig.contentLeftMarginBase};
+  --content-left-margin-tablet: ${siteConfig.contentLeftMarginTablet};
 `}>
 
   <ClientRouter />
@@ -159,10 +161,13 @@ const {
 
     /* 大屏幕适配：显示侧边栏 */
     @media (min-width: 1024px) {
-      .main-content { padding: 2rem; }
-      html[data-sidebar-open="true"] .main-content { margin-left: var(--sidebar-width); }
-      html[data-sidebar-open="false"] .main-content { margin-left: 0; }
+      .main-content { padding: 2rem; margin-left: var(--content-left-margin-base); }
+      .content-pane { padding: 2rem; }
       .post-rail { display: block; }
+    }
+
+    @media (min-width: 1024px) and (max-width: 1440px) {
+      .main-content { margin-left: var(--content-left-margin-tablet); }
     }
 
     @media (max-width: 1023px) {
