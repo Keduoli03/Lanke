@@ -39,6 +39,10 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
   --primary-hue: ${siteConfig.themeColor.hue};
   --page-width: ${siteConfig.pageWidth}; 
   --sidebar-width: ${siteConfig.sidebarWidth}; 
+  /* 新增平板模式专用变量，可在 config 中统一配置 */
+  --tablet-max-width: 700px; 
+  --mobile-padding: 1rem;
+  --tablet-padding: 1.5rem;
 `}>
   <ClientRouter />
 	<div class="hidden lg:block">
@@ -75,7 +79,6 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
       padding: 2rem 1rem;
     }
 
-
     .page-outer-container {
       max-width: var(--page-width); 
       margin: 0 auto; 
@@ -83,10 +86,9 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
       position: relative;
     }
 
-   
     .content-pane {
       width: 100%;
-      max-width: var(--page-width);
+      max-width: 100%; /* 修正：继承父容器宽度，避免超出 */
       background-color: var(--content-pane-bg);
       border-radius: 0.75rem;
       box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.08);
@@ -99,6 +101,7 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
       box-shadow: none;
     }
 
+    /* 桌面端（≥1024px）：原有逻辑保留 */
     @media (min-width: 1024px) {
       .main-content { padding: 2rem; }
       html[data-sidebar-open="true"] .main-content { margin-left: var(--sidebar-width); }
@@ -106,30 +109,42 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
       .content-pane { padding: 2rem; }
     }
 
-    @media (max-width: 1023px) {
+    /* 手机端（<768px）：全屏宽度，紧凑内边距 */
+    @media (max-width: 767px) {
       .main-content {
         margin-left: 0 !important; 
-        padding: 1rem; 
+        padding: var(--mobile-padding); /* 使用变量统一管理 */
         padding-top: 4rem; 
         overflow-x: hidden;
       }
       .layout-container { overflow-x: hidden; }
-      .page-outer-container { max-width: 100%; width: 100%; overflow-x: hidden; }
+      .page-outer-container { max-width: 100%; width: 100%; }
       .content-pane {
-        padding: 1rem; 
-        max-width: 100%; 
-        min-width: 0;
-        overflow-x: hidden;
+        padding: var(--mobile-padding); 
+        border-radius: 0.5rem; /* 手机端圆角更小 */
       }
     }
 
-    @media (min-width: 640px) and (max-width: 1023px) {
-      .page-outer-container { max-width: calc(100% - 1rem); }
-      .content-pane { padding: 1.25rem; }
+    /* 平板端（768px-1023px）：固定最大宽度+充足边距 */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .main-content {
+        margin-left: 0 !important; 
+        padding: var(--tablet-padding); /* 平板端更大边距 */
+        padding-top: 3rem; 
+        overflow-x: hidden;
+      }
+      .page-outer-container {
+        max-width: var(--tablet-max-width); /* 核心：固定平板内容最大宽度 */
+        width: 100%;
+        margin: 0 auto; /* 自动居中，左右生成相等边距 */
+      }
+      .content-pane {
+        padding: var(--tablet-padding) 2rem; /* 内边距优化，左右更宽 */
+        border-radius: 0.75rem;
+      }
     }
 
-
-    /* 桌面端窄屏（例如 1280–1440px）：收缩主内容宽度为“视口减去侧边栏与目录宽度”以留出右侧栏空间 */
+    /* 桌面端窄屏（1024px-1440px）：原有逻辑保留 */
     @media (min-width: 1024px) and (max-width: 1440px) {
       :root {
         --page-width: min(60rem, calc(100vw - var(--sidebar-width) - var(--rail-width) - var(--content-rail-gap) - 2rem));
