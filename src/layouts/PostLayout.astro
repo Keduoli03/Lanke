@@ -158,14 +158,8 @@ const {
 
     /* 大屏幕适配：显示侧边栏 */
     @media (min-width: 1024px) {
-      .main-content { padding: 2rem; }
-      html[data-sidebar-open="true"] .main-content { margin-left: var(--sidebar-width); }
-      html[data-sidebar-open="false"] .main-content { margin-left: 0; }
+      .main-content { padding: 2rem; margin-left: var(--sidebar-width); }
       .post-rail { display: block; }
-    }
-
-    @media (min-width: 1024px) and (max-width: 1440px) {
-      .page-outer-container { margin-left: 0; margin-right: auto; }
     }
 
     @media (max-width: 1023px) {
