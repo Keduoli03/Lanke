@@ -87,7 +87,11 @@ const fullPostUrl = Astro.url.href;
 <style>
   .rail-actions{
     margin-top: auto;
-    margin-left: 2rem;
-    padding-top: 20rem;
+    margin-left: 0;
+    padding-top: 1rem;
+  }
+
+  @media (min-width: 1024px) and (max-width: 1440px) {
+    .post-rail { display: none; }
   }
 </style>

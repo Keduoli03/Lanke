@@ -18,7 +18,7 @@ const extendedLinks: ExtendedLink[] = [...links];
   <div
     id="sidebar"
     class="relative h-full bg-[var(--sidebar-bg)] flex-col transition-all duration-300 ease lg:flex hidden"
-    style={`--sidebar-width-narrow: 64px; --sidebar-width-wide: ${siteConfig.sidebarExtendWidth};`}
+    style={`--sidebar-width-narrow: ${siteConfig.sidebarWidth}; --sidebar-width-wide: ${siteConfig.sidebarExtendWidth};`}
   >
   <!-- 顶部Logo + 展开收起按钮：重点修改布局逻辑 -->
   <div class="sidebar-header p-2 border-b border-[var(--line-divider)] flex items-center justify-center relative" transition:persist="sidebar-logo">
@@ -137,8 +137,8 @@ const extendedLinks: ExtendedLink[] = [...links];
   }
 
   @media (min-width: 1024px) and (max-width: 1440px) {
-    #sidebar { --sidebar-width-narrow: var(--sidebar-width); }
-    html[data-sidebar-open="true"] #sidebar { width: 6rem; }
+    #sidebar { --sidebar-width-narrow: var(--tablet-sidebar-width); }
+    html[data-sidebar-open="true"] #sidebar { width: var(--tablet-sidebar-extend-width); }
   }
 
   html.dark #sidebar {
