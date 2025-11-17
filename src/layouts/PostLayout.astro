@@ -188,6 +188,11 @@ const {
         overflow-x: hidden;
       }
     }
+
+    @media (min-width: 640px) and (max-width: 1023px) {
+      .page-outer-container { max-width: calc(100% - 1rem); }
+      .content-pane { padding: 1.25rem; }
+    }
   </style>
 </body>
 </html>

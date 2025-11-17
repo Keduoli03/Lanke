@@ -123,6 +123,11 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
       }
     }
 
+    @media (min-width: 640px) and (max-width: 1023px) {
+      .page-outer-container { max-width: calc(100% - 1rem); }
+      .content-pane { padding: 1.25rem; }
+    }
+
     @media (max-width: 1023px) {
       html, body { touch-action: pan-y; }
     }

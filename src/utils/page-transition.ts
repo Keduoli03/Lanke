@@ -32,9 +32,22 @@ function isInternalAnchor(el){
   try{
     if(!el) return false;
     var a=el.closest('a');
-    if(!a||!a.href) return false;
+    if(!a) return false;
+    // 明确标记为不触发过渡
+    var noTransition = a.getAttribute('data-no-transition');
+    if(noTransition === 'true') return false;
+    // 无 href 或锚点占位，视为非导航
+    var hrefAttr = a.getAttribute('href')||'';
+    if(!hrefAttr || hrefAttr === '#' || hrefAttr.startsWith('javascript:')) return false;
     var u=new URL(a.href,window.location.href);
-    return u.origin===window.location.origin&&a.target!=='_blank';
+    // 内部导航且不新开窗口
+    if(u.origin===window.location.origin && a.target!=='_blank'){
+      // 同页面 hash 变化不触发加载
+      var sameDoc = u.pathname===window.location.pathname && u.search===window.location.search;
+      if(sameDoc && u.hash) return false;
+      return true;
+    }
+    return false;
   }catch(e){return false}
 }
 
