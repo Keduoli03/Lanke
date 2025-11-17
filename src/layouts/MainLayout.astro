@@ -103,7 +103,7 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
     @media (min-width: 1024px) {
       .main-content { padding: 2rem; }
       html[data-sidebar-open="true"] .main-content { margin-left: var(--sidebar-extend-width); }
-      html[data-sidebar-open="false"] .main-content { margin-left: var(--sidebar-width); }
+      html[data-sidebar-open="false"] .main-content { margin-left: 0; }
       .content-pane { padding: 2rem; }
     }
 
