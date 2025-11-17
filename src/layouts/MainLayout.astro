@@ -37,7 +37,8 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
 </head>
 <body class="bg-page text-primary" style={`
   --primary-hue: ${siteConfig.themeColor.hue};
-  --sidebar-width: ${siteConfig.sidebarWidth}; 
+  --sidebar-width: ${siteConfig.sidebarWidth};
+  --sidebar-extend-width: ${siteConfig.sidebarExtendWidth};
 `}>
 
   <ClientRouter />
@@ -100,7 +101,9 @@ const { title = siteConfig.title, description = siteConfig.description } = Astro
     }
 
     @media (min-width: 1024px) {
-      .main-content { padding: 2rem; margin-left: var(--sidebar-width); }
+      .main-content { padding: 2rem; }
+      html[data-sidebar-open="true"] .main-content { margin-left: var(--sidebar-extend-width); }
+      html[data-sidebar-open="false"] .main-content { margin-left: var(--sidebar-width); }
       .content-pane { padding: 2rem; }
     }
 

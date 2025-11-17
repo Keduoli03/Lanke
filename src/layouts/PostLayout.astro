@@ -43,6 +43,7 @@ const {
 <body class="bg-page text-primary" style={`
   --primary-hue: ${siteConfig.themeColor.hue};
   --sidebar-width: ${siteConfig.sidebarWidth};
+  --sidebar-extend-width: ${siteConfig.sidebarExtendWidth};
   --rail-width: ${railWidth};
   --content-rail-gap: 1.5rem; /* 主内容和侧边栏的间距 */
 `}>
@@ -158,7 +159,9 @@ const {
 
     /* 大屏幕适配：显示侧边栏 */
     @media (min-width: 1024px) {
-      .main-content { padding: 2rem; margin-left: var(--sidebar-width); }
+      .main-content { padding: 2rem; }
+      html[data-sidebar-open="true"] .main-content { margin-left: var(--sidebar-extend-width); }
+      html[data-sidebar-open="false"] .main-content { margin-left: var(--sidebar-width); }
       .post-rail { display: block; }
     }
 

@@ -136,6 +136,10 @@ const extendedLinks: ExtendedLink[] = [...links];
     width: var(--sidebar-width-wide);
   }
 
+  @media (min-width: 1024px) and (max-width: 1440px) {
+    #sidebar { --sidebar-width-narrow: var(--sidebar-width); }
+  }
+
   html.dark #sidebar {
     box-shadow: 2px 0 12px -5px rgba(0, 0, 0, 0.2);
   }

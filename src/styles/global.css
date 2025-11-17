@@ -47,6 +47,7 @@ textarea,
 :root {
   --page-width: 60rem;
   --sidebar-width: 4rem;
+  --sidebar-extend-width: 8rem;
   --content-rail-gap: 1.5rem;
   --rail-width: 12rem;
   --page-bg: hsl(var(--primary-hue), 45%, 96%); 
@@ -222,9 +223,9 @@ html.dark .content-pane { border: 1px solid var(--line-divider); box-shadow: non
   .content-pane { padding: 1rem; max-width: 100%; }
 }
 
-@media (min-width: 1024px) and (max-width: 1920px) {
+@media (min-width: 1024px) and (max-width: 1440px) {
   :root { 
-    --sidebar-width: 4rem; 
+    --sidebar-width: 2.5rem; 
     --page-width: clamp(48rem, calc(100vw - var(--sidebar-width) - var(--rail-width, 0px) - var(--content-rail-gap, 0px) - 4rem), 60rem); 
   }
 }
