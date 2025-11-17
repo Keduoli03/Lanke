@@ -45,6 +45,10 @@ textarea,
 }
 
 :root {
+  --page-width: 60rem;
+  --sidebar-width: 4rem;
+  --content-rail-gap: 1.5rem;
+  --rail-width: 12rem;
   --page-bg: hsl(var(--primary-hue), 45%, 96%); 
   --sidebar-bg: hsl(var(--primary-hue), 15%, 99.5%); 
   --content-pane-bg: hsl(0, 0%, 100%);

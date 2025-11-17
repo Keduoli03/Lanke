@@ -65,16 +65,22 @@ function hideLoader(){ try{ document.documentElement.classList.remove('layout-lo
 
 var __pt_touch=false; var __pt_drag=false; var __pt_x=0; var __pt_y=0;
 document.addEventListener('pointerdown',function(e){
-  if(e.pointerType==='touch'){ __pt_touch=true; __pt_drag=false; __pt_x=e.clientX||0; __pt_y=e.clientY||0; return; }
-  var t=e.target; if(t&&t instanceof Element&&isInternalAnchor(t)){ showLoader(); }
+  if(e.pointerType==='touch'){ __pt_touch=true; __pt_drag=false; __pt_x=e.clientX||0; __pt_y=e.clientY||0; }
 },true);
 document.addEventListener('pointermove',function(e){
   if(__pt_touch){ var dx=(e.clientX||0)-__pt_x; var dy=(e.clientY||0)-__pt_y; if(Math.abs(dx)>8||Math.abs(dy)>8){ __pt_drag=true; } }
 },true);
 document.addEventListener('pointerup',function(){ __pt_touch=false; __pt_drag=false; },true);
 document.addEventListener('pointercancel',function(){ __pt_touch=false; __pt_drag=false; },true);
-document.addEventListener('click',function(e){ if(__pt_drag){ __pt_touch=false; __pt_drag=false; return; } var t=e.target; if(t&&t instanceof Element&&isInternalAnchor(t)){ showLoader(); } },true);
+document.addEventListener('click',function(e){
+  if(__pt_drag){ __pt_touch=false; __pt_drag=false; return; }
+  if(e.defaultPrevented) return;
+  if(e.button!==0) return;
+  if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey) return;
+  var t=e.target; if(t&&t instanceof Element&&isInternalAnchor(t)){ showLoader(); }
+},true);
 
 document.addEventListener('astro:before-swap',function(){ showLoader(); });
 document.addEventListener('astro:after-swap',function(){ setTimeout(hideLoader,160); });
 document.addEventListener('astro:page-load',function(){ hideLoader(); });
+window.addEventListener('popstate',function(){ hideLoader(); });
