@@ -33,16 +33,23 @@ const { Content } = await render(friendPost);
           class="group flex flex-col p-4 sm:p-6 rounded-xl bg-[var(--content-pane-bg)] border border-[var(--line-divider)] shadow-sm hover:shadow-md transition-all duration-300 w-full hover:-translate-y-0.5 hover:ring-1 hover:ring-[var(--theme-color)]/20"
         >
           <div class="flex items-center mb-3">
-            {friend.imgurl && (
-              <img 
-                src={friend.imgurl} 
-                alt={friend.title} 
-                class="w-10 h-10 rounded-full mr-3 object-cover ring-2 ring-[var(--line-divider)] group-hover:ring-[var(--theme-color)]/50" 
-                loading="lazy"
-                onerror="this.onerror=null; this.src='/assets/default-avatar.png';"
-              />
-            )}
-            <h2 class="text-lg font-semibold text-[var(--text-primary)] truncate group-hover:text-[var(--theme-color)]">{friend.title}</h2>
+            <div class="mr-3" data-title={friend.title}>
+              {friend.imgurl ? (
+                <img 
+                  src={friend.imgurl} 
+                  alt={friend.title} 
+                  class="w-10 h-10 rounded-full object-cover ring-2 ring-[var(--line-divider)] group-hover:ring-[var(--theme-color)]/50" 
+                  loading="lazy"
+                  decoding="async"
+                  onerror="(function(el){var wrap=el.parentElement; el.style.display='none'; var t=(wrap.getAttribute('data-title')||'').trim(); var letter=t? t[0].toUpperCase():'?'; var s=document.createElement('span'); s.className='w-10 h-10 rounded-full flex items-center justify-center font-semibold ring-2 ring-[var(--line-divider)] group-hover:ring-[var(--theme-color)]/50 bg-[var(--sidebar-icon-bg)] text-[var(--text-primary)]'; s.textContent=letter; wrap.appendChild(s);})(this)"
+                />
+              ) : (
+                <span class="w-10 h-10 rounded-full flex items-center justify-center font-semibold ring-2 ring-[var(--line-divider)] group-hover:ring-[var(--theme-color)]/50 bg-[var(--sidebar-icon-bg)] text-[var(--text-primary)]">
+                  {(friend.title || '?').charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
+            <h2 class="text-lg font-semibold text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--theme-color)]" title={friend.title} style="overflow-wrap: break-word; word-break: break-all;">{friend.title}</h2>
           </div>
           
           <!-- 强制长文本换行，避免撑开宽度 -->

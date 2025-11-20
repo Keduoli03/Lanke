@@ -123,4 +123,18 @@ export const items = [
 		siteurl: "https://www.sumi233.top/",
 		tags: ["友链"],
 	},
+	{
+		title: "蘇 SU",
+		imgurl: "https://suus.me/avatar.webp",
+		desc: "在数字的海洋中，寻找属于自己的星辰。",
+		siteurl: "https://suus.me/",
+		tags: ["友链"],
+	},
+	{
+		title: "Evilrabbit Blog",
+		imgurl: "https://blog.yujiay.wang/images/site/BlogHsvg.png",
+		desc: "爱 Coding 爱生活",
+		siteurl: "https://blog.yujiay.wang/",
+		tags: ["友链"],
+	}
 ];
