@@ -24,6 +24,9 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
           <Icon slot="palette-icon" name="material-symbols:palette-outline" class="bottom-bar-icon h-5 w-5 cursor-pointer" />
           <Icon slot="reset-icon" name="fa6-solid:arrow-rotate-left" class="text-xs" />
         </ThemeSwitch>
+            <button aria-label="Search" class="btn-plain scale-animation rounded-lg h-9 w-9 active:scale-90 text-[var(--deep-text)] flex items-center justify-center" id="mobile-search-btn">
+                <Icon name="ri:search-line" class="h-5 w-5" />
+            </button>
             <button aria-label="Menu" class="btn-plain scale-animation rounded-lg h-9 w-9 active:scale-90 text-[var(--deep-text)] flex items-center justify-center" id="mobile-menu-toggle">
                 <Icon name="material-symbols:menu" class="h-5 w-5" id="mobile-menu-icon-open" />
                 <Icon name="material-symbols:close" class="h-5 w-5 hidden" id="mobile-menu-icon-close" />
@@ -35,6 +38,14 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
     <div id="mobile-nav-panel" class="fixed top-14 right-0 w-28 bg-[var(--sidebar-bg)] border border-[var(--line-divider)] z-30 transform translate-x-full opacity-0 transition-all duration-300 shadow-xl rounded-bl-lg">
         <nav class="p-2">
             <ul class="space-y-1">
+                <li>
+                    <button id="mobile-panel-search" class="transition-all group nav-link flex flex-row items-center p-2 w-full rounded-lg">
+                        <div class="w-6 h-6 rounded-full bg-[var(--sidebar-icon-bg)] flex items-center justify-center mr-2 transition-all relative">
+                            <Icon name="ri:search-line" class="text-sm text-[var(--sidebar-icon-symbol)]" />
+                        </div>
+                        <span class="text-sm text-[var(--text-secondary)] text-left flex-1 truncate font-bold">搜索</span>
+                    </button>
+                </li>
                 {links.map((l) => {
                 const linkPath = url(l.url);
                 return (
@@ -74,6 +85,8 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
         const panel = document.getElementById('mobile-nav-panel');
         const iconOpen = document.getElementById('mobile-menu-icon-open');
         const iconClose = document.getElementById('mobile-menu-icon-close');
+        const searchBtn = document.getElementById('mobile-search-btn');
+        const panelSearchBtn = document.getElementById('mobile-panel-search');
 
         if (!menuToggle || !panel || !iconOpen || !iconClose) {
             return;
@@ -103,6 +116,22 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
                 openPanel();
             }
         });
+
+        // 搜索触发：顶部按钮
+        if (searchBtn) {
+            searchBtn.addEventListener('click', () => {
+                if (panel) closePanel();
+                window.dispatchEvent(new CustomEvent('search:open'));
+            });
+        }
+
+        // 搜索触发：面板内按钮
+        if (panelSearchBtn) {
+            panelSearchBtn.addEventListener('click', () => {
+                closePanel();
+                window.dispatchEvent(new CustomEvent('search:open'));
+            });
+        }
 
         // 在页面切换前，确保菜单是关闭的
         document.addEventListener('astro:before-swap', closePanel);
