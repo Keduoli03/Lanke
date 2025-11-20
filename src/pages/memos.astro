@@ -189,18 +189,26 @@ const title = '说说';
 
       async function loadArtalk(btn) {
         const id = btn.getAttribute('data-id') || '';
+        const item = btn.closest('.memos-item');
+        if (!item) return;
         const container = document.getElementById('memos-comment-global');
         if (!container) return;
 
-        if (window.__memosCommentId === id && !container.classList.contains('d-none')) {
+        const isOpen = !container.classList.contains('d-none');
+        const currentId = container.getAttribute('data-current-id') || '';
+
+        if (isOpen && currentId === id) {
           container.classList.add('d-none');
           container.innerHTML = '';
+          container.removeAttribute('data-current-id');
           window.__memosCommentId = null;
           return;
         }
 
         container.classList.remove('d-none');
         container.innerHTML = '<div id="artalk"></div>';
+        container.setAttribute('data-current-id', id);
+        item.insertAdjacentElement('afterend', container);
 
         const Artalk = await ensureArtalk();
         Artalk.init({
@@ -213,7 +221,6 @@ const title = '说说';
         });
 
         window.__memosCommentId = id;
-        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
       function updateMemoList(data = []) {
@@ -288,14 +295,15 @@ const title = '说说';
       // 点击页面空白处关闭评论容器
       document.addEventListener('click', (e) => {
         const t = e.target;
-        const c1 = document.getElementById('memos-comment-global');
-        const insideComment = !!t.closest('#memos-comment-global');
         const isBtn = !!t.closest('.memos-comments');
-        if (insideComment || isBtn) return;
-        if (c1 && !c1.classList.contains('d-none')) { 
-          c1.classList.add('d-none'); 
-          c1.innerHTML=''; 
-          window.__memosCommentId=null; 
+        const isGlobal = !!t.closest('#memos-comment-global');
+        if (isBtn || isGlobal) return;
+        const c1 = document.getElementById('memos-comment-global');
+        if (c1 && !c1.classList.contains('d-none')) {
+          c1.classList.add('d-none');
+          c1.innerHTML='';
+          c1.removeAttribute('data-current-id');
+          window.__memosCommentId = null;
         }
       });
 
@@ -308,7 +316,7 @@ const title = '说说';
         memoGrid.innerHTML = '';
         if (loadMoreContainer) loadMoreContainer.innerHTML = '';
         const c1 = document.getElementById('memos-comment-global');
-        if (c1) { c1.classList.add('d-none'); c1.innerHTML = ''; }
+        if (c1) { c1.classList.add('d-none'); c1.innerHTML = ''; c1.removeAttribute('data-current-id'); }
         window.__memosCommentId = null;
         getFirstPageMemos();
       });
@@ -464,6 +472,16 @@ const title = '说说';
   }
 
   .comment-global {
+    width: 100%;
+    margin: 0.6rem 0;
+    padding: 0.6rem;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-bg-1);
+    column-span: all;
+  }
+
+  .comment {
     width: 100%;
     margin: 0.6rem 0;
     padding: 0.6rem;
