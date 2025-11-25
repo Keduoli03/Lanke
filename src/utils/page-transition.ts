@@ -77,7 +77,26 @@ document.addEventListener('click',function(e){
   if(e.defaultPrevented) return;
   if(e.button!==0) return;
   if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey) return;
-  var t=e.target; if(t&&t instanceof Element&&isInternalAnchor(t)){ showLoader(); }
+  var t=e.target;
+  try{
+    var dlg = document.getElementById('md-lightbox-dialog') as any;
+    var dialogOpen = !!(dlg && (dlg.open === true));
+    if(dialogOpen) return; // 灯箱打开时不触发加载动画
+    if(t && t instanceof Element){
+      // 点击在灯箱内部不触发
+      if(t.closest && (t.closest('#md-lightbox-dialog') || t.closest('.md-lightbox'))) return;
+
+      // 若为图片预览链接，跳过加载动画
+      var a = t.closest('a');
+      if(a){
+        var hrefAttr = a.getAttribute('href')||'';
+        var hasLightboxAttr = a.hasAttribute('data-lightbox') || a.hasAttribute('data-pswp-src');
+        var isImageHref = /\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(hrefAttr);
+        if(hasLightboxAttr || isImageHref || a.classList.contains('md-lightbox')) return;
+      }
+      if(isInternalAnchor(t)){ showLoader(); }
+    }
+  }catch(err){ if(t&&t instanceof Element&&isInternalAnchor(t)){ showLoader(); } }
 },true);
 
 document.addEventListener('astro:before-swap',function(){ showLoader(); });

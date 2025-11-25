@@ -80,6 +80,7 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
                         data-year={year}
                         data-categories={categoriesAttr}
                         data-tags={tagsAttr}
+                        data-column={post.data.column || ''}
                       >
                         <div class="post-connector"></div>
                         <time class="post-date">{formatFullDate(new Date(post.data.date))}</time>
@@ -525,19 +526,22 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
     const subtitleEl = containerEl.querySelector<HTMLElement>('.archive-subtitle');
     const emptyEl = containerEl.querySelector<HTMLElement>('.archive-empty');
 
-    const getSelectedFromURL = (): { categories: string[]; tags: string[] } => {
+    const getSelectedFromURL = (): { categories: string[]; tags: string[]; columns: string[] } => {
       const params = new URLSearchParams(window.location.search);
       const cat = params.get('分类') || '';
       const cats = cat ? [cat] : [];
       const tags = params.getAll('标签');
-      return { categories: cats, tags };
+      const column = params.get('专栏') || '';
+      const columns = column ? [column] : [];
+      return { categories: cats, tags, columns };
     };
 
-    function updateVisibility(container: HTMLElement, selected: { categories: string[]; tags: string[] }) {
+    function updateVisibility(container: HTMLElement, selected: { categories: string[]; tags: string[]; columns?: string[] }) {
       const posts = Array.from(container.querySelectorAll<HTMLElement>('.post-item'));
       posts.forEach(li => {
         const cats = (li.getAttribute('data-categories') || '').split('|').filter(Boolean);
         const tags = (li.getAttribute('data-tags') || '').split('|').filter(Boolean);
+        const column = (li.getAttribute('data-column') || '');
 
         const matchCategory =
           selected.categories.length === 0 ||
@@ -547,7 +551,8 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
           selected.tags.length === 0 ||
           selected.tags.every((t: string) => tags.includes(t));
 
-        li.style.display = matchCategory && matchTag ? '' : 'none';
+        const matchColumn = !selected.columns || selected.columns.length === 0 || selected.columns.includes(column);
+        li.style.display = matchCategory && matchTag && matchColumn ? '' : 'none';
       });
 
       let totalVisible = 0;
@@ -575,8 +580,9 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
     window.addEventListener(
       'filters:changed',
       ((e: Event) => {
-        const detail = (e as CustomEvent<{ categories: string[]; tags: string[] }>).detail;
-        updateVisibility(containerEl, detail || { categories: [], tags: [] });
+        const detail = (e as CustomEvent<{ categories: string[]; tags: string[]; columns?: string[] }>).detail;
+        const fallback = { categories: [], tags: [], columns: [] };
+        updateVisibility(containerEl, detail || fallback);
       }) as EventListener
     );
 

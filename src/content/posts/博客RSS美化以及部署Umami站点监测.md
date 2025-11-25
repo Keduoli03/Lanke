@@ -5,8 +5,8 @@ categories:
   - 博客
 tags:
   - 博客
-series: 博客
-cover: 
+column: 博客
+cover:
 status: 已完成
 date: 2025-05-17 19:22
 updated: 2025-05-31 23:35

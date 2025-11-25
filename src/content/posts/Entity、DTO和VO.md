@@ -7,11 +7,11 @@ tags:
   - 笔记
   - 后端
   - SpringBoot
-series: SpringBoot
-cover: 
+column: SpringBoot
+cover:
 status: 未完成
 date: 2025-05-30 20:35
-updated: 2025-05-31 23:31
+updated: 2025-11-25 22:25
 slug: "894321"
 ---
 

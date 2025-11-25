@@ -10,7 +10,7 @@ cover: https://api.mtyqx.cn/tapi/random.php
 status: 已完成
 date: 2025-03-22 17:35
 updated: 2025-05-31 23:58
-series: SpringBoot
+column: SpringBoot
 slug: "234253"
 ---
 

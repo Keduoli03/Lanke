@@ -76,7 +76,7 @@ const extendedLinks: ExtendedLink[] = [...links];
   </nav>
 
   <aside class="p-2 border-t border-[var(--line-divider)]">
-    <div class="flex flex-col items-center gap-2 sidebar-text">
+    <div class="bottom-bar flex flex-col items-center gap-2 sidebar-text">
       <button id="open-search-btn" class="w-full flex items-center p-1 nav-link rounded-lg">
         <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center relative shadow-md" style="background-color: var(--sidebar-icon-bg)">
           <Icon name="ri:search-line" class="icon h-5 w-5" />
@@ -117,7 +117,7 @@ const extendedLinks: ExtendedLink[] = [...links];
     transition: width 300ms ease, box-shadow 0.3s ease;
     display: grid;
     grid-template-rows: 60px 1fr auto;
-    --bottom-bar-height: 14rem;
+    --bottom-bar-height: 4.5rem;
   }
 
   html.no-sidebar-transition #sidebar {
@@ -284,6 +284,19 @@ const extendedLinks: ExtendedLink[] = [...links];
   #sidebar nav { scrollbar-gutter: stable; min-height: 0; padding-bottom: var(--bottom-bar-height); }
   #sidebar aside { position: absolute; bottom: 0; left: 0; right: 0; height: var(--bottom-bar-height); background-color: var(--sidebar-bg); }
   #sidebar aside * { transition: none !important; }
+
+  .bottom-bar { display: flex; padding: 0.25rem; gap: 0.5rem; }
+  .bottom-bar .nav-link { padding: 0.25rem; }
+  .bottom-bar-icon { border: 2px solid transparent; }
+  .bottom-bar .nav-link:hover .bottom-bar-icon { border-color: var(--theme-color); }
+  html[data-sidebar-open="false"] #sidebar .bottom-bar { flex-direction: column; align-items: center; justify-content: center; }
+  html[data-sidebar-open="true"] #sidebar .bottom-bar { flex-direction: column; align-items: center; justify-content: flex-start; }
+  #sidebar { --bottom-bar-height-collapsed: 5、8rem; --bottom-bar-height-expanded: 14rem; }
+  #sidebar { --bottom-bar-height: var(--bottom-bar-height-collapsed); }
+  html[data-sidebar-open="true"] #sidebar { --bottom-bar-height: var(--bottom-bar-height-expanded); }
+
+  /* 折叠时隐藏文字，仅显示图标 */
+  html[data-sidebar-open="false"] #sidebar .bottom-bar .sidebar-text { display: none; }
 </style>
 
 <script>

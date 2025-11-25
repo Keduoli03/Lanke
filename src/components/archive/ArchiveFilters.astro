@@ -12,13 +12,11 @@ const categories = await getAllCategories();
 const tags = await getAllTags();
 ---
 
-<!-- 容器完全复制目录的 toc-container 样式，宽度100%填满父容器 -->
 <div class:list={[
   "category-filter-container sticky top-6 p-4 bg-content-pane dark:bg-content-pane rounded-lg border border-border shadow-sm",
   className
 ]} data-expanded={defaultExpanded}>
   <div class="combined-content" data-expanded="true">
-    <!-- 分类 section：完全对齐目录标题样式 -->
     <div class="section">
       <h4 class="section-title flex items-center gap-3 mb-5 pb-3 border-b border-border">
         <div class="flex items-center justify-center w-7 h-7 rounded-full bg-theme/10">
@@ -197,8 +195,8 @@ const tags = await getAllTags();
     font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin: 0 0 1.25rem 0;
-    padding-bottom: 0.75rem;
+    margin: 0 0 0.5rem 0 !important;
+    padding-bottom: 0.35rem !important;
     border-bottom: 1px solid var(--border-color);
   }
 
@@ -278,6 +276,8 @@ const tags = await getAllTags();
     .section-title {
       font-size: 0.9rem;
       gap: 0.5rem;
+      margin-bottom: 0.45rem !important;
+      padding-bottom: 0.3rem !important;
     }
 
     .filter-list {

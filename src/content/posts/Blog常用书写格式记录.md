@@ -6,7 +6,7 @@ categories:
 tags:
   - 笔记
   - 博客
-series: 博客
+column: 博客
 cover:
 status: 已完成
 date: 2025-04-23 00:47

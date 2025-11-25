@@ -40,12 +40,12 @@
       const s = document.getElementById('sd-status');
       const l = document.getElementById('sd-list');
       const i = document.getElementById('sd-input');
-      if (!o || !s || !l || !(i instanceof HTMLInputElement)) return;
+      if (!o) return;
       o.style.display = 'none';
       unlockScroll();
-      i.value = '';
-      s.textContent = '';
-      l.innerHTML = '';
+      if (i instanceof HTMLInputElement) { i.value = ''; }
+      if (s) { s.textContent = ''; }
+      if (l) { l.innerHTML = ''; }
       selected = -1;
     }
     const runSearch = async () => {
@@ -105,7 +105,7 @@
         const o = document.getElementById('sd-overlay');
         const l = document.getElementById('sd-list');
         if (!o || o.style.display === 'none') return;
-        // 移除 ESC 关闭，避免误触
+        if (e.key === 'Escape') { e.preventDefault(); closeDialog(); return; }
         if (e.key === 'ArrowDown'){
           const count = l ? l.children.length : 0;
           selected = Math.min(selected + 1, count - 1);
@@ -125,6 +125,12 @@
           }
         }
       }, { capture: true });
+      const overlay = document.getElementById('sd-overlay');
+      if (overlay) {
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) { e.preventDefault(); e.stopPropagation(); closeDialog(); }
+        });
+      }
     })();
   </script>
 </div>

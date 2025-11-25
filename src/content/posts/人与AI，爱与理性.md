@@ -6,7 +6,7 @@ categories:
 tags:
   - 生活
   - 动漫
-series: 动漫
+column: 动漫
 cover: https://gcore.jsdelivr.net/gh/Keduoli03/My_img@img/p2638160918.webp
 status: 已完成
 date: 2025-05-24 15:43

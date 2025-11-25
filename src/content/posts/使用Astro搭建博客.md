@@ -8,25 +8,29 @@ tags:
 cover: http://www.98qy.com/sjbz/api.php
 status: 已完成
 date: 2025-04-03 11:40
-updated: 2025-08-12 13:30
-series: 博客
+updated: 2025-11-25 22:27
+column: 博客
 slug: "107368"
 ---
 
 ## 为什么选择 Astro
+
 **Astro** 是一个现代化的静态站点生成框架，其核心目标是帮助开发者创建 **快速、轻量、且以内容为核心** 的网站。它于 2021 年首次发布，由于其独特的设计理念和对性能的极致追求，迅速在开发者社区中崭露头角。
 
 ### 推荐什么人适合 Astro
+
 1. 想亲手打造独具一格的博客
 2. 对编程有耐心
 3. 能读懂官方文档并原因钻研
 
 ## 本章目标
+
 1. 本地部署 Astro
 2. 部署到 Vercel 或 GitHub Pages
 3. 配置主题并优化
 
 ### 所需环境
+
 - node >= 18.14.1
 - 文本编辑器(VsCode)
 
@@ -83,6 +87,7 @@ pnpm add sharp
 在 `src/config.ts` 进行站点配置
 
 ### 页面配置
+
 #### 关于页面
 
 在 `src\content\spec\about.md` 进行配置
@@ -98,6 +103,7 @@ pnpm add sharp
 - [给你的Fuwari添加一个友链页面 - AULyPc](https://blog.aulypc0x0.online/posts/add_friendspage_in_fuwari/)
 
 ####  添加一个系列页面
+
 **参考文章**
 - [在Fuwari中添加系列栏 - 伊卡的记事本](https://ikamusume7.org/posts/frontend/add_series_field/)
 

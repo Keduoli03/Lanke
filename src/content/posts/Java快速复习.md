@@ -6,11 +6,11 @@ categories:
 tags:
   - 笔记
   - Java
-series: Java面试
+column: Java面试
 status: 未完成
 pinned: false
 date: 2025-09-07 15:43
-updated: 2025-11-17 12:04
+updated: 2025-11-25 15:37
 slug: "247840"
 ---
 
@@ -37,9 +37,6 @@ slug: "247840"
 
 ---
 
-著作权归JavaGuide(javaguide.cn)所有 基于MIT协议 原文链接：https://javaguide.cn/java/basis/java-basic-questions-01.html
----
-
 ## Java SE 和 Java EE
 
 - Java SE（Java Platform，Standard Edition）: Java 平台标准版，Java 编程语言的基础，它包含了支持 Java 应用程序开发和运行的核心类库以及虚拟机等核心组件。Java SE 可以用于构建桌面应用程序或简单的服务器应用程序。
@@ -61,7 +58,7 @@ Java 从源代码到运行的过程：![[Java快速复习-202509071609.png]]
 
 ![[Java快速复习-202509071612.png]]
 
-## JVM、JDK 以及 JRE
+## JVM、JDK 以及 JRE（重点）
 
 ### JVM
 

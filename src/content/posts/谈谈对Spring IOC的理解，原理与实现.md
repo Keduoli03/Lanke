@@ -7,8 +7,8 @@ tags:
   - 后端
   - 面试
   - SpringBoot
-series: Java面试
-cover: 
+column: Java面试
+cover:
 status: 未完成
 date: 2025-05-12 11:30
 updated: 2025-05-31 23:41

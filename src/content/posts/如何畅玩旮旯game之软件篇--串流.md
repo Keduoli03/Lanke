@@ -5,7 +5,7 @@ categories:
   - 大杂烩
 tags:
   - 小技巧
-series:
+column:
 cover:
 status: 已完成
 pinned: false

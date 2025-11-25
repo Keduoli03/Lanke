@@ -47,6 +47,11 @@ export const navBarConfig: NavBarConfig = {
       url: "/archive",
       icon: "material-symbols:article-outline",
     },
+    columns: {
+      name: "专栏",
+      url: "/columns",
+      icon: "material-symbols:view-list-outline-rounded",
+    },
     friends: {
       name: "友链",
       url: "/friends",

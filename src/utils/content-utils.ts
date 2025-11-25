@@ -114,3 +114,37 @@ export async function getPostsByTag(tag: string): Promise<CollectionEntry<'posts
   const posts = await getPublishedPosts();
   return posts.filter(post => post.data.tags?.includes(tag));
 }
+
+// 获取所有专栏及其文章数量
+export async function getAllColumns(): Promise<{ name: string; count: number; posts: CollectionEntry<'posts'>[] }[]> {
+  const posts = await getPublishedPosts();
+  const columnMap = new Map<string, CollectionEntry<'posts'>[]>();
+
+  posts.forEach(post => {
+    const column = post.data.column || '';
+    if (!column) return;
+    if (!columnMap.has(column)) {
+      columnMap.set(column, []);
+    }
+    columnMap.get(column)!.push(post);
+  });
+
+  return Array.from(columnMap.entries()).map(([name, posts]) => ({
+    name,
+    count: posts.length,
+    posts,
+  })).sort((a, b) => b.count - a.count);
+}
+
+// 根据专栏获取文章
+export async function getPostsByColumn(column: string): Promise<CollectionEntry<'posts'>[]> {
+  const posts = await getPublishedPosts();
+  const target = (column || '').trim();
+  return posts.filter(post => ((post.data.column || '').trim()) === target);
+}
+
+// 获取所有带专栏的文章并保持置顶+日期排序
+export async function getSortedPostsWithColumn(): Promise<CollectionEntry<'posts'>[]> {
+  const posts = await getSortedPosts();
+  return posts.filter(post => !!post.data.column);
+}
