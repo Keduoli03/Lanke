@@ -136,5 +136,12 @@ export const items = [
 		desc: "爱 Coding 爱生活",
 		siteurl: "https://blog.yujiay.wang/",
 		tags: ["友链"],
+	},
+	{
+		title: "两个笨笨",
+		imgurl: "https://pan.mkirin.top/f/9Bt9/icon.png",
+		desc: "两个笨笨的blog",
+		siteurl: "https://mkirin.top",
+		tags: ["友链"],
 	}
 ];
