@@ -36,7 +36,7 @@ export const siteConfig: SiteConfig = {
 
   // Live2D 开关
   live2d: {
-    enable: true,
+    enable: false,
   },
 };
 
