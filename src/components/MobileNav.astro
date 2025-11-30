@@ -47,14 +47,15 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
                     </button>
                 </li>
                 {links.map((l) => {
-                const linkPath = url(l.url);
+                const isExternal = !!l.external || /^https?:\/\//.test(l.url);
+                const linkPath = isExternal ? l.url : url(l.url);
                 return (
                     <li transition:name={`mobile-link-${l.url}`}>
                     <a
-                        href={l.external ? l.url : linkPath}
-                        target={l.external ? '_blank' : '_self'}
-                        rel={l.external ? 'noopener noreferrer' : ''}
-                        data-astro-prefetch={l.external ? "false" : "tap"}
+                        href={linkPath}
+                        target={isExternal ? '_blank' : '_self'}
+                        rel={isExternal ? 'noopener noreferrer' : ''}
+                        data-astro-prefetch={isExternal ? "false" : "tap"}
                         class="transition-all group nav-link flex flex-row items-center p-2 w-full rounded-lg"
                         data-navigation-link
                     >
@@ -64,7 +65,7 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
                         <span class="text-sm text-[var(--text-secondary)] text-left flex-1 truncate font-bold">
                         {l.name}
                         </span>
-                        {l.external && (
+                        {isExternal && (
                         <Icon
                             name="fa6-solid:arrow-up-right-from-square"
                             class="text-xs text-[var(--deep-text)]/70 ml-auto flex-shrink-0"
