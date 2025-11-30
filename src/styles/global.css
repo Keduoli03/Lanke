@@ -21,27 +21,31 @@ html, body {
 	touch-action: manipulation;
 }
 
-/* 禁用所有元素的用户选择和拖拽（可选，根据需要调整） */
-* {
-	/* 禁用长按时的上下文菜单 */
-	-webkit-touch-callout: none;
-	/* 禁用文本选择 */
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
+/* 默认允许文本选择；仅在交互控件上禁用选择避免误触 */
+button,
+.nav-link,
+.icon-container,
+#sidebar-toggle,
+.toggle-pill,
+.sd-close,
+.sd-search {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
-/* 允许文章内容和输入框的文本选择 */
-article, 
-.prose, 
-input, 
-textarea, 
+/* 确保主要内容区域与输入可选中 */
+.content-pane,
+article,
+.prose,
+input,
+textarea,
 [contenteditable] {
-	-webkit-user-select: text;
-	-moz-user-select: text;
-	-ms-user-select: text;
-	user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
 
 :root {
@@ -253,5 +257,4 @@ html.to-light::view-transition-old(root) {
   animation: conceal 0.5s ease-in forwards !important;
   z-index: 1;
 }
-
 

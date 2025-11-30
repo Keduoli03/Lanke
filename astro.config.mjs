@@ -18,7 +18,6 @@ import { pluginFileIcons } from "@xt0rted/expressive-code-file-icons";
 import { expressiveCodeConfig, siteConfig } from './src/config';
 import rehypeCallouts from "rehype-callouts";
 import remarkAplayer from './src/plugins/rehype-component-aplayer.mjs';
-// 删除：import remarkImageWrapper from './src/plugins/remark-image-wrapper.mjs'
 import rehypeImageLightbox from './src/plugins/rehype-image-lightbox.mjs';
 import pagefind from 'astro-pagefind';
 
@@ -35,7 +34,6 @@ export default defineConfig({
       remarkDirective,
       remarkGithubCard,
       remarkAplayer,
-      // 删除：remarkImageWrapper
     ],
     rehypePlugins: [
       [rehypeCallouts, { theme: "github" }],
@@ -49,7 +47,6 @@ export default defineConfig({
           properties: { className: ['anchor'] },
         },
       ],
-      // 新增：在 Astro 完成图片处理后再包裹 Lightbox
       rehypeImageLightbox,
     ],
     shikiConfig: {

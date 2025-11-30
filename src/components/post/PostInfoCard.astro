@@ -70,26 +70,26 @@ const fullPostUrl = postUrl;
 
 <style>
   .post-info-card {
-    --card-bg: color-mix(in srgb, var(--theme-color) 5%, var(--content-pane-bg));
-    --card-border: color-mix(in srgb, var(--theme-color) 20%, transparent);
-    --card-shadow: color-mix(in srgb, var(--theme-color) 15%, transparent);
+    --card-bg: color-mix(in srgb, var(--theme-color) 10%, var(--content-pane-bg));
+    --card-border: color-mix(in srgb, var(--theme-color) 18%, transparent);
+    --card-shadow: color-mix(in srgb, var(--theme-color) 8%, transparent);
 
     background-color: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: 0.75rem;
-    margin-top: 2rem;
-    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    padding: 0.75rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    box-shadow: 0 2px 8px var(--card-shadow);
-    transition: all 0.3s ease;
+    gap: 0.75rem;
+    box-shadow: 0 1px 6px var(--card-shadow);
+    transition: all 0.2s ease;
   }
 
   html.dark .post-info-card {
-    --card-bg: color-mix(in srgb, var(--theme-color) 20%, var(--content-pane-bg));
-    --card-border: color-mix(in srgb, var(--theme-color) 50%, transparent);
-    --card-shadow: color-mix(in srgb, var(--theme-color) 20%, transparent);
+    --card-bg: color-mix(in srgb, var(--theme-color) 22%, var(--content-pane-bg));
+    --card-border: color-mix(in srgb, var(--theme-color) 30%, transparent);
+    --card-shadow: color-mix(in srgb, var(--theme-color) 10%, transparent);
   }
 
   .info-section {
@@ -132,7 +132,7 @@ const fullPostUrl = postUrl;
 
   .actions-section {
     border-top: 1px solid var(--card-border);
-    padding-top: 1rem;
+    padding-top: 0.5rem;
     display: flex;
     justify-content: center;
   }
@@ -140,42 +140,41 @@ const fullPostUrl = postUrl;
   .share-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    background: var(--theme-color);
-    color: var(--text-on-theme, #fff);
-    border: none;
+    gap: 0.4rem;
+    background: var(--tag-bg);
+    color: var(--theme-color);
+    border: 1px solid color-mix(in srgb, var(--theme-color) 35%, transparent);
     border-radius: 9999px;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.825rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px -3px color-mix(in srgb, var(--theme-color) 50%, transparent);
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 6px -3px color-mix(in srgb, var(--theme-color) 35%, transparent);
   }
 
   .share-btn:hover {
-    transform: translateY(-2px) scale(1.02);
-    background: color-mix(in srgb, var(--theme-color) 90%, #000);
-    box-shadow: 0 4px 12px -5px color-mix(in srgb, var(--theme-color) 45%, transparent);
+    transform: translateY(-1px);
+    border-color: var(--theme-color);
   }
   
   .share-btn:active {
-    transform: translateY(-1px) scale(0.98);
-    box-shadow: 0 2px 8px -3px color-mix(in srgb, var(--theme-color) 50%, transparent);
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 1px 6px -3px color-mix(in srgb, var(--theme-color) 35%, transparent);
   }
 
   .share-btn .share-icon {
-    width: 1rem;
-    height: 1rem;
+    width: 0.95rem;
+    height: 0.95rem;
   }
 
   /* 移动端特定样式 */
   @media (max-width: 640px) {
     .post-info-card {
-      margin-top: 1.5rem;
-      padding: 0.875rem;
-      border-radius: 0.625rem;
-      gap: 0.875rem;
+      margin-top: 1rem;
+      padding: 0.625rem;
+      border-radius: 0.5rem;
+      gap: 0.75rem;
     }
     
     .info-section {
@@ -191,13 +190,13 @@ const fullPostUrl = postUrl;
     }
     
     .actions-section {
-      padding-top: 0.875rem;
+      padding-top: 0.5rem;
     }
     
     .share-btn {
-      padding: 0.375rem 0.875rem;
+      padding: 0.35rem 0.75rem;
       font-size: 0.8rem;
-      gap: 0.375rem;
+      gap: 0.35rem;
     }
     
     .share-btn .share-icon {
@@ -211,7 +210,7 @@ const fullPostUrl = postUrl;
     .post-info-card {
       flex-direction: row;
       align-items: center;
-      padding: 1.25rem;
+      padding: 1rem;
     }
     
     .info-section {
@@ -223,21 +222,21 @@ const fullPostUrl = postUrl;
       border-top: none;
       border-left: 1px solid var(--card-border);
       padding-top: 0;
-      padding-left: 1.25rem;
+      padding-left: 1rem;
       justify-content: flex-start;
       align-items: center;
     }
     
     .share-btn {
-      padding: 0.625rem 1.25rem;
-      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
     }
   }
 
   /* 大屏幕样式 */
   @media (min-width: 1024px) {
     .post-info-card {
-      padding: 1.5rem;
+      padding: 1.25rem;
     }
     
     .info-label {
@@ -249,8 +248,8 @@ const fullPostUrl = postUrl;
     }
     
     .share-btn {
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
+      padding: 0.6rem 1.25rem;
+      font-size: 0.9rem;
     }
   }
 </style>
