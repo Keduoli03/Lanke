@@ -143,5 +143,11 @@ export const items = [
 		desc: "两个笨笨的blog",
 		siteurl: "https://mkirin.top",
 		tags: ["友链"],
+	},{
+		title: '吐司气泡',
+		imgurl: 'https://blog.toastbubble.top/avatar.webp',
+		desc: '追求源于热爱',
+		siteurl: 'https://blog.toastbubble.top/',
+		tags: ['友链'],
 	}
 ];
