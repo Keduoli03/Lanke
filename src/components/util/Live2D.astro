@@ -1,0 +1,358 @@
+<div id="oml2d-root"></div>
+<!-- oh-my-live2d 看板娘 -->
+<script type="module">
+  import { loadOml2d, type ModelOptions } from "oh-my-live2d";
+  import { siteConfig } from "@/config";
+
+  const modelList: ModelOptions[] = [
+    {
+      path: 'https://model.hacxy.cn/HK416-1-normal/model.json',
+      position: [0, 60],
+      scale: 0.08,
+      stageStyle: {
+        height: 300,
+        width: 270
+      }
+    }
+  ];
+
+  let oml2d = (typeof window !== 'undefined' ? (window as any).__oml2d : null);
+  if (!oml2d && siteConfig.live2d?.enable) {
+    oml2d = loadOml2d({
+      dockedPosition: "right",
+      models: modelList,
+      mobileDisplay: false,
+      statusBar: {
+        restMessage: '看板娘休息中',
+        loadingIcon: 'icon-loading'
+      },
+      tips: {
+        // 添加样式配置
+        style: {
+          top: '-25px',
+          fontSize: '12px',
+          // 或者使用 transform
+          transform: 'translateY(-10px) translateX(15px)',  // Y轴上移，X轴右移
+          // 或者使用 marginLeft
+          marginLeft: '15px'      // 右边距15px
+        },
+        idleTips: {
+          wordTheDay(wordTheDayData) {
+            return `${wordTheDayData.hitokoto} -来自 ${wordTheDayData.from}`;
+          }
+        }
+      },
+      // Menu configuration with all items
+      menus: {
+        disable: false,
+        // 添加样式配置，让菜单往右移动
+        style: {
+          transform: 'translateX(40px)',  // 距离右边的距离，可以调整数值
+          // 或者使用 left 属性
+          // left: '300px'  // 距离左边的距离
+        },
+        items: [
+          {
+            id: 'hitokoto',
+            title: '一言',
+            icon: 'icon-like',
+            onClick(oml2d) {
+              // 定义API源配置（按优先级排序）
+              const API_SOURCES = [
+                {
+                  url: 'https://international.v1.hitokoto.cn',
+                  parser: (data: { hitokoto: string; from: string }) => `${data.hitokoto} —— ${data.from}`
+                },
+                {
+                  url: 'https://v1.hitokoto.cn?encode=json&charset=utf-8',
+                  parser: (data: { hitokoto: string; from: string }) => `${data.hitokoto} —— ${data.from}`
+                },
+                {
+                  url: 'https://hitokoto.icodeq.com/api',
+                  parser: (data: { sentence: string; author?: string }) => `${data.sentence} —— ${data.author || '未知'}`
+                },
+                {
+                  url: 'https://api.a632079.me/hitokoto',
+                  parser: (data: { content: string; creator?: string }) => `${data.content} —— ${data.creator || '未知'}`
+                }
+              ];
+      // 显示错误信息的工具函数
+    const showError = () => {
+      oml2d.tipsMessage('所有数据源均请求失败', 3000, 9);
+    };
+
+    // 带降级策略的请求函数
+    const fetchWithFallback = async (index = 0) => {
+      // 所有数据源都尝试过仍失败
+      if (index >= API_SOURCES.length) {
+        showError();
+        return;
+      }
+
+      try {
+        const source = API_SOURCES[index];
+        const response = await fetch(source.url, {
+          headers: { 'Accept': 'application/json' },
+          referrerPolicy: 'no-referrer-when-downgrade'
+        });
+
+        // 检查HTTP响应状态
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        // 解析响应并显示结果
+        const data = await response.json();
+        oml2d.tipsMessage(source.parser(data), 4000, 10);
+      } 
+      // 尝试下一个数据源
+      catch (error) {
+        fetchWithFallback(index + 1);
+      }
+    };
+
+    // 启动请求流程
+    fetchWithFallback();
+  }
+		  },
+          {
+
+            id: 'switch-skin',
+            title: '换衣服',
+            icon: 'icon-skin',
+            onClick(oml2d) {
+              oml2d.loadNextModelClothes();
+            }
+          },
+          {
+            id: 'switch-model',
+            title: '切换模型',
+            icon: 'icon-switch',
+            onClick(oml2d) {
+              oml2d.loadNextModel();
+            }
+          },
+          {
+            id: 'rest',
+            title: '休息',
+            icon: 'icon-rest',
+            onClick(oml2d) {
+              oml2d.stageSlideOut();
+              // 显式设置状态栏消息为休息状态
+              oml2d.statusBarOpen('看板娘休息中');
+              // 设置状态栏点击事件，让模型重新显示
+              oml2d.setStatusBarClickEvent(() => {
+                oml2d.stageSlideIn();
+              });
+            }
+          },
+          {
+            id: 'about',
+            title: 'About',
+            icon: 'icon-about',
+            onClick(oml2d) {
+              window.open('https://github.com/oh-my-live2d/oh-my-live2d', '_blank');
+            }
+          },
+        ]
+      },
+      primaryColor: 'var(--primary)',
+      sayHello: true
+    });
+  }
+
+  function moveOML2DNodesToRoot(){
+    const root = typeof document !== 'undefined' ? document.getElementById('oml2d-root') : null;
+    if (!root) return;
+    const ids = ['oml2d-stage','oml2d-statusBar','oml2d-tips','oml2d-menus'];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.parentElement !== root) {
+        try { root.appendChild(el); } catch(e){}
+      }
+    });
+  }
+
+  if (oml2d) {
+    (window as any).__oml2d = oml2d;
+    moveOML2DNodesToRoot();
+  }
+
+  // 添加事件监听器
+  if (oml2d && !(typeof window !== 'undefined' && (window as any).__oml2dEventsBound)) {
+    (window as any).__oml2dEventsBound = true;
+    oml2d.onStageSlideIn(() => { oml2d.statusBarClose(); });
+    oml2d.onStageSlideOut(() => { oml2d.statusBarOpen(); });
+  }
+
+  document.addEventListener('astro:before-swap', moveOML2DNodesToRoot);
+  document.addEventListener('astro:page-load', moveOML2DNodesToRoot);
+  document.addEventListener('astro:after-swap', moveOML2DNodesToRoot);
+</script>
+
+<!-- https://github.com/orgs/swup/discussions/939  暂时固定样式 -->
+<style id="oml2d-global-style" is:global>
+  @keyframes oml2d-shake-tips {
+    0% {
+      transform: translate(-50%, 5%) scale(0.99);
+    }
+    50% {
+      transform: translate(-50%, 0%) scale(1);
+    }
+    100% {
+      transform: translate(-50%, 5%) scale(0.99);
+    }
+  }
+
+  @keyframes oml2d-stage-slide-in {
+    from {
+      transform: translateY(130%);
+    }
+    to {
+      transform: translateY(0%);
+    }
+  }
+
+  @keyframes oml2d-stage-slide-out {
+    from {
+      transform: translateY(0%);
+    }
+    to {
+      transform: translateY(130%);
+    }
+  }
+
+  @keyframes oml2d-display-tips {
+    0% {
+      opacity: 0;
+      visibility: hidden;
+    }
+    100% {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  @keyframes oml2d-hidden-tips {
+    0% {
+      opacity: 1;
+      visibility: visible;
+    }
+    100% {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  @keyframes oml2d-loading-rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .oml2d-icon {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+  }
+
+  .oml2d-loading {
+    animation-name: oml2d-loading-rotate;
+    animation-duration: 600ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+  }
+
+  .oml2d-menus-item {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    align-items: center;
+    transition: all 300ms;
+    color: var(--primary) !important;  /* 使用主题色变量 */
+    cursor: pointer;
+    background-color: #fff;
+  }
+
+  .oml2d-menus-item:hover {
+    background-color: var(--primary) !important;  /* 悬停背景使用主题色 */
+    color: #fff !important;
+    box-shadow: 0 0 5px var(--primary);  /* 阴影也使用主题色 */
+  }
+
+  /* 确保图标颜色跟随父元素 */
+  .oml2d-menus-item .oml2d-icon {
+    color: inherit !important;
+    fill: currentColor !important;
+  }
+
+  /* 暗色主题适配 - 增强选择器优先级 */
+  html[data-theme="dark"] .oml2d-menus-item,
+  [data-theme="dark"] .oml2d-menus-item {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    color: #333 !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  }
+
+  html[data-theme="dark"] .oml2d-menus-item:hover,
+  [data-theme="dark"] .oml2d-menus-item:hover {
+    background-color: var(--primary) !important;
+    color: #fff !important;
+    box-shadow: 0 0 8px var(--primary) !important;
+  }
+
+  /* 确保暗色主题下图标颜色正确 */
+  html[data-theme="dark"] .oml2d-menus-item .oml2d-icon,
+  [data-theme="dark"] .oml2d-menus-item .oml2d-icon {
+    color: inherit !important;
+    fill: currentColor !important;
+  }
+
+  #oml2d-menus .oml2d-menus-item:not(:last-child) {
+    margin-bottom: 10px;
+  }
+
+  @keyframes oml2d-status-bar-left-slide-out {
+    0% {
+      transform: translateX(-8%);
+    }
+    100% {
+      transform: translateX(-120%);
+    }
+  }
+
+  @keyframes oml2d-status-bar-left-slide-in {
+    0% {
+      transform: translateX(-120%);
+    }
+    100% {
+      transform: translateX(-8%);
+    }
+  }
+
+  @keyframes oml2d-status-bar-right-slide-out {
+    0% {
+      transform: translateX(8%);
+    }
+    100% {
+      transform: translateX(120%);
+    }
+  }
+
+  @keyframes oml2d-status-bar-right-slide-in {
+    0% {
+      transform: translateX(120%);
+    }
+    100% {
+      transform: translateX(8%);
+    }
+  }
+</style>

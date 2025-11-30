@@ -33,6 +33,11 @@ export interface SiteConfig {
 
 	contentLeftMarginBase?: string; // 新增：主容器左外边距（桌面）
 	contentLeftMarginTablet?: string; // 新增：主容器左外边距（平板横屏）
+
+	// Live2D 配置
+	live2d?: {
+		enable: boolean;
+	};
 }
 
 export interface NavBarConfig {

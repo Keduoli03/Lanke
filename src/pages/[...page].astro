@@ -1,7 +1,7 @@
 ---
 import type { Page, PaginateFunction } from 'astro';
 import type { CollectionEntry } from 'astro:content';
-import MainLayout from '../layouts/MainLayout.astro';
+import PostLayout from '../layouts/PostLayout.astro';
 import PostPage from '../components/post/PostPage.astro';
 import { getSortedPosts } from '../utils/content-utils';
 import { PAGE_SIZE } from '../config';
@@ -18,9 +18,9 @@ interface Props {
 }
 const { page } = Astro.props;
 ---
-<MainLayout 
+<PostLayout 
   title={`文章列表 - 第 ${page.currentPage} 页`}
   description="文章列表页面"
 >
   <PostPage page={page} showTitle={false} />
-</MainLayout>
+</PostLayout>

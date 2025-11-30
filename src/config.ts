@@ -33,6 +33,11 @@ export const siteConfig: SiteConfig = {
   
   contentLeftMarginBase: "-2rem", // 主容器左外边距（桌面）
   contentLeftMarginTablet: "-3rem", // 主容器左外边距（平板横屏）
+
+  // Live2D 开关
+  live2d: {
+    enable: true,
+  },
 };
 
 export const navBarConfig: NavBarConfig = {

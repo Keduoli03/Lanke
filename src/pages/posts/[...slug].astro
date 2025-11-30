@@ -13,6 +13,7 @@ import AiSummary from '@/components/util/AiSummary.astro';
 import Toc from '@/components/post/Toc.astro';
 import ScrollToTop from '@/components/util/ScrollToTop.astro';
 import ScrollToComment from '@/components/util/ScrollToComment.astro';
+import Live2D from '@/components/util/Live2D.astro';
 
 export const prerender = true;
 
@@ -77,6 +78,7 @@ const fullPostUrl = Astro.url.href;
 
 
   <div slot="rail">
+    
     <Toc items={headings} />
     <div class="rail-actions">
       <ScrollToTop />

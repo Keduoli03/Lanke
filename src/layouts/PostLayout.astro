@@ -9,6 +9,7 @@ import themeScript from '../utils/theme-script.ts?raw';
 import pageTransitionScript from '../utils/page-transition.ts?raw';
 import LightboxDialog from '../components/util/Lightbox.astro';
 import SearchDialog from '@/components/search/SearchDialog.astro';
+import Live2D from '@/components/util/Live2D.astro';
 
 export interface Props {
   title: string;
@@ -53,6 +54,7 @@ const {
 `}>
 
   <ClientRouter />
+  <Live2D transition:persist transition:name="live2d" />
   <div class="layout-container">
     <div class="hidden lg:block">
 		<Sidebar transition:persist />
@@ -68,17 +70,16 @@ const {
             <slot />
           </div>
 
-          <!-- 侧边栏：相对于主内容容器定位在右侧 -->
+          <!-- 侧边栏 -->
           <aside class="post-rail">
             <div class="rail-sticky">
               <slot name="rail" />
             </div>
           </aside>
         </div>
-      </div>
-    </main>
   </div>
-
+  </main>
+  </div>
   <Footer />
   <SearchDialog client:load />
   <LightboxDialog />
