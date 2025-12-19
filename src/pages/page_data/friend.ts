@@ -149,5 +149,12 @@ export const items = [
 		desc: '追求源于热爱',
 		siteurl: 'https://blog.toastbubble.top/',
 		tags: ['友链'],
+	},
+	{
+		title: '半巷栀子',
+imgurl: 'https://www.kaca.life/usr/uploads/2025/12/2411141244.jpg',
+desc: '文字记录者，生活观察家。 在平凡的日子里打捞诗意的碎片。 这里存放着我的思考、阅读与沿途光影。',
+siteurl: 'https://www.kaca.life/'
 	}
+
 ];
