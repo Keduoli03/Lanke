@@ -1,6 +1,6 @@
 ---
 title: 在电脑上共存MySQL
-description: 摘要
+description: 因面试需求需使用 MySQL 5.7 版本，而本机已安装 MySQL 9.5，为此整理MySQL 5.7 与 9.5 版本共存的实操教程。
 categories:
   - 数据库
 tags:
@@ -12,7 +12,7 @@ status: 已完成
 pinned: false
 aiSummary: true
 date: 2025-12-23 18:25
-updated: 2025-12-23 18:50
+updated: 2025-12-23 20:48
 slug: "724"
 ---
 
