@@ -7,12 +7,12 @@ tags:
   - 后端
   - MySQL
 column:
-cover:
+cover: https://gcore.jsdelivr.net/gh/Keduoli03/My_img@main/image/%E6%99%AE%E6%8B%89%E5%A8%9C-%E7%A2%A7%E8%93%9D%E6%A1%A3%E6%A1%88.jpg
 status: 已完成
 pinned: false
 aiSummary: true
 date: 2025-12-23 18:25
-updated: 2025-12-23 20:48
+updated: 2025-12-23 21:35
 slug: "724"
 ---
 
