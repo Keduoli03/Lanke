@@ -1,0 +1,256 @@
+<!-- 文章底部许可信息组件 -->
+---
+import { Icon } from 'astro-icon/components';
+import { siteConfig } from '../../config';
+import { formatDateToYYYYMMDD } from '../../utils/date-utils';
+
+interface Props {
+  title?: string;
+  postUrl: string; 
+  license?: string;
+  pubDate?: Date;
+}
+
+const { title, postUrl, license = 'CC BY-NC-SA 4.0', pubDate } = Astro.props;
+const fullPostUrl = postUrl; 
+---
+
+<div class="post-info-card" data-pagefind-ignore>
+  <div class="info-content">
+    {title && <div class="post-title">{title}</div>}
+    <div class="meta-info">
+      <span class="meta-item author">
+        <span class="meta-label">作者</span>
+        <span class="meta-value">{siteConfig.title}</span>
+      </span>
+      <span class="meta-item date">
+        <span class="meta-label">发布于</span>
+        <span class="meta-value">{pubDate ? formatDateToYYYYMMDD(pubDate) : '-'}</span>
+      </span>
+      <span class="meta-item license">
+        <span class="meta-label">许可协议</span>
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer" class="meta-value license-link">{license}</a>
+      </span>
+    </div>
+    <div class="link-wrapper">
+      <span class="link-label">本文链接</span>
+      <a href={fullPostUrl} class="link-value">{fullPostUrl}</a>
+    </div>
+  </div>
+  
+  <div class="cc-badge-icon">
+    <Icon name="fa6-brands:creative-commons" class="cc-icon-xl" />
+  </div>
+
+  <div class="action-wrapper">
+    <button class="share-btn" data-url={fullPostUrl} title="复制分享链接">
+      <Icon name="material-symbols:share-outline" class="share-icon" />
+    </button>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const shareBtn = document.querySelector('.share-btn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', async (e) => {
+        const button = e.currentTarget as HTMLButtonElement;
+        const urlToCopy = button.dataset.url;
+        if (!urlToCopy) return;
+
+        try {
+          await navigator.clipboard.writeText(urlToCopy);
+          button.classList.add('copied');
+          
+          setTimeout(() => {
+            button.classList.remove('copied');
+          }, 2000);
+
+        } catch (err) {
+          console.error('无法复制链接: ', err);
+        }
+      });
+    }
+  });
+</script>
+
+<style>
+  .post-info-card {
+    background-color: var(--card-bg, color-mix(in srgb, var(--theme-color) 5%, var(--content-pane-bg)));
+    border: 1px solid var(--card-border, color-mix(in srgb, var(--theme-color) 15%, transparent));
+    border-radius: 0.75rem;
+    padding: 1.5rem 1.25rem;
+    margin-top: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+  
+  .post-info-card:hover {
+    border-color: var(--theme-color);
+  }
+
+  .info-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .post-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.4;
+  }
+
+  .meta-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .meta-label {
+    font-weight: 600;
+    opacity: 0.8;
+    font-size: 0.8rem;
+  }
+
+  .meta-value {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  
+  .license-link {
+    color: var(--text-primary);
+    text-decoration: none;
+    border-bottom: 1px dashed transparent;
+    transition: all 0.2s;
+  }
+  
+  .license-link:hover {
+    color: var(--theme-color);
+    border-bottom-color: var(--theme-color);
+  }
+
+  .link-wrapper {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    flex-wrap: wrap;
+  }
+
+  .link-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .link-value {
+    color: var(--text-primary);
+    text-decoration: none;
+    word-break: break-all;
+    font-family: monospace;
+    font-weight: 600;
+    transition: opacity 0.2s;
+  }
+  
+  .link-value:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+
+  .action-wrapper {
+    position: relative;
+    z-index: 2;
+  }
+
+  .cc-badge-icon {
+    position: absolute;
+    right: 15%;
+    top: -1rem;
+    font-size: 12rem;
+    color: var(--text-secondary);
+    opacity: 0.1;
+    transition: all 0.3s ease;
+    z-index: 1;
+    transform: rotate(-15deg);
+    pointer-events: none;
+  }
+  
+  .cc-badge-icon:hover {
+    color: var(--theme-color);
+    opacity: 0.2;
+    transform: rotate(0deg) scale(1.1);
+  }
+
+  .action-wrapper {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    background-color: color-mix(in srgb, var(--theme-color) 15%, var(--content-pane-bg));
+    color: var(--theme-color);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .share-btn:hover {
+    background-color: var(--theme-color);
+    color: white;
+  }
+  
+  .share-btn.copied {
+    background-color: #10b981; /* Success green */
+    color: white;
+  }
+
+  .share-icon {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+  @media (max-width: 640px) {
+    .post-info-card {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .cc-badge-icon {
+      display: none;
+    }
+    
+    .action-wrapper {
+      width: 100%;
+      justify-content: flex-end;
+      border-top: 1px dashed var(--card-border, color-mix(in srgb, var(--theme-color) 20%, transparent));
+      padding-top: 0.75rem;
+    }
+  }
+</style>

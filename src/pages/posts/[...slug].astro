@@ -2,7 +2,7 @@
 import { type CollectionEntry, getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import PostLayout from '../../layouts/PostLayout.astro';
-import PostInfoCard from '../../components/post/PostInfoCard.astro';
+import License from '@/components/post/License.astro';
 import PostHeader from '@/components/post/PostHeader.astro';
 import { render } from 'astro:content';
 import Markdown from '@/components/util/Markdown.astro';
@@ -35,7 +35,6 @@ const fullPostUrl = Astro.url.href;
   description={entry.data.description}
   railWidth={siteConfig.tocWidth} // 可选：自定义侧边插槽宽度
 >
-  {/* 主内容插槽：文章主体内容（和原来一致） */}
   {entry.data.cover && (
     <div class="hero-image mb-4 sm:mb-6 lg:mb-8" transition:name={`hero-${entry.data.slug}`}>
       <Image 
@@ -70,7 +69,7 @@ const fullPostUrl = Astro.url.href;
     <Content />
   </Markdown>
 
-  <PostInfoCard postUrl={fullPostUrl} />
+  <License title={entry.data.title} postUrl={fullPostUrl} pubDate={entry.data.date} />
 
   <div id="comment-section" class="mt-10">
     <Artalk />
