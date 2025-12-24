@@ -22,6 +22,8 @@ import rehypeImageLightbox from './src/plugins/rehype-image-lightbox.mjs';
 import pagefind from 'astro-pagefind';
 
 import vercel from '@astrojs/vercel';
+import { pluginAutoTitleSetup, pluginAutoTitleCleanup } from './src/plugins/expressive-code-auto-title.mjs';
+
 // https://astro.build/config
 export default defineConfig({
   site: siteConfig.url,
@@ -49,14 +51,19 @@ export default defineConfig({
       ],
       rehypeImageLightbox,
     ],
-    shikiConfig: {
-      theme: "one-dark-pro",
-      wrap: true,
-    },
+    
+    // 停止使用内置的 shiki 代码块渲染器，官网：https://shiki.zhcndoc.com/guide/
+    // shikiConfig: {
+    //   theme: "one-dark-pro",
+    //   wrap: true,
+    // },
+  },
+  // 实验性功能：svg优化 来自 https://astro.build/blog/astro-5160/
+  experimental: {
+    svgo: true,
   },
 
   integrations: [
-    
     sitemap(),
     pagefind(),
     icon({
@@ -70,12 +77,14 @@ export default defineConfig({
         expressiveCode({
             themes: expressiveCodeConfig.themes,
             plugins: [
+                pluginAutoTitleSetup(),
                 pluginLineNumbers(),
                 pluginCollapsibleSections(),
                 pluginFileIcons({
                     iconClass: "text-4 w-5 inline mr-1 mb-1",
-                    titleClass: "",
+                    titleClass: ""
                 }),
+                pluginAutoTitleCleanup(),
             ],
             defaultProps: {
                 wrap: false,
