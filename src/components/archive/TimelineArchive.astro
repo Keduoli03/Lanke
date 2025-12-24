@@ -96,7 +96,12 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
                         {showTags && tags.length > 0 && (
                           <div class="post-tags">
                             {tags.slice(0, 3).map(tag => (
-                              <span class="post-tag">#{tag}</span>
+                              <a 
+                                href={`?标签=${encodeURIComponent(tag)}`}
+                                class="post-tag clickable-tag"
+                                data-tag={tag}
+                                onclick="event.stopPropagation();"
+                              >#{tag}</a>
                             ))}
                             {tags.length > 3 && <span class="post-tag-more">+{tags.length - 3}</span>}
                           </div>
@@ -588,6 +593,75 @@ const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
 
     window.addEventListener('popstate', () => {
       updateVisibility(containerEl, getSelectedFromURL());
+    });
+
+    // 处理标签点击
+    containerEl.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const tagLink = target.closest('.clickable-tag');
+      
+      if (tagLink) {
+        e.preventDefault();
+        const tag = tagLink.getAttribute('data-tag');
+        if (!tag) return;
+
+        // 更新 URL
+        const url = new URL(window.location.href);
+        const currentTags = url.searchParams.getAll('标签');
+        
+        // 如果标签已存在，则移除（取消选择），否则添加
+        if (currentTags.includes(tag)) {
+          // 这里简单处理：如果已存在，我们其实希望是“只看这个标签”还是“取消这个标签”？
+          // 通常在归档页点击标签，意图是“筛选该标签”。
+          // 如果当前只选中了这个标签，再次点击可能是取消？或者保持不变？
+          // 既然是筛选，最直观的是：点击标签 -> 筛选该标签。
+          // 如果想支持多选，逻辑会复杂些。这里假设点击即筛选该标签（覆盖其他筛选，或者追加？）
+          // 既然用户说“触发侧边栏的标签选择”，侧边栏通常是多选或单选。
+          // 为了简单直观，我们先实现：点击即设置为只筛选该标签（类似点击侧边栏的一个标签）
+          
+          // 如果想模拟侧边栏的行为（可能是追加），需要看侧边栏的具体实现。
+          // 但通常在列表里的标签点击，用户期望的是“只看这个标签的文章”。
+          
+          url.searchParams.delete('标签');
+          url.searchParams.set('标签', tag);
+        } else {
+           // 如果没选中，则设置为选中该标签（清空其他还是追加？通常归档页点击标签是“只看这个”）
+           url.searchParams.delete('标签');
+           url.searchParams.set('标签', tag);
+        }
+        
+        // 实际上，为了与侧边栏联动，我们需要触发 filters:changed 事件或者更新 URL 并让 popstate/其他逻辑处理
+        // 由于 updateVisibility 监听了 filters:changed，且我们有 URL 参数解析逻辑
+        // 最稳妥的方式是：更新 URL -> 触发 history.pushState -> 触发 filters:changed (如果侧边栏组件监听了 URL 变化最好，否则我们需要手动触发)
+        
+        // 观察代码，Sidebar/ArchiveFilters 可能会读取 URL。
+        // 这里我们直接更新 URL 并分发事件
+        
+        window.history.pushState({}, '', url.toString());
+        
+        // 构造 detail 对象
+        const detail = {
+          categories: url.searchParams.getAll('分类'),
+          tags: url.searchParams.getAll('标签'),
+          columns: url.searchParams.getAll('专栏')
+        };
+        
+        // 触发自定义事件通知 ArchiveFilters 更新状态
+        window.dispatchEvent(new CustomEvent('filters:updated-from-url', { detail }));
+        
+        // 手动调用 updateVisibility (虽然 filters:changed 也会处理，但那是 ArchiveFilters 发出的)
+        // 实际上 ArchiveFilters 应该监听 URL 变化或者我们也触发 filters:changed？
+        // 如果 ArchiveFilters 是 source of truth，我们应该通知它。
+        // 假设 ArchiveFilters 监听 'filters:updated-from-url' (我们需要去确认或添加)
+        // 或者我们直接触发 'filters:changed' 让本组件更新，同时希望 ArchiveFilters 也能更新 UI。
+        
+        // 简单起见，我们触发 popstate (虽然 pushState 不会触发 popstate) 或者手动调用逻辑
+        updateVisibility(containerEl, detail);
+        
+        // 为了让侧边栏同步高亮，我们需要一种机制。
+        // 通常侧边栏会根据 URL 初始化状态。
+        // 我们可以发送一个事件让侧边栏刷新。
+      }
     });
   });
 </script>

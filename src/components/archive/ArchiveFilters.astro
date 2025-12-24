@@ -170,6 +170,11 @@ const tags = await getAllTags();
     // 监听浏览器返回/前进，自动同步选中与筛选
     window.addEventListener('popstate', applySelectionFromURL);
 
+    // 监听来自其他组件（如 TimelineArchive）的 URL 更新事件
+    window.addEventListener('filters:updated-from-url', () => {
+      applySelectionFromURL();
+    });
+
     const resetBtn = document.querySelector<HTMLButtonElement>('.filters-reset');
     resetBtn && resetBtn.addEventListener('click', () => {
       const url = new URL(window.location.href);

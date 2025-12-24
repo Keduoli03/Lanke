@@ -4,7 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 import PostLayout from '../layouts/PostLayout.astro';
 import PostPage from '../components/post/PostPage.astro';
 import { getSortedPosts } from '../utils/content-utils';
-import { PAGE_SIZE } from '../config';
+import { PAGE_SIZE, siteConfig } from '../config';
 
 export const prerender = true; // <--- 添加此行
 
@@ -17,9 +17,13 @@ interface Props {
   page: Page<CollectionEntry<'posts'>>;
 }
 const { page } = Astro.props;
+
+// 动态设置标题：如果是第一页，则使用站点标题；否则显示“文章列表 - 第X页”
+const isFirstPage = page.currentPage === 1;
+const pageTitle = isFirstPage ? siteConfig.title : `文章列表 - 第 ${page.currentPage} 页`;
 ---
 <PostLayout 
-  title={`文章列表 - 第 ${page.currentPage} 页`}
+  title={pageTitle}
   description="文章列表页面"
 >
   <PostPage page={page} showTitle={false} />
