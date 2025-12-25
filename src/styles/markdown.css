@@ -217,40 +217,65 @@ code::after {
   ==========================================================================
 */
 .prose blockquote {
-  @apply relative border-l-4 p-5 my-6 rounded-r-lg shadow-sm 
-         transition-all duration-300 hover:shadow-md;
-  border-left-color: hsl(var(--primary-hue), 60%, 60%);
-  background-color: hsl(var(--primary-hue), 80%, 95%);
-  color: hsl(var(--primary-hue), 70%, 25%);
+  /* 调整 padding 为上下 0.5rem(py-2) 左右 1rem(px-4)，margin 为 my-4 */
+  /* 整体缩进 1.5em */
+  @apply relative px-4 py-2 my-4 rounded-md shadow-sm transition-all duration-300;
+  margin-left: 1.5em;
+  width: auto;
+  
+  /* 仿 Callout 结构 */
+  border: none; /* 重置默认边框 */
+  border-left: 4px solid hsl(var(--primary-hue), 60%, 50%);
+  background-color: hsl(var(--primary-hue), 80%, 96%); /* 极浅的主题色背景 */
+  
+  /* 添加三边细边框 */
+  border-top: 1px solid hsl(var(--primary-hue), 60%, 90%);
+  border-right: 1px solid hsl(var(--primary-hue), 60%, 90%);
+  border-bottom: 1px solid hsl(var(--primary-hue), 60%, 90%);
+  
+  color: var(--text-secondary);
+}
+
+.prose blockquote:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border-top-color: hsl(var(--primary-hue), 60%, 85%);
+  border-right-color: hsl(var(--primary-hue), 60%, 85%);
+  border-bottom-color: hsl(var(--primary-hue), 60%, 85%);
 }
 
 /* 移动端引用块调整 */
 @media (max-width: 768px) {
   .prose blockquote {
-    @apply p-3 my-4 text-sm;
-  }
-  
-  .prose blockquote::before {
-    @apply -top-1 -left-1 text-4xl;
+    @apply px-3 py-2 my-3 text-sm;
   }
 }
 
 /* 深色模式下的引用块样式 */
 html.dark .prose blockquote {
-  background-color: hsl(var(--primary-hue), 40%, 8%);
-  color: hsl(var(--primary-hue), 60%, 80%);
-  border-left-color: hsl(var(--primary-hue), 50%, 50%);
+  background-color: hsl(var(--primary-hue), 30%, 15%); /* 深色背景，保持低饱和度 */
+  border-left-color: hsl(var(--primary-hue), 50%, 60%);
+  
+  /* 深色模式边框 */
+  border-top: 1px solid hsl(var(--primary-hue), 30%, 25%);
+  border-right: 1px solid hsl(var(--primary-hue), 30%, 25%);
+  border-bottom: 1px solid hsl(var(--primary-hue), 30%, 25%);
+  
+  color: var(--text-secondary);
 }
 
-/* 装饰性引用符号 */
+html.dark .prose blockquote:hover {
+  border-top-color: hsl(var(--primary-hue), 30%, 35%);
+  border-right-color: hsl(var(--primary-hue), 30%, 35%);
+  border-bottom-color: hsl(var(--primary-hue), 30%, 35%);
+}
+
+/* 移除装饰性引用符号 */
 .prose blockquote::before {
-  content: '"';
-  @apply absolute -top-2 -left-2 text-5xl opacity-30;
-  color: hsl(var(--primary-hue), 50%, 60%);
+  content: none;
 }
 
 html.dark .prose blockquote::before {
-  color: hsl(var(--primary-hue), 40%, 40%);
+  content: none;
 }
 
 .prose blockquote p:first-of-type::before {
@@ -258,7 +283,39 @@ html.dark .prose blockquote::before {
 }
 
 .prose blockquote p {
-  @apply m-0 pl-2 relative z-10;
+  @apply m-0 relative z-10;
+  text-indent: 0;
+}
+
+/* 脚注样式调整 */
+.prose .footnote-ref,
+.prose sup > a[href^="#fn"],
+.prose sup > a[href^="#user-content-fn"] {
+  @apply no-underline opacity-80 hover:opacity-100 transition-opacity cursor-pointer;
+  color: var(--theme-color);
+}
+
+.prose .footnote-ref::before,
+.prose sup > a[href^="#fn"]::before,
+.prose sup > a[href^="#user-content-fn"]::before {
+  content: '[';
+}
+
+.prose .footnote-ref::after,
+.prose sup > a[href^="#fn"]::after,
+.prose sup > a[href^="#user-content-fn"]::after {
+  content: ']';
+}
+
+/* 脚注悬浮提示框 */
+.footnote-tooltip {
+  @apply fixed z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 rounded-lg shadow-xl text-sm max-w-xs pointer-events-none opacity-0 transition-opacity duration-200 text-gray-700 dark:text-gray-200;
+  /* 确保提示框在最上层 */
+  z-index: 9999;
+}
+
+.footnote-tooltip.show {
+  @apply opacity-100;
 }
 
 /* 引用来源样式 */
@@ -282,8 +339,7 @@ html.dark .prose blockquote::before {
   @apply [text-indent:2em];
 }
 
-.prose li > p,
-.prose blockquote p {
+.prose li > p {
   @apply [text-indent:0];
 }
 
