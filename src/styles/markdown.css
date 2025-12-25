@@ -288,6 +288,23 @@ html.dark .prose blockquote::before {
 }
 
 /* 脚注样式调整 */
+/* 隐藏自动生成的 Footnotes 标题 */
+.prose .footnotes h2,
+.prose #footnote-label {
+  @apply hidden;
+}
+
+/* 脚注区域分割线及整体样式 */
+.prose .footnotes {
+  @apply mt-12 pt-8 border-t border-[var(--line-divider)] text-sm;
+}
+
+/* 脚注标题 "注：" */
+.prose .footnotes::before {
+  content: '注：';
+  @apply block font-bold mb-4 text-base;
+}
+
 .prose .footnote-ref,
 .prose sup > a[href^="#fn"],
 .prose sup > a[href^="#user-content-fn"] {
