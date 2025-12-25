@@ -1,0 +1,14 @@
+---
+import '@/styles/markdown.css';
+---
+<div class="prose prose-lg max-w-none dark:prose-invert">
+  <slot />
+</div>
+
+<script>
+  import { initFootnoteTooltips } from './footnote-tooltip';
+
+  // 同时监听 DOMContentLoaded 和 astro:page-load 以确保脚本执行
+  document.addEventListener('DOMContentLoaded', initFootnoteTooltips);
+  document.addEventListener('astro:page-load', initFootnoteTooltips);
+</script>

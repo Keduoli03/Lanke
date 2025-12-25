@@ -1,15 +1,11 @@
 ---
-import Markdown from '@/components/util/Markdown.astro';
+import Markdown from '@/components/util/Markdown/Markdown.astro';
 import PostLayout from '../layouts/PostLayout.astro';
 import { getEntry } from 'astro:content';
 import { render } from 'astro:content';
 import Artalk from '@/components/util/Artalk.astro';
 import PageHeader from '@/components/page/PageHeader.astro';
 import { Icon } from 'astro-icon/components';
-import ScrollToTop from '@/components/util/ScrollToTop.astro';
-import ScrollToComment from '@/components/util/ScrollToComment.astro';
-import Toc from '@/components/post/Toc.astro';
-import { siteConfig } from '@/config';
 
 const aboutPost = await getEntry("pages", "about");
 

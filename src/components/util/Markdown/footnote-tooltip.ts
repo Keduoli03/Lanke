@@ -1,0 +1,90 @@
+export function initFootnoteTooltips() {
+  // 扩展选择器：支持 .footnote-ref 类或 sup 标签内的脚注链接（兼容 user-content- 前缀）
+  const refs = document.querySelectorAll('.footnote-ref, sup > a[href^="#fn"], sup > a[href^="#user-content-fn"]');
+  if (refs.length === 0) return;
+
+  let tooltip = document.querySelector('.footnote-tooltip') as HTMLElement;
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.className = 'footnote-tooltip';
+    document.body.appendChild(tooltip);
+  }
+
+  refs.forEach(ref => {
+    if (ref.hasAttribute('data-tooltip-initialized')) return;
+    ref.setAttribute('data-tooltip-initialized', 'true');
+    
+    // 确保元素有 footnote-ref 类，以便 CSS 样式生效
+    ref.classList.add('footnote-ref');
+
+    const href = ref.getAttribute('href');
+    if (!href) return;
+    
+    // 处理 ID 转义问题（有些生成器 ID 包含 : 或 .）
+    // 同时处理 href 中的 # 符号
+    const targetId = href.replace(/^#/, '').replace(/(:|\.|\[|\]|,|=|@)/g, "\\$1");
+    
+    let target;
+    try {
+      target = document.querySelector(`#${targetId}`);
+    } catch (e) {
+      console.warn('Invalid selector for footnote:', targetId);
+    }
+    
+    if (target) {
+      const tempDiv = document.createElement('div');
+      // 克隆节点以避免修改原始 DOM
+      tempDiv.innerHTML = target.innerHTML;
+      
+      // 移除返回链接 (通常是 class="data-footnote-backref" 或 class="footnote-backref")
+      const backrefs = tempDiv.querySelectorAll('.footnote-backref, [data-footnote-backref]');
+      backrefs.forEach(el => el.remove());
+      
+      const content = tempDiv.innerHTML.trim();
+      ref.setAttribute('data-footnote-content', content);
+      
+      ref.addEventListener('mouseenter', (e) => {
+          const content = ref.getAttribute('data-footnote-content');
+          if (content && tooltip) {
+              tooltip.innerHTML = content;
+              tooltip.classList.add('show');
+              updatePosition(e as MouseEvent, tooltip);
+          }
+      });
+      
+      ref.addEventListener('mousemove', (e) => {
+          if (tooltip && tooltip.classList.contains('show')) {
+              updatePosition(e as MouseEvent, tooltip);
+          }
+      });
+      
+      ref.addEventListener('mouseleave', () => {
+          if (tooltip) {
+              tooltip.classList.remove('show');
+          }
+      });
+    }
+  });
+}
+
+function updatePosition(e: MouseEvent, el: HTMLElement) {
+    const offset = 15;
+    let x = e.clientX + offset;
+    let y = e.clientY + offset;
+    
+    const rect = el.getBoundingClientRect();
+    // 视口边界检查
+    if (x + rect.width > window.innerWidth) {
+        x = e.clientX - rect.width - offset;
+    }
+    if (y + rect.height > window.innerHeight) {
+        y = e.clientY - rect.height - offset;
+    }
+    // 简单的底部边界检查，防止被遮挡
+    if (y + rect.height > window.innerHeight) {
+       y = e.clientY - rect.height - offset;
+    }
+    
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+}
