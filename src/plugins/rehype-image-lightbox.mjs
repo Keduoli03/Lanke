@@ -3,7 +3,6 @@ import { visit } from 'unist-util-visit';
 export default function rehypeImageLightbox() {
   return (tree) => {
     visit(tree, 'element', (node, index, parent) => {
-      // 移除 V5 策略中的 <img-lightbox> 还原逻辑
       
       if (!parent || node.tagName !== 'img') return;
 
