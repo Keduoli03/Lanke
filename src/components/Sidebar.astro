@@ -25,7 +25,7 @@ const extendedLinks: ExtendedLink[] = [...links];
     <!-- Logo容器：折叠/展开时都保持居中对齐 -->
     <a href={url("/")} class="hover:opacity-80 transition-opacity flex items-center justify-center" data-no-lightbox="true">
       <img src="/favicon-192.png" alt={siteConfig.title} class="sidebar-logo w-10 h-10" data-no-lightbox="true" />
-      <span class="text-sm font-semibold text-[var(--text-primary)] sidebar-text ml-2">
+      <span class="text-sm font-semibold text-[var(--text-primary)] sidebar-text">
         {siteConfig.title}
       </span>
     </a>
@@ -50,7 +50,7 @@ const extendedLinks: ExtendedLink[] = [...links];
               href={linkPath}
               target={isExternal ? "_blank" : "_self"}
               rel={isExternal ? "noopener noreferrer" : ""}
-              data-astro-prefetch={isExternal ? "false" : "viewport"}
+              data-astro-prefetch={isExternal ? "false" : "load"}
               class:list={[
                 "group flex items-center p-1 nav-link rounded-lg transition-all duration-300",
                 { "is-active": isActive },
@@ -59,7 +59,7 @@ const extendedLinks: ExtendedLink[] = [...links];
               <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center relative shadow-md border-2 border-transparent group-hover:border-[var(--theme-color-light)]" style="background-color: var(--sidebar-icon-bg)">
                 {l.icon && <Icon name={l.icon} class="icon h-5 w-5" />}
               </div>
-              <span class="text-xs text-[var(--text-secondary)] font-medium sidebar-text ml-2">
+              <span class="text-xs text-[var(--text-secondary)] font-medium sidebar-text">
                 {l.name}
               </span>
               {isExternal && (
@@ -76,12 +76,12 @@ const extendedLinks: ExtendedLink[] = [...links];
   </nav>
 
   <aside class="p-2 border-t border-[var(--line-divider)]">
-    <div class="bottom-bar flex flex-col items-center gap-2 sidebar-text">
+    <div class="bottom-bar flex flex-col items-center gap-2">
       <button id="open-search-btn" class="w-full flex items-center p-1 nav-link rounded-lg">
         <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center relative shadow-md" style="background-color: var(--sidebar-icon-bg)">
           <Icon name="ri:search-line" class="icon h-5 w-5" />
         </div>
-        <span class="text-xs text-[var(--text-secondary)] font-medium sidebar-text ml-2">搜索</span>
+        <span class="text-xs text-[var(--text-secondary)] font-medium sidebar-text">搜索</span>
       </button>
       <div id="theme-mode-item" class="w-full flex items-center p-1 nav-link rounded-lg">
         <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center relative shadow-md" style="background-color: var(--sidebar-icon-bg)">
@@ -90,7 +90,7 @@ const extendedLinks: ExtendedLink[] = [...links];
             <Icon slot="light-icon" name="material-symbols:light-mode-outline" class="icon h-5 w-5 cursor-pointer" />
           </LightDarkSwitch>
         </div>
-        <span id="theme-mode-label" class="text-xs text-[var(--text-secondary)] font-medium sidebar-text ml-2">模式</span>
+        <span id="theme-mode-label" class="text-xs text-[var(--text-secondary)] font-medium sidebar-text">模式</span>
       </div>
       <div id="theme-color-item" class="w-full flex items-center p-1 nav-link rounded-lg">
         <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center relative shadow-md" style="background-color: var(--sidebar-icon-bg)">
@@ -99,7 +99,7 @@ const extendedLinks: ExtendedLink[] = [...links];
             <Icon slot="reset-icon" name="fa6-solid:arrow-rotate-left" class="text-xs" />
           </ThemeSwitch>
         </div>
-        <span class="text-xs text-[var(--text-secondary)] font-medium sidebar-text ml-2">配色</span>
+        <span class="text-xs text-[var(--text-secondary)] font-medium sidebar-text">配色</span>
       </div>
     </div>
   </aside>
@@ -134,6 +134,13 @@ const extendedLinks: ExtendedLink[] = [...links];
   /* 展开状态：仅依赖 html 属性，避免 dataset 切换导致宽度抖动 */
   html[data-sidebar-open="true"] #sidebar {
     width: var(--sidebar-width-wide);
+    /* 展开时使用标准缓动 */
+    transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+  }
+
+  /* 收起时：稍微快一点 */
+  html[data-sidebar-open="false"] #sidebar {
+    transition: width 250ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
   }
 
   @media (min-width: 1024px) and (max-width: 1440px) {
@@ -150,17 +157,45 @@ const extendedLinks: ExtendedLink[] = [...links];
     height: 60px; /* 和菜单图标行高一致 */
     width: 100%;
     box-sizing: border-box;
+    /* 移除 overflow: hidden，否则会裁剪掉右侧绝对定位的展开按钮 */
   }
 
-  /* 折叠/展开文本切换：仅影响头部标题文本 */
-  .sidebar-header .sidebar-text {
-    display: none;
-    transition: opacity 0.3s ease;
+  /* 折叠/展开文本切换：精细控制 opacity 和 占位 */
+  .sidebar-text {
+    opacity: 0;
+    width: 0;           /* 收起时宽度为0，不占位，避免挤偏Logo */
+    margin-left: 0;     /* 收起时去掉间距 */
+    white-space: nowrap;
+    overflow: hidden;
+    /* 收起时：各项属性快速复位 */
+    transition: opacity 100ms ease, width 200ms ease, margin-left 200ms ease; 
   }
-  html[data-sidebar-open="true"] #sidebar .sidebar-header .sidebar-text,
-  #sidebar[data-open="1"] .sidebar-header .sidebar-text {
-    display: inline;
+
+  /* 展开状态下：文字显示 */
+  html[data-sidebar-open="true"] #sidebar .sidebar-text,
+  #sidebar[data-open="1"] .sidebar-text {
     opacity: 1;
+    width: auto;        /* 恢复宽度 */
+    margin-left: 0.5rem; /* 恢复间距 (对应 ml-2) */
+    /* 展开时：增加延迟到 300ms，确保侧边栏宽度动画（300ms）完成后再开始显示文字 */
+    transition: opacity 200ms ease 300ms, width 200ms ease, margin-left 200ms ease; 
+  }
+
+  /* 特殊处理：折叠状态下的主导航文字（显示在图标下方） */
+  html[data-sidebar-open="false"] #sidebar nav .nav-link .sidebar-text {
+    opacity: 1;
+    width: auto;
+    margin-left: 0;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    text-align: center;
+    /* 覆盖之前的 transition，不需要延迟 */
+    transition: opacity 100ms ease;
+  }
+
+  /* 特殊处理：折叠状态下的底部栏文字（强制隐藏，防止撑高） */
+  html[data-sidebar-open="false"] #sidebar .bottom-bar .sidebar-text {
+    display: none;
   }
 
   /* Logo样式：和菜单icon-container尺寸完全一致，确保对齐 */
@@ -291,12 +326,21 @@ const extendedLinks: ExtendedLink[] = [...links];
   .bottom-bar .nav-link:hover .bottom-bar-icon { border-color: var(--theme-color); }
   html[data-sidebar-open="false"] #sidebar .bottom-bar { flex-direction: column; align-items: center; justify-content: center; }
   html[data-sidebar-open="true"] #sidebar .bottom-bar { flex-direction: column; align-items: center; justify-content: flex-start; }
-  #sidebar { --bottom-bar-height-collapsed: 5、8rem; --bottom-bar-height-expanded: 14rem; }
+  #sidebar {
+    --sidebar-width: 4rem; /* 折叠宽度 */
+    --sidebar-width-wide: 14rem; /* 展开宽度 */
+    --bottom-bar-height-collapsed: 10rem; /* 底部栏折叠高度 (3个图标 + 间距) */
+    --bottom-bar-height-expanded: 10rem; /* 底部栏展开高度 */
+  }
   #sidebar { --bottom-bar-height: var(--bottom-bar-height-collapsed); }
   html[data-sidebar-open="true"] #sidebar { --bottom-bar-height: var(--bottom-bar-height-expanded); }
 
+  /* 底部栏文字控制 */
   /* 折叠时隐藏文字，仅显示图标 */
-  html[data-sidebar-open="false"] #sidebar .bottom-bar .sidebar-text { display: none; }
+  html[data-sidebar-open="false"] #sidebar .bottom-bar .sidebar-text { 
+    /* 使用通用的 .sidebar-text 规则控制，这里不需要额外隐藏，
+       因为上面的 .sidebar-text 默认 opacity: 0 */
+  }
 </style>
 
 <script>
