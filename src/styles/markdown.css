@@ -41,6 +41,9 @@
 .prose img {
   max-width: 100%;
   height: auto;
+  width: auto; /* 允许 width 属性生效 */
+  margin: 0 auto; /* 全局图片居中 */
+  display: block; /* 确保 margin auto 生效 */
 }
 
 .prose pre {

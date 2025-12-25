@@ -88,49 +88,68 @@
       });
     }
     (function(){
-      const i = document.getElementById('sd-input');
-      const c = document.getElementById('sd-close');
-      const b = document.getElementById('sd-search');
-      if (!(i instanceof HTMLInputElement) || !c) return;
-      i.addEventListener('input', () => {
-        clearTimeout(t);
-        t = window.setTimeout(() => runSearch(), 200);
-      });
-      if (b) { b.addEventListener('click', () => runSearch()); }
-      c.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); closeDialog(); });
-      // 无遮罩点击关闭
-      window.addEventListener('search:open', () => openDialog());
-      window.addEventListener('search:close', () => closeDialog());
-      window.addEventListener('keydown', (e) => {
-        const o = document.getElementById('sd-overlay');
-        const l = document.getElementById('sd-list');
-        if (!o || o.style.display === 'none') return;
-        if (e.key === 'Escape') { e.preventDefault(); closeDialog(); return; }
-        if (e.key === 'ArrowDown'){
-          const count = l ? l.children.length : 0;
-          selected = Math.min(selected + 1, count - 1);
-          updateSelected();
-          e.preventDefault();
-        }
-        if (e.key === 'ArrowUp'){
-          selected = Math.max(selected - 1, -1);
-          updateSelected();
-          e.preventDefault();
-        }
-        if (e.key === 'Enter'){
-          if (selected >= 0 && l && l.children[selected]){
-            const a = l.children[selected].querySelector('a');
-            const href = a && a.getAttribute('href') ? a.getAttribute('href') : '';
-            if (href) window.location.href = href;
-          }
-        }
-      }, { capture: true });
-      const overlay = document.getElementById('sd-overlay');
-      if (overlay) {
-        overlay.addEventListener('click', (e) => {
-          if (e.target === overlay) { e.preventDefault(); e.stopPropagation(); closeDialog(); }
+      const initSearchEvents = () => {
+        const i = document.getElementById('sd-input');
+        const c = document.getElementById('sd-close');
+        const b = document.getElementById('sd-search');
+        const overlay = document.getElementById('sd-overlay');
+        
+        if (!(i instanceof HTMLInputElement) || !c) return;
+        
+        // 避免重复绑定
+        if (i.dataset.bound === 'true') return;
+        i.dataset.bound = 'true';
+
+        i.addEventListener('input', () => {
+          clearTimeout(t);
+          t = window.setTimeout(() => runSearch(), 200);
         });
+        if (b) { b.addEventListener('click', () => runSearch()); }
+        c.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); closeDialog(); });
+        
+        if (overlay) {
+          overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) { e.preventDefault(); e.stopPropagation(); closeDialog(); }
+          });
+        }
+      };
+
+      // 绑定全局事件（只需绑定一次）
+      // 使用标记避免在热更新等情况下重复绑定
+      if (!(window as any)._sd_events_bound) {
+        window.addEventListener('search:open', () => openDialog());
+        window.addEventListener('search:close', () => closeDialog());
+        window.addEventListener('keydown', (e) => {
+          const o = document.getElementById('sd-overlay');
+          const l = document.getElementById('sd-list');
+          if (!o || o.style.display === 'none') return;
+          if (e.key === 'Escape') { e.preventDefault(); closeDialog(); return; }
+          if (e.key === 'ArrowDown'){
+            const count = l ? l.children.length : 0;
+            selected = Math.min(selected + 1, count - 1);
+            updateSelected();
+            e.preventDefault();
+          }
+          if (e.key === 'ArrowUp'){
+            selected = Math.max(selected - 1, -1);
+            updateSelected();
+            e.preventDefault();
+          }
+          if (e.key === 'Enter'){
+            if (selected >= 0 && l && l.children[selected]){
+              const a = l.children[selected].querySelector('a');
+              const href = a && a.getAttribute('href') ? a.getAttribute('href') : '';
+              if (href) window.location.href = href;
+            }
+          }
+        }, { capture: true });
+        (window as any)._sd_events_bound = true;
       }
+
+      // 每次页面加载（包括 View Transitions）重新绑定 DOM 元素事件
+      document.addEventListener('astro:page-load', initSearchEvents);
+      // 首次加载也手动调用一次（以防 astro:page-load 已触发或未触发）
+      initSearchEvents();
     })();
   </script>
 </div>

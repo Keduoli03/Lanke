@@ -3,6 +3,7 @@ import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 import remarkDirective from 'remark-directive';
 import { remarkGithubCard } from './src/plugins/rehype-component-github-card.mjs';
+import { remarkImageSize } from './src/plugins/remark-image-size.mjs';
 import rehypeAplayer from './src/plugins/rehype-component-aplayer.mjs';
 import icon from "astro-icon";
 import svelte from "@astrojs/svelte";
@@ -31,10 +32,16 @@ export default defineConfig({
     prefetchAll: true,
     defaultStrategy: 'viewport',
   },
+  image: {
+    // 尝试关闭响应式样式
+    // @ts-ignore
+    responsiveStyles: false,
+  },
   markdown: {
     remarkPlugins: [
       remarkDirective,
       remarkGithubCard,
+      remarkImageSize,
       remarkAplayer,
     ],
     rehypePlugins: [

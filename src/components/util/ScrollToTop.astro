@@ -3,22 +3,84 @@ import { Icon } from 'astro-icon/components';
 ---
 
 <button id="scroll-to-top" title="回到顶部">
-  <Icon name="material-symbols:arrow-upward" />
+  <!-- 进度条 SVG -->
+  <svg class="progress-ring" viewBox="0 0 100 100" aria-hidden="true">
+    <!-- 背景轨道 -->
+    <path
+      class="track"
+      d="M 50 2 H 76 A 24 24 0 0 1 98 26 V 74 A 24 24 0 0 1 76 98 H 24 A 24 24 0 0 1 2 74 V 26 A 24 24 0 0 1 24 2 H 50 Z"
+      fill="none"
+      stroke-width="4"
+    />
+    <!-- 进度指示器 -->
+    <path
+      class="progress"
+      d="M 50 2 H 76 A 24 24 0 0 1 98 26 V 74 A 24 24 0 0 1 76 98 H 24 A 24 24 0 0 1 2 74 V 26 A 24 24 0 0 1 24 2 H 50 Z"
+      fill="none"
+      stroke-width="4"
+      pathLength="1"
+      stroke-dasharray="1"
+      stroke-dashoffset="1"
+    />
+  </svg>
+  
+  <div class="icon-wrapper">
+    <Icon name="material-symbols:arrow-upward" />
+  </div>
 </button>
 
 <script>
   document.addEventListener('astro:page-load', () => {
     const scrollToTopBtn = document.getElementById('scroll-to-top');
+    const progressPath = scrollToTopBtn?.querySelector('.progress') as SVGPathElement;
 
-    if (scrollToTopBtn) {
-      // 滚动时检查按钮的可见性
-      window.addEventListener('scroll', () => {
+    if (scrollToTopBtn && progressPath) {
+      const updateProgress = () => {
+        // 计算滚动进度
+        let scrollTotal = document.documentElement.scrollHeight - window.innerHeight;
+        
+        // 如果存在评论区，排除评论区高度，仅计算正文区域的进度
+        const commentSection = document.getElementById('comment-section');
+        if (commentSection) {
+          // 获取评论区相对于视口的顶部位置 + 当前滚动距离 = 评论区在文档中的绝对顶部位置
+          const commentTop = commentSection.getBoundingClientRect().top + window.scrollY;
+          // 当视口底部接触到评论区顶部时，视为 100% 进度
+          // 即：目标滚动距离 = 评论区绝对顶部 - 视口高度
+          const contentScrollTotal = commentTop - window.innerHeight;
+          
+          // 确保值有效（防止文章极短导致负值）
+          if (contentScrollTotal > 0) {
+            scrollTotal = contentScrollTotal;
+          }
+        }
+
+        const scrollCurrent = window.scrollY;
+        
+        let scrollPercentage = 0;
+        if (scrollTotal > 0) {
+          scrollPercentage = scrollCurrent / scrollTotal;
+        }
+        
+        // 限制在 0 到 1 之间
+        scrollPercentage = Math.min(Math.max(scrollPercentage, 0), 1);
+        
+        // 更新 stroke-dashoffset (1 -> 0)
+        // 1 代表空 (完全偏移), 0 代表满
+        progressPath.style.strokeDashoffset = (1 - scrollPercentage).toString();
+
+        // 滚动超过 400px 显示按钮
         if (window.scrollY > 400) {
           scrollToTopBtn.classList.add('visible');
         } else {
           scrollToTopBtn.classList.remove('visible');
         }
-      });
+      };
+
+      // 监听滚动事件 (使用 passive 提升性能)
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      
+      // 初始化调用一次以设置初始状态
+      updateProgress();
 
       // 点击按钮平滑滚动到顶部
       scrollToTopBtn.addEventListener('click', () => {
@@ -33,9 +95,11 @@ import { Icon } from 'astro-icon/components';
 
 <style>
   #scroll-to-top {
-    background: color-mix(in srgb, var(--theme-color) 25%, transparent);
-    color: var(--theme-color);
-    border: 1px solid color-mix(in srgb, var(--theme-color) 40%, transparent);
+    position: relative; /* 为绝对定位的 SVG 提供上下文 */
+    background: var(--content-pane-bg); /* 使用卡片背景色，保持干净 */
+    color: var(--text-secondary); /* 图标默认使用次级文本色 */
+    /* 移除原有边框，改用 SVG 实现 */
+    border: none;
     border-radius: 0.75rem; 
     width: 3.25rem; 
     height: 3.25rem;
@@ -43,17 +107,52 @@ import { Icon } from 'astro-icon/components';
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    padding: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* 添加轻微阴影以区分背景 */
     
     /* 初始状态和过渡 */
     opacity: 0;
     visibility: hidden;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    
-    /* 图标大小 */
-    & > [data-icon] {
-      width: 1.75rem;
-      height: 1.75rem;
-    }
+    transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                visibility 0.4s, 
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                color 0.2s ease;
+  }
+
+  /* SVG 容器 */
+  .progress-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* 让点击穿透到按钮 */
+    transform: rotate(0deg); /* 确保起始位置正确 */
+  }
+
+  .track {
+    stroke: var(--line-divider); /* 轨道使用分割线颜色，低调 */
+  }
+
+  .progress {
+    stroke: var(--theme-color);
+    transition: stroke-dashoffset 0.1s linear;
+    stroke-linecap: round; /* 圆角端点看起来更顺滑 */
+  }
+
+  .icon-wrapper {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 图标大小 */
+  .icon-wrapper > [data-icon] {
+    width: 1.75rem;
+    height: 1.75rem;
   }
 
   #scroll-to-top.visible {
@@ -62,14 +161,14 @@ import { Icon } from 'astro-icon/components';
   }
 
   #scroll-to-top:hover {
-    transform: scale(1.05);
-    background: color-mix(in srgb, var(--theme-color) 80%, var(--color-bg));
-    color: var(--text-on-theme);
-    box-shadow: 0 8px 20px -5px color-mix(in srgb, var(--theme-color) 50%, transparent);
+    transform: translateY(-2px); /* 悬停时轻微上浮 */
+    background: var(--content-pane-bg); /* 保持背景不变 */
+    color: var(--theme-color); /* 图标变亮 */
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.12); /* 阴影加深 */
   }
 
   #scroll-to-top:active {
-    transform: scale(0.95);
-    transition: transform 0.1s ease;
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   }
 </style>

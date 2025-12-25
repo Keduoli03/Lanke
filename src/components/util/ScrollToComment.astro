@@ -27,9 +27,9 @@ import { Icon } from 'astro-icon/components';
 
 <style>
   #scroll-to-comment {
-    background: color-mix(in srgb, var(--theme-color) 25%, transparent);
-    color: var(--theme-color);
-    border: 1px solid color-mix(in srgb, var(--theme-color) 40%, transparent);
+    background: var(--content-pane-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--line-divider);
     border-radius: 0.75rem; 
     width: 3.25rem; 
     height: 3.25rem;
@@ -37,6 +37,7 @@ import { Icon } from 'astro-icon/components';
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     
     /* 过渡效果 */
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -49,14 +50,15 @@ import { Icon } from 'astro-icon/components';
   }
 
   #scroll-to-comment:hover {
-    transform: scale(1.05);
-    background: color-mix(in srgb, var(--theme-color) 80%, var(--color-bg));
-    color: var(--text-on-theme);
-    box-shadow: 0 8px 20px -5px color-mix(in srgb, var(--theme-color) 50%, transparent);
+    transform: translateY(-2px);
+    background: var(--content-pane-bg);
+    color: var(--theme-color);
+    border-color: var(--theme-color);
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.12);
   }
 
   #scroll-to-comment:active {
-    transform: scale(0.95);
-    transition: transform 0.1s ease;
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   }
 </style>

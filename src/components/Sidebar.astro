@@ -23,8 +23,8 @@ const extendedLinks: ExtendedLink[] = [...links];
   <!-- 顶部Logo + 展开收起按钮：重点修改布局逻辑 -->
   <div class="sidebar-header p-2 border-b border-[var(--line-divider)] flex items-center justify-center relative" transition:persist="sidebar-logo">
     <!-- Logo容器：折叠/展开时都保持居中对齐 -->
-    <a href={url("/")} class="hover:opacity-80 transition-opacity flex items-center justify-center">
-      <img src="/favicon-192.png" alt={siteConfig.title} class="sidebar-logo w-10 h-10" />
+    <a href={url("/")} class="hover:opacity-80 transition-opacity flex items-center justify-center" data-no-lightbox="true">
+      <img src="/favicon-192.png" alt={siteConfig.title} class="sidebar-logo w-10 h-10" data-no-lightbox="true" />
       <span class="text-sm font-semibold text-[var(--text-primary)] sidebar-text ml-2">
         {siteConfig.title}
       </span>
