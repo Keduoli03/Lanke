@@ -16,7 +16,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 <!-- Global Metadata -->
 <meta charset="utf-8" />
-<!-- 尝试修复保存阅读进度不及时 -->
+
 <script>
   window.history.scrollRestoration = 'manual';
 </script>
@@ -48,4 +48,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website" />
+
+<!-- Umami Analytics -->
+<script defer src="https://umami.blueke.top/script.js" data-website-id="381b2283-cb7d-4fb6-bf43-f818198d9eb4"></script>
 
