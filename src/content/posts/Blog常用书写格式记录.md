@@ -171,4 +171,4 @@ print(a+b)
 
 ![乌贼 | 600](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@main/image/%E4%B9%8C%E8%B4%BC.webp)
 
-![乌贼 | 400](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@main/image/%E4%B9%8C%E8%B4%BC.webp)
+![乌贼|400](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@main/image/%E4%B9%8C%E8%B4%BC.webp)
