@@ -17,7 +17,8 @@ export default function rehypeImageLightbox() {
           const currentStyle = props.style || '';
           
           // 设置 CSS 样式强制控制显示宽度，并添加 margin: 0 auto 实现居中
-          props.style = `width: ${w}px !important; max-width: ${w}px !important; display: block; margin: 0 auto; ${currentStyle}`;
+          // 注意：max-width 设为 100% 以保证移动端不溢出
+          props.style = `width: ${w}px !important; max-width: 100% !important; display: block; margin: 0 auto; ${currentStyle}`;
           
           // 对于这种强制指定宽度的网络图片，我们可以保留 sizes="100vw" 以确保清晰度
           if (!props.sizes) props.sizes = '100vw';

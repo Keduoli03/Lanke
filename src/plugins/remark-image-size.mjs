@@ -5,17 +5,23 @@ export function remarkImageSize() {
     visit(tree, 'image', (node) => {
       const alt = node.alt || '';
       
-      // 匹配 "text|100" 或 "text|100x200" 或 "|100"
-      const match = alt.match(/^(.*?)\|(\d+)(?:x(\d+))?$/);
+      // 匹配 "text|100" 或 "text | 100" 或 "text|100x200" 等，允许空格
+      // 兼容中文管道符 "｜" 和乘号 "×"
+      // 使用更宽松的正则，确保捕获所有可能的情况
+      const match = alt.match(/^(.*?)\s*[|｜]\s*(\d+)(?:\s*[xX×]\s*(\d+))?\s*$/);
       
+      console.log(`[RemarkImageSize] Visiting image: "${alt}"`);
+
       if (match) {
         const [_, cleanAlt, width, height] = match;
+        console.log(`[RemarkImageSize] MATCHED: "${alt}" -> w=${width}, h=${height}`);
+
         
         // 1. 使用正则判断是否为网络图片
         const isRemote = /^(https?:|\/\/)/i.test(node.url);
         
         // 还原 alt
-        node.alt = cleanAlt;
+        node.alt = cleanAlt.trim();
         
         // 策略 V12：本地图片 CSS 样式缩放方案
         // 目标：支持 |200 语法，缩小显示，但保留高清原图（不触发 Astro 物理压缩）
@@ -36,6 +42,9 @@ export function remarkImageSize() {
         delete node.width;
         // @ts-ignore
         delete node.height;
+        
+        // 强制确保 hProperties 存在
+        if (!node.data.hProperties) node.data.hProperties = {};
       }
     });
   };

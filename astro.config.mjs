@@ -3,7 +3,7 @@ import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 import remarkDirective from 'remark-directive';
 import { remarkGithubCard } from './src/plugins/rehype-component-github-card.mjs';
-import { remarkImageSize } from './src/plugins/remark-image-size.mjs';
+import { remarkImageSize } from './src/plugins/remark-image-size.mjs'; 
 import rehypeAplayer from './src/plugins/rehype-component-aplayer.mjs';
 import icon from "astro-icon";
 import svelte from "@astrojs/svelte";
