@@ -10,7 +10,7 @@ column: 博客
 cover:
 status: true
 date: 2025-04-23 00:47
-updated: 2025-12-30 00:34
+updated: 2025-12-30 00:39
 slug: "303355"
 pinned: true
 ---
@@ -165,7 +165,9 @@ print(a+b)
 
 示例：
 
-![普拉娜 | 600](./附件/Blog常用书写格式记录/Blog常用书写格式记录.webp) ![乌贼 | 450](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@main/image/%E4%B9%8C%E8%B4%BC.webp)
+![普拉娜 | 600](./附件/Blog常用书写格式记录/Blog常用书写格式记录.webp)
+
+![乌贼 | 450](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@main/image/%E4%B9%8C%E8%B4%BC.webp)
 
 ![普拉娜 | 300](./附件/Blog常用书写格式记录/Blog常用书写格式记录.webp)
 
