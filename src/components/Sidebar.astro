@@ -50,7 +50,7 @@ const extendedLinks: ExtendedLink[] = [...links];
               href={linkPath}
               target={isExternal ? "_blank" : "_self"}
               rel={isExternal ? "noopener noreferrer" : ""}
-              data-astro-prefetch={isExternal ? "false" : "load"}
+              data-astro-prefetch={isExternal ? "false" : "hover"}
               class:list={[
                 "group flex items-center p-1 nav-link rounded-lg transition-all duration-300",
                 { "is-active": isActive },
@@ -189,23 +189,21 @@ const extendedLinks: ExtendedLink[] = [...links];
     margin-top: 0.25rem;
     font-size: 0.75rem;
     text-align: center;
-    /* 覆盖之前的 transition，不需要延迟 */
     transition: opacity 100ms ease;
   }
 
-  /* 特殊处理：折叠状态下的底部栏文字（强制隐藏，防止撑高） */
   html[data-sidebar-open="false"] #sidebar .bottom-bar .sidebar-text {
     display: none;
   }
 
-  /* Logo样式：和菜单icon-container尺寸完全一致，确保对齐 */
+
   .sidebar-logo {
     width: 2.5rem; /* 等于w-10 */
     height: 2.5rem;
     flex-shrink: 0;
   }
 
-  /* 展开收起按钮：固定右侧间距，不挤压Logo */
+
   #sidebar-toggle {
     border: none;
     cursor: pointer;
@@ -383,6 +381,37 @@ const extendedLinks: ExtendedLink[] = [...links];
   function initSidebar() {
     const sidebar = document.getElementById('sidebar');
     if (!sidebar) return;
+
+    // 更新侧边栏链接的激活状态（因为 Sidebar 是持久化的，切换页面不会重新渲染）
+    const updateActiveLinks = () => {
+      const currentPath = window.location.pathname;
+      // 移除末尾斜杠以统一比较（除非是根路径）
+      const normalize = (p: string) => p.length > 1 && p.endsWith('/') ? p.slice(0, -1) : p;
+      const normCurrent = normalize(currentPath);
+
+      const links = sidebar.querySelectorAll('a.nav-link');
+      links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (!href) return;
+        
+        const linkPath = new URL(href, window.location.origin).pathname;
+        const normLink = normalize(linkPath);
+
+        let isActive = false;
+        if (normLink === '/') {
+          isActive = normCurrent === '/';
+        } else {
+          isActive = normCurrent.startsWith(normLink);
+        }
+
+        if (isActive) {
+          link.classList.add('is-active');
+        } else {
+          link.classList.remove('is-active');
+        }
+      });
+    };
+    updateActiveLinks();
 
     try {
       const savedState = localStorage.getItem('sidebarOpen');
