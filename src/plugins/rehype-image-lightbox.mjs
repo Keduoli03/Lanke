@@ -11,18 +11,30 @@ export default function rehypeImageLightbox() {
       let alt = String(props.alt || '');
       let title = String(props.title || '');
 
+      // DEBUG: 注入调试信息到 DOM，以便在生产环境排查
+      // props['data-debug-alt-raw'] = alt;
+
       let width = props['data-md-width'];
       let height = props['data-md-height'];
 
       // Fallback: 如果 remark 插件未处理，尝试在 rehype 阶段解析 alt 中的尺寸
       if (!width && !height) {
         // 匹配 "text|100" 或 "text | 100" 等，允许空格，兼容中文管道符和乘号
-        const match = alt.match(/^(.*?)\s*[|｜]\s*(\d+)(?:\s*[xX×]\s*(\d+))?\s*$/);
+        // 增强正则：兼容 HTML 实体管道符 (&#124;) 和非中断空格
+        // const match = alt.match(/^(.*?)\s*[|｜]\s*(\d+)(?:\s*[xX×]\s*(\d+))?\s*$/);
+        
+        // 尝试先解码 HTML 实体（简单的替换，避免引入 heavy library）
+        const decodedAlt = alt.replace(/&#124;/g, '|').replace(/&vert;/g, '|').replace(/&#x7C;/g, '|');
+        
+        const match = decodedAlt.match(/^(.*?)(?:[\s\u00A0]*[|｜][\s\u00A0]*)(\d+)(?:[\s\u00A0]*[xX×][\s\u00A0]*(\d+))?[\s\u00A0]*$/);
+        
         if (match) {
            const [_, cleanAlt, w, h] = match;
            alt = cleanAlt.trim();
            width = w;
            height = h;
+           
+           // props['data-debug-fallback'] = 'triggered';
            
            // 更新 img 节点的 alt，避免显示管道符
            props.alt = alt;
