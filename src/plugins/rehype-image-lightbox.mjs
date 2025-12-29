@@ -11,9 +11,26 @@ export default function rehypeImageLightbox() {
       let alt = String(props.alt || '');
       let title = String(props.title || '');
 
+      let width = props['data-md-width'];
+      let height = props['data-md-height'];
 
-      if (props['data-md-width']) {
-          const w = props['data-md-width'];
+      // Fallback: 如果 remark 插件未处理，尝试在 rehype 阶段解析 alt 中的尺寸
+      if (!width && !height) {
+        // 匹配 "text|100" 或 "text | 100" 等，允许空格，兼容中文管道符和乘号
+        const match = alt.match(/^(.*?)\s*[|｜]\s*(\d+)(?:\s*[xX×]\s*(\d+))?\s*$/);
+        if (match) {
+           const [_, cleanAlt, w, h] = match;
+           alt = cleanAlt.trim();
+           width = w;
+           height = h;
+           
+           // 更新 img 节点的 alt，避免显示管道符
+           props.alt = alt;
+        }
+      }
+
+      if (width) {
+          const w = width;
           const currentStyle = props.style || '';
           
           // 设置 CSS 样式强制控制显示宽度，并添加 margin: 0 auto 实现居中
@@ -27,8 +44,8 @@ export default function rehypeImageLightbox() {
           delete props['data-md-width'];
       }
       
-      if (props['data-md-height']) {
-          const h = props['data-md-height'];
+      if (height) {
+          const h = height;
           const currentStyle = props.style || '';
           // 同样为高度限制的图片添加居中
           props.style = `height: ${h}px !important; display: block; margin: 0 auto; ${currentStyle}`;
@@ -43,7 +60,10 @@ export default function rehypeImageLightbox() {
         parent.properties.className = Array.isArray(cls) ? [...new Set([...cls, 'md-lightbox'])] : ['md-lightbox'];
         // 不再覆盖 href，保留原链接
         parent.properties['data-lightbox'] = parent.properties['data-lightbox'] || src;
+        
+        // 关键修复：更新父级 <a> 标签的 data-alt 为处理后的 alt（不带管道符）
         parent.properties['data-alt'] = alt;
+        
         parent.properties['data-title'] = title;
         // 禁用 Astro 预取，避免视口预取造成 404
         parent.properties['data-astro-prefetch'] = 'false';
