@@ -1,4 +1,4 @@
-﻿---
+---
 title: Blog常用书写格式记录
 description: 部分内容只适用于本博客
 categories:
@@ -10,7 +10,7 @@ column: 博客
 cover:
 status: true
 date: 2025-04-23 00:47
-updated: 2025-11-15 23:09
+updated: 2025-12-29 20:41
 slug: "303355"
 pinned: true
 ---
@@ -87,7 +87,7 @@ pinned: true
 
 通过添加 `-` 参数实现折叠功能，默认折叠状态；添加 `+` 可默认展开：
 
-```markdown title="可折叠的 Callout 示例"
+```markdown
 # 默认折叠（需点击展开）
 > [!IMPORTANT]- 折叠的重要信息
 > 点击标题可展开/折叠内容，适合内容较长的标注，减少视觉干扰。
@@ -151,3 +151,24 @@ print(a+b)
 :: music{title="晴天" author="周杰伦" url=" https://openlist.blueke.top/d/115%E7%BD%91%E7%9B%98/%E9%9F%B3%E4%B9%90/%E5%91%A8%E6%9D%B0%E4%BC%A6/03.%20%E6%99%B4%E5%A4%A9.flac?sign=pCKUnc6dsm61PHHHVdBEGJtTaf57h3B_SUwtqCKRADY=:0" }
 ```
 
+示例：
+
+:: music{title="晴天" author="周杰伦" url=" https://openlist.blueke.top/d/115%E7%BD%91%E7%9B%98/%E9%9F%B3%E4%B9%90/%E5%91%A8%E6%9D%B0%E4%BC%A6/03.%20%E6%99%B4%E5%A4%A9.flac?sign=pCKUnc6dsm61PHHHVdBEGJtTaf57h3B_SUwtqCKRADY=:0" }
+
+## 不同尺寸的插图
+
+适配了 obsidian 的写法 , `|` 后添加数字可以规定图片的大小
+
+```text
+![乌贼 | 800](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@main/image/%E4%B9%8C%E8%B4%BC.webp)
+```
+
+示例：
+
+![乌贼](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@main/image/%E4%B9%8C%E8%B4%BC.webp)
+
+![乌贼 | 800](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@main/image/%E4%B9%8C%E8%B4%BC.webp)
+
+![乌贼 | 600](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@main/image/%E4%B9%8C%E8%B4%BC.webp)
+
+![乌贼 | 400](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@main/image/%E4%B9%8C%E8%B4%BC.webp)
