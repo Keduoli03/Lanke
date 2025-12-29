@@ -54,6 +54,7 @@ const generatePageUrl = (pageNum: number) => {
     {/* 上一页按钮 - 增强对比 */}
     <a 
       href={page.url.prev || '#'} 
+      data-astro-prefetch="load"
       class={`px-2.5 py-1.5 text-sm sm:px-4 sm:py-2.5 sm:text-base rounded-md font-bold transition-all duration-200 ${
         page.url.prev 
           ? 'bg-sidebar-icon text-primary border border-sidebar-icon/50 hover:bg-link-bg hover:text-white shadow hover:shadow-lg hover:translate-y-[-1px]' 
@@ -79,6 +80,7 @@ const generatePageUrl = (pageNum: number) => {
       return (
         <a
           href={pageUrl}
+          data-astro-prefetch
           class={`px-2.5 py-1.5 text-xs sm:px-3.5 sm:py-2 sm:text-sm rounded-md font-medium transition-all duration-200 ${
             isCurrent
               ? 'bg-link-bg text-white font-bold shadow-lg transform scale-105 border border-link-bg/30 ring-1 ring-link-bg/20'
@@ -94,6 +96,7 @@ const generatePageUrl = (pageNum: number) => {
     {/* 下一页按钮 - 增强对比 */}
     <a 
       href={page.url.next || '#'} 
+      data-astro-prefetch="load"
       class={`px-2.5 py-1.5 text-sm sm:px-4 sm:py-2.5 sm:text-base rounded-md font-bold transition-all duration-200 ${
         page.url.next 
           ? 'bg-sidebar-icon text-primary border border-sidebar-icon/50 hover:bg-link-bg hover:text-white shadow hover:shadow-lg hover:translate-y-[-1px]' 
