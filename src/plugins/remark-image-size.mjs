@@ -5,10 +5,7 @@ export function remarkImageSize() {
     visit(tree, 'image', (node) => {
       const alt = node.alt || '';
       
-      // 匹配 "text|100" 或 "text | 100" 或 "text|100x200" 等，允许空格
-      // 兼容中文管道符 "｜" 和乘号 "×"
-      // 使用更宽松的正则，确保捕获所有可能的情况
-      const match = alt.match(/^(.*?)(?:[\s\u00A0]*[|｜][\s\u00A0]*)(\d+)(?:[\s\u00A0]*[xX×][\s\u00A0]*(\d+))?[\s\u00A0]*$/);
+      const match = alt.match(/^(.*?)\s*[|｜]\s*(\d+)(?:\s*[xX×]\s*(\d+))?\s*$/);
       
       console.log(`[RemarkImageSize] Visiting image: "${alt}"`);
 
