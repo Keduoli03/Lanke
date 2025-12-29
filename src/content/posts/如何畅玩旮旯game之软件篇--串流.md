@@ -1,4 +1,4 @@
----
+﻿---
 title: 如何畅玩旮旯game之软件篇--串流
 description: 使用Sunshine基地班和moonlight实现
 categories:
@@ -7,7 +7,7 @@ tags:
   - 小技巧
 column:
 cover:
-status: 已完成
+status: true
 pinned: false
 aiSummary: true
 date: 2025-11-08 22:46
@@ -76,3 +76,4 @@ Sunshine -> Audio/Video 推荐配置
 好像除了分辨率需要注意一下，其他的也没什么了？毕竟现在相较于我之前接触到的，连配置都很少了。
 
 好了，我要去玩了，有问题再补~
+

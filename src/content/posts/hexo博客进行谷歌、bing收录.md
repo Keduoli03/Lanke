@@ -1,4 +1,4 @@
----
+﻿---
 title: hexo博客进行谷歌、bing收录
 description: 折腾一下搜索引擎收录，顺便优化一下文章链接
 categories:
@@ -7,7 +7,7 @@ tags:
   - 博客
   - Hexo
 cover: https://imgapi.xl0408.top/index.php
-status: 已完成
+status: true
 date: 2025-03-17 13:55
 updated: 2025-09-13 00:07
 slug: "965179"
@@ -210,3 +210,4 @@ Sitemap: https://你的域名/baidusitemap.xml
 #### 参考来源
 -  [hexo-seo-submit使用](https://ksh7.com/posts/docs-hexo-seo-submit/index.html#%E4%BD%BF%E7%94%A8)
 - [Hexo博客之高级优化教程 | Wrysmile 的博客](https://www.wrysmile.cn/Hexo-03.html) 
+

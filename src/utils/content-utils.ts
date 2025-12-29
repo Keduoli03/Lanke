@@ -14,8 +14,8 @@ import { getCollection, type CollectionEntry } from 'astro:content';
  */
 export async function getPublishedPosts(): Promise<CollectionEntry<'posts'>[]> {
   const allPosts = await getCollection('posts');
-  // 黑名单策略：过滤掉状态为 '未完成' 的文章
-  const publishedPosts = allPosts.filter(post => post.data.status !== '未完成');
+  // 黑名单策略：过滤掉状态为 false (未完成) 的文章
+  const publishedPosts = allPosts.filter(post => post.data.status !== false);
   return publishedPosts;
 }
 
@@ -138,7 +138,7 @@ export async function getAllColumns(): Promise<{ name: string; count: number; po
 
 // 根据专栏获取文章
 export async function getPostsByColumn(column: string): Promise<CollectionEntry<'posts'>[]> {
-  const posts = await getPublishedPosts();
+  const posts = await getSortedPosts();
   const target = (column || '').trim();
   return posts.filter(post => ((post.data.column || '').trim()) === target);
 }

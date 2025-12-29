@@ -1,11 +1,11 @@
----
+﻿---
 categories:
   - Obsidian
 tags:
   - 笔记
   - 博客
 cove:
-status: 已完成
+status: true
 title: Obsidian拓展
 slug: obsidiantuo-zhan
 cover: ""
@@ -228,3 +228,4 @@ template path: 模板地址，我是专门建个文件夹存放的
 
 ### Quick Add
 1. [Obsidian最强插件：QuickAdd - 少数派](https://sspai.com/post/69375)
+

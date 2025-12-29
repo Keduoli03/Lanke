@@ -1,4 +1,4 @@
----
+﻿---
 title: MySQL9.2版本安装
 description: MySQL9.2版本安装配置
 categories:
@@ -7,7 +7,7 @@ tags:
   - 数据库
   - 笔记
 cover: https://api.miaomc.cn/image/get
-status: 已完成
+status: true
 date: 2025-03-21 11:31
 updated: 2025-09-13 00:08
 slug: "179640"
@@ -58,3 +58,4 @@ datadir= 你的路径/Data
 Navicat 是个非常好用的数据库管理软件，现在也出了 lite 版可以免费使用
 
 下载地址：[Navicat | 免费下载 Navicat Premium Lite](https://www.navicat.com.cn/download/navicat-premium-lite)
+

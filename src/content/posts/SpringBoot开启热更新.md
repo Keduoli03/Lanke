@@ -1,4 +1,4 @@
----
+﻿---
 title: SpringBoot开启热更新
 description: Spring Boot 中实现热更新（热部署）可以显著提升开发效率，以下是几种主流的实现方案及详细配置步骤
 categories:
@@ -9,7 +9,7 @@ tags:
   - Java
   - Vue
 cover: https://api.mtyqx.cn/tapi/random.php
-status: 已完成
+status: true
 date: 2025-03-22 19:17
 updated: 2025-12-25 18:36
 Series: SpringBoot
@@ -138,3 +138,4 @@ mvn spring-boot:run
 ❗ **重要**：所有热部署工具（包括 DevTools）都 **不能用于生产环境**！务必确保生产部署时已移除相关依赖。
 
 根据项目需求选择最适合的方案，一般推荐优先使用 DevTools + IDEA 原生热加载的组合，兼顾便捷性和稳定性。
+

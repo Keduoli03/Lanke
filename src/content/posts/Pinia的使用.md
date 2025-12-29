@@ -1,4 +1,4 @@
----
+﻿---
 title: Pinia的使用
 description: Pinia 是 Vue 的专属状态管理库，它允许你跨组件或页面共享状态。
 categories:
@@ -8,7 +8,7 @@ tags:
   - 前端
   - Vue
 cover:
-status: 已完成
+status: true
 date: 2025-03-23 14:39
 updated: 2025-11-25 22:26
 column: SpringBoot
@@ -277,3 +277,4 @@ sequenceDiagram
 我是边看 [pinia看这一篇就够了 - 掘金](https://juejin.cn/post/7347207466818895911#heading-16) 边自己查阅资料写的，以后用到再补充吧
 
 还有就是上面数据流图的实现，我还要写一篇来记录一下，因为我对这个规范还不是很熟练。
+

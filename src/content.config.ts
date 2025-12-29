@@ -16,7 +16,7 @@ const posts = defineCollection({
 			cover: z.union([image(), z.null()]).optional(),
 			pinned: z.boolean().default(false),
 			aiSummary: z.boolean().optional().default(true),
-			status: z.string().optional(),
+			status: z.boolean().optional().default(true),
 			column: z.union([z.string(), z.null()]).optional(),
 		}),
 });

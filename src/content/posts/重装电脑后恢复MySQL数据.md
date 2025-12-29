@@ -1,4 +1,4 @@
----
+﻿---
 title: 重装电脑后恢复MySQL数据
 description: 从 IBD 文件抢救 MySQL 数据
 categories:
@@ -6,7 +6,7 @@ categories:
 tags:
   - 数据库
   - 后端
-status: 已完成
+status: true
 pinned: false
 aiSummary: true
 date: 2025-11-11 22:23
@@ -35,3 +35,4 @@ python main.py your_file.ibd --sql --ddl
 ```
 
 最终也是完整的恢复了数据库的数据，虽然说都是一堆半成品，但是有一些还是自己慢慢写出来的，还是挺有感情的。
+

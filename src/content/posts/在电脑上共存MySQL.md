@@ -1,4 +1,4 @@
----
+﻿---
 title: 在电脑上共存MySQL
 description: 因面试需求需使用 MySQL 5.7 版本，而本机已安装 MySQL 9.5，为此整理MySQL 5.7 与 9.5 版本共存的实操教程。
 categories:
@@ -8,7 +8,7 @@ tags:
   - MySQL
 column:
 cover: https://gcore.jsdelivr.net/gh/Keduoli03/My_img@main/image/%E6%99%AE%E6%8B%89%E5%A8%9C-%E7%A2%A7%E8%93%9D%E6%A1%A3%E6%A1%88.jpg
-status: 已完成
+status: true
 pinned: false
 aiSummary: true
 date: 2025-12-23 18:25
@@ -101,3 +101,4 @@ net start MySQL57
 这里需要设置密码，毕竟此时密码是临时的
 
 我使用的是 navicat，所以链接上数据库后自动让我重新设置密码了。你也可以使用命令进行重置
+

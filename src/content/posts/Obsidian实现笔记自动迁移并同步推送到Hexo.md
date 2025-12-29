@@ -1,4 +1,4 @@
----
+﻿---
 title: Obsidian实现笔记自动迁移并同步推送到Hexo
 categories:
   - Obsidian
@@ -6,7 +6,7 @@ tags:
   - 笔记
   - 博客
   - 前端
-status: 已完成
+status: true
 date: 2024-11-19 20:47
 updated: 2025-09-13 00:08
 slug: obsidianshi-xian-bi-ji-zi-dong-qian-yi-bing-tong-bu-tui-song-dao-hexo
@@ -65,3 +65,4 @@ git push 的相关代码如图所示，可自行更改。
 ### 参考资料
 - [史上最简单易用的obsidian插件开发方法（适合新手） - 开发讨论 - Obsidian 中文论坛](https://forum-zh.obsidian.md/t/topic/37149)
 - [声明 | Obsidian 插件开发文档](https://luhaifeng666.github.io/obsidian-plugin-docs-zh/zh2.0/)
+

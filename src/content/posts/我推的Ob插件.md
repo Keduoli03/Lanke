@@ -5,7 +5,7 @@ categories:
   - Obsidian
 description: 最近在酷安看到有伙伴分享了自己的笔记软件分享，我也就借花献佛，来推荐下我觉得很好用的 Obsidian 插件，也欢迎各位交流分享
 date: 2024-09-24 12:32
-updated: 2025-09-13 00:13
+updated: 2025-12-28 14:36
 title: 我推的Ob插件
 slug: "301279"
 tags:
@@ -19,6 +19,7 @@ tags:
 <!--more-->
 
 ## 插件
+
 ### 1.Remotely Save -- 第三方同步插件
 
 插件介绍：这是一款非官方的的同步插件，支持Amazon S3 或兼容 S3 的服务（如阿里云）、Webdav、 OneDrive 等众多服务。
@@ -47,7 +48,7 @@ tags:
 
 插件介绍：支持附件文件夹名称绑定笔记名、自动重命名、自动删除、显示/隐藏。
 
-![我推的Ob插件-Attachment Manager](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@img/img/%E6%88%91%E6%8E%A8%E7%9A%84Ob%E6%8F%92%E4%BB%B6-Attachment%20Manager.png)
+![我推的Ob插件-Attachment Manager|475](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@img/img/%E6%88%91%E6%8E%A8%E7%9A%84Ob%E6%8F%92%E4%BB%B6-Attachment%20Manager.png)
 
 这个本人真的强烈推荐，适用于强迫症，按照 Obsidian 本身的附件管理，只能指定到一个文件夹里，随着笔记的积累，无异会很混乱。而这个插件可以完美的解决这个问题，不仅可以自动命名，还能自动创建附件子文件夹，分别存储，美观整洁。
 
@@ -66,3 +67,10 @@ tags:
 插件介绍：旨在增强 Obsidian 的可视化编辑体验。提供类似于 Word，在线办公软件的浮动工具栏等交互方式。
 
 这个也是提供了很多的格式，方便 Markdown 的书写，如果你是 Markdown 刚入门或者不熟悉很多的语法，那么强烈推荐
+
+### 7. Painter
+
+插件介绍，提供了更加快捷丰富的高亮体验
+
+
+![Painter|675](附件/我推的Ob插件.md_附件/Pasted%20image%2020251228143643.png)

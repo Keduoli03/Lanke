@@ -1,4 +1,4 @@
----
+﻿---
 title: 人与AI，爱与理性
 description: 写在《薇薇-萤石眼之歌》后
 categories:
@@ -8,7 +8,7 @@ tags:
   - 动漫
 column: 动漫
 cover: https://gcore.jsdelivr.net/gh/Keduoli03/My_img@img/p2638160918.webp
-status: 已完成
+status: true
 date: 2025-05-24 15:43
 updated: 2025-12-26 05:08
 slug: "178593"
@@ -71,3 +71,4 @@ slug: "178593"
 [^2]: **DeepSeek**：深度求索（DeepSeek）是一家专注实现AGI的中国人工智能公司，其开源的模型在中文语境和逻辑推理方面表现优异。
 
 [^3]: **功利主义**：一种伦理学理论，主张行为的道德价值取决于其结果，即能否为最大多数人带来最大的幸福（Greatest Happiness Principle）。
+

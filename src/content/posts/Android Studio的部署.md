@@ -1,4 +1,4 @@
----
+﻿---
 title: Android Studio的部署
 description: 简单记录一下
 categories:
@@ -6,7 +6,7 @@ categories:
 tags:
   - 笔记
 cover: http://www.98qy.com/sjbz/api.php
-status: 已完成
+status: true
 date: 2025-03-11 19:26
 updated: 2025-04-04 19:22
 slug: "946133"
@@ -55,3 +55,4 @@ zipStorePath=wrapper/dists
 ![Android Studio的部署-202503112052](https://gcore.jsdelivr.net/gh/Keduoli03/My_img@img/Android%20Studio%E7%9A%84%E9%83%A8%E7%BD%B2-202503112052.png)
 
 到这里也是结束了
+

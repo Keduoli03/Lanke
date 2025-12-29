@@ -1,4 +1,4 @@
----
+﻿---
 title: 使用Astro搭建博客
 description: 简单记录Astro的部署以及主题自定义配置
 categories:
@@ -6,7 +6,7 @@ categories:
 tags:
   - 博客
 cover: http://www.98qy.com/sjbz/api.php
-status: 已完成
+status: true
 date: 2025-04-03 11:40
 updated: 2025-11-25 22:27
 column: 博客
@@ -305,3 +305,4 @@ export const collections = {
 指南：[为什么是 Astro? | Docs](https://docs.astro.build/zh-cn/concepts/why-astro/)
 
 [新一代静态博客框架Astro的部署优化指南与使用体验 - 时歌的博客](https://www.lapis.cafe/posts/technicaltutorials/%E6%96%B0%E4%B8%80%E4%BB%A3%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E6%A1%86%E6%9E%B6astro%E7%9A%84%E9%83%A8%E7%BD%B2%E4%BC%98%E5%8C%96%E6%8C%87%E5%8D%97%E4%B8%8E%E4%BD%BF%E7%94%A8%E4%BD%93%E9%AA%8C/#1%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C)
+

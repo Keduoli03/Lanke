@@ -1,4 +1,4 @@
----
+﻿---
 title: Entity、DTO和VO
 description: 一点笔记记录
 categories:
@@ -9,7 +9,7 @@ tags:
   - SpringBoot
 column: SpringBoot
 cover:
-status: 未完成
+status: false
 date: 2025-05-30 20:35
 updated: 2025-11-25 22:25
 slug: "894321"
@@ -93,3 +93,4 @@ public class UserVO {
 ## 实践
 
 在实践中，我是将 DTO 和 VO 组合起来使用的，就比如说上面的，我先用 DTO 获取前端的传来的字段，再根据此字段数据进行处理，将结果以定义好的 UserVO 返回。
+
