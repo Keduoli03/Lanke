@@ -613,6 +613,14 @@ function initLightbox() {
           if (typeof dialog.close === 'function') dialog.close();
           else dialog.removeAttribute('open');
       }
+      
+      // Clear image source to avoid flash of old content when reopening
+      if (img) {
+          img.src = '';
+          img.removeAttribute('src');
+          img.alt = '';
+      }
+      
       unlockScroll();
   };
 
