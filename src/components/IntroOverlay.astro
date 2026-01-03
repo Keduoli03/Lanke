@@ -4,198 +4,71 @@ import { siteConfig } from "../config";
 
 const theme = siteConfig.introStyle?.theme || 'dark';
 const hasBackground = !!siteConfig.introBackground;
+const isLight = hasBackground && theme === 'light';
 
-let textColor, subTextColor, borderColor;
-
-if (hasBackground) {
-    if (theme === 'light') {
-        textColor = '!text-gray-900';
-        subTextColor = '!text-gray-700';
-        borderColor = '!border-transparent';
-    } else {
-        textColor = '!text-white';
-        subTextColor = '!text-gray-200';
-        borderColor = '!border-white';
-    }
-} else {
-    textColor = 'text-gray-800 dark:text-white';
-    subTextColor = 'text-gray-600 dark:text-gray-300';
-    borderColor = 'border-white dark:border-gray-800';
-}
+// Simplify color logic
+const textColor = hasBackground 
+    ? (isLight ? '!text-gray-900' : '!text-white') 
+    : 'text-gray-800 dark:text-white';
+const subTextColor = hasBackground 
+    ? (isLight ? '!text-gray-700' : '!text-gray-200') 
+    : 'text-gray-600 dark:text-gray-300';
+const borderColor = hasBackground 
+    ? (isLight ? '!border-transparent' : '!border-white') 
+    : 'border-white dark:border-gray-800';
 ---
 
 <script is:inline>
   (function() {
-    const STORAGE_KEY = 'intro-seen-v1';
-    const SESSION_KEY = 'intro-seen-session';
+    // 1. Immediate anti-flash (Executes during HTML parsing)
+    const KEYS = { STORAGE: 'intro-seen-v1', SESSION: 'intro-seen-session' };
     
-    try {
-      if (sessionStorage.getItem(SESSION_KEY)) {
-        document.documentElement.classList.add('intro-seen');
-        return;
-      }
+    function setSeenState(isSeen) {
+      const action = isSeen ? 'add' : 'remove';
+      document.documentElement.classList[action]('intro-seen');
+      if (document.body) document.body.classList[action]('intro-seen');
+    }
 
-      // 检查持久存储 (对应设置为 >0 的情况)
-      const seenData = localStorage.getItem(STORAGE_KEY);
-      if (seenData) {
-        const { timestamp, days } = JSON.parse(seenData);
-        const expirationDays = days || 3; 
-        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-        const now = Date.now();
-        
-        if (now - timestamp < expirationDays * ONE_DAY_MS) {
-          document.documentElement.classList.add('intro-seen');
+    // Check visibility logic
+    try {
+      if (window.location.search.includes('debug-intro')) { /* skip check */ }
+      else if (sessionStorage.getItem(KEYS.SESSION)) { setSeenState(true); return; }
+      else {
+        const seenData = localStorage.getItem(KEYS.STORAGE);
+        if (seenData) {
+          const { timestamp, days } = JSON.parse(seenData);
+          // Fallback to 7 if DOM not ready (data-days unavailable)
+          if (Date.now() - timestamp < (days || 7) * 86400000) { setSeenState(true); }
         }
       }
-    } catch (e) {
-      // ignore
-    }
+    } catch (e) {}
   })();
 </script>
 
-<script>
-  import { siteConfig } from "../config";
-  const STORAGE_KEY = 'intro-seen-v1';
-  const SESSION_KEY = 'intro-seen-session';
-
-  function initIntro() {
-    const overlay = document.getElementById('intro-overlay');
-    const content = overlay?.querySelector('.intro-content');
-    const btn = document.getElementById('enter-btn');
-    
-    if (!overlay) return;
-
-    const configDays = siteConfig.introDisplayDays ?? 7;
-
-    let shouldShow = true;
-    
-    try {
-      if (configDays === 0) {
-        // 模式 0: 会话级别，刷新不显示，关闭浏览器后重置
-        if (sessionStorage.getItem(SESSION_KEY)) {
-          shouldShow = false;
-        }
-      } else {
-        // 模式 >0: 时间间隔级别
-        const seenData = localStorage.getItem(STORAGE_KEY);
-        if (seenData) {
-          const { timestamp } = JSON.parse(seenData);
-          const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-          const now = Date.now();
-          if (now - timestamp < configDays * ONE_DAY_MS) {
-            shouldShow = false;
-          }
-        }
-      }
-    } catch (e) {
-      // error
-    }
-
-    if (!shouldShow) {
-      document.documentElement.classList.add('intro-seen');
-      return;
-    }
-    document.documentElement.classList.remove('intro-seen');
-    document.body.style.overflow = 'hidden';
-
-    requestAnimationFrame(() => {
-        if(content instanceof HTMLElement) {
-            content.classList.remove('opacity-0', 'translate-y-8');
-        }
-    });
-
-    const closeIntro = () => {
-      overlay.style.opacity = '0';
-
-      if(content instanceof HTMLElement) {
-          content.style.transform = 'translateY(-20px)';
-          content.style.opacity = '0';
-      }
-      
-      // 根据配置写入存储
-      if (configDays === 0) {
-        sessionStorage.setItem(SESSION_KEY, 'true');
-      } else {
-        const now = Date.now();
-        // 将 days 也存进去，方便内联脚本读取
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ timestamp: now, days: configDays }));
-      }
-      
-      setTimeout(() => {
-          document.documentElement.classList.add('intro-seen'); 
-          document.body.style.overflow = ''; 
-      }, 700);
-    };
-
-    if(btn) {
-      const newBtn = btn.cloneNode(true);
-      btn.parentNode?.replaceChild(newBtn, btn);
-      newBtn.addEventListener('click', closeIntro);
-    }
-
-    // 鼠标滚轮滑动关闭
-    const handleWheel = (e: WheelEvent) => {
-      if (e.deltaY > 0) {
-        overlay.removeEventListener('wheel', handleWheel);
-        closeIntro();
-      }
-    };
-    overlay.addEventListener('wheel', handleWheel, { passive: true });
-
-    // 触摸滑动关闭
-    let touchStartY = 0;
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY;
-    };
-    const handleTouchEnd = (e: TouchEvent) => {
-      const touchEndY = e.changedTouches[0].clientY;
-      // 向上滑动（手指上移，查看下方内容）
-      if (touchStartY - touchEndY > 50) {
-        overlay.removeEventListener('touchstart', handleTouchStart);
-        overlay.removeEventListener('touchend', handleTouchEnd);
-        closeIntro();
-      }
-    };
-    overlay.addEventListener('touchstart', handleTouchStart, { passive: true });
-    overlay.addEventListener('touchend', handleTouchEnd, { passive: true });
-  }
-
-  document.addEventListener('astro:page-load', initIntro);
-  // 删除空代码段，避免混淆
-</script>
-
-<style is:global>
-  html.intro-seen #intro-overlay {
-    display: none !important;
-  }
-</style>
-
 <div 
   id="intro-overlay" 
-  class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white dark:bg-[#1a1a1a] transition-opacity duration-700 overflow-hidden" 
-  data-days={siteConfig.introDisplayDays || 7}
+  class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white dark:bg-[#1a1a1a] transition-opacity duration-300 overflow-hidden" 
+  data-days={siteConfig.introDisplayDays ?? 7}
+  style="display:flex; opacity:1;"
 >
-  
-  {/* 背景图层 */}
+  {/* Background Layer */}
   {siteConfig.introBackground && (
     <div class="absolute inset-0 z-0">
       <img 
         src={siteConfig.introBackground} 
         alt="Background" 
         class="w-full h-full object-cover scale-105"
-        style={`
-          filter: blur(${siteConfig.introStyle?.blur || '0px'});
-        `}
+        style={`filter: blur(${siteConfig.introStyle?.blur || '0px'});`}
       />
       <div 
-        class={`absolute inset-0 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}
+        class={`absolute inset-0 w-full h-full ${theme === 'light' ? 'bg-white' : 'bg-black'}`}
         style={`opacity: ${siteConfig.introStyle?.opacity || '0.5'}`}
       ></div>
     </div>
   )}
 
-  <div class="intro-content relative z-10 flex flex-col items-center justify-center h-full w-full space-y-8 opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-300">
-    <div class="flex-1 flex flex-col items-center justify-center space-y-8">
+  <div class="intro-content relative z-10 flex flex-col items-center justify-center h-full w-full space-y-8 opacity-0 translate-y-8 transition-all duration-1000 ease-out">
+    <div class="flex-1 flex flex-col items-center justify-center space-y-8 pb-32">
       <div class="relative inline-block">
           <img 
               src={siteConfig.avatar || "/logo.png"} 
@@ -214,17 +87,135 @@ if (hasBackground) {
       </div>
     </div>
 
-    <div class="absolute bottom-8 pb-0">
-      <button id="enter-btn" class={`group relative inline-flex items-center justify-center p-4 transition-colors duration-300 focus:outline-none cursor-pointer ${textColor} hover:text-blue-500`} aria-label="Enter Blog">
-        <Icon name="material-symbols:keyboard-arrow-down-rounded" class="w-12 h-12 relative z-10 animate-bounce drop-shadow-lg" />
-      </button>
+    <div class="absolute bottom-4 left-0 w-full flex flex-col items-center justify-center pb-0 z-20">
+        <button 
+            id="enter-btn"
+            class={`group relative inline-flex items-center justify-center p-4 rounded-full transition-all duration-300 hover:scale-110 focus:outline-none animate-bounce-slow animate-pulse`}
+            aria-label="Enter Blog"
+        >
+            <Icon name="material-symbols:arrow-downward-rounded" class={`w-8 h-8 ${textColor} opacity-80 group-hover:opacity-100`} />
+        </button>
     </div>
   </div>
 </div>
 
-<style>
-  @keyframes fadeInOverlay {
-    from { opacity: 0; }
-    to { opacity: 1; }
+<style is:inline>
+  /* Critical Inline Styles */
+  #intro-overlay {
+    position: fixed !important; top: 0 !important; left: 0 !important;
+    width: 100vw !important; height: 100vh !important;
+    z-index: 2147483647 !important;
+    background-color: #ffffff; display: flex !important; opacity: 1 !important;
+    flex-direction: column; align-items: center; justify-content: center;
+  }
+  html.dark #intro-overlay { background-color: #1a1a1a; }
+  html.intro-seen #intro-overlay, body.intro-seen #intro-overlay {
+    display: none !important; opacity: 0 !important; pointer-events: none !important; z-index: -1 !important;
   }
 </style>
+
+<script is:inline>
+  // 2. Interaction Logic (Post-DOM)
+  (function() {
+    const KEYS = { STORAGE: 'intro-seen-v1', SESSION: 'intro-seen-session' };
+
+    function initIntro() {
+      const DOM = {
+        overlay: document.getElementById('intro-overlay'),
+        content: document.querySelector('#intro-overlay .intro-content'),
+        btn: document.getElementById('enter-btn')
+      };
+      
+      if (!DOM.overlay) return;
+
+      const configDays = parseInt(DOM.overlay.dataset.days || '7', 10);
+      const isDebug = new URLSearchParams(window.location.search).has('debug-intro');
+      
+      if (isDebug) {
+        localStorage.removeItem(KEYS.STORAGE);
+        sessionStorage.removeItem(KEYS.SESSION);
+      }
+
+      // Check visibility logic
+      let shouldShow = true;
+      if (!isDebug) {
+        if (sessionStorage.getItem(KEYS.SESSION)) shouldShow = false;
+        else if (configDays > 0) {
+          const seenData = localStorage.getItem(KEYS.STORAGE);
+          if (seenData) {
+            try {
+              const { timestamp, days } = JSON.parse(seenData);
+              if (Date.now() - timestamp < (days || configDays) * 86400000) shouldShow = false;
+            } catch (e) { localStorage.removeItem(KEYS.STORAGE); }
+          }
+        }
+      }
+
+      // Apply visibility
+      const action = shouldShow ? 'remove' : 'add';
+      document.documentElement.classList[action]('intro-seen');
+      if (document.body) document.body.classList[action]('intro-seen');
+
+      if (shouldShow) {
+        DOM.overlay.style.display = 'flex';
+        DOM.overlay.style.opacity = '1';
+        document.body.style.overflow = 'hidden';
+        
+        // Entrance animation
+        requestAnimationFrame(() => {
+          if (DOM.content) {
+            void DOM.content.offsetWidth; // Force reflow
+            DOM.content.classList.remove('opacity-0', 'translate-y-8');
+          }
+        });
+
+        // Close handler
+        const closeIntro = () => {
+          DOM.overlay.style.opacity = '0';
+          DOM.overlay.style.pointerEvents = 'none';
+          if (DOM.content) {
+            DOM.content.style.transform = 'translateY(-20px)';
+            DOM.content.style.opacity = '0';
+          }
+
+          if (configDays === 0) sessionStorage.setItem(KEYS.SESSION, 'true');
+          else localStorage.setItem(KEYS.STORAGE, JSON.stringify({ timestamp: Date.now(), days: configDays }));
+
+          setTimeout(() => {
+            document.documentElement.classList.add('intro-seen');
+            document.body.style.overflow = '';
+          }, 350);
+        };
+
+        // Bind events
+        if (DOM.btn) {
+            const newBtn = DOM.btn.cloneNode(true);
+            DOM.btn.parentNode.replaceChild(newBtn, DOM.btn);
+            newBtn.addEventListener('click', closeIntro);
+        }
+
+        // Wheel & Touch
+        const handleWheel = (e) => {
+          if (e.deltaY > 10) {
+            DOM.overlay.removeEventListener('wheel', handleWheel);
+            closeIntro();
+          }
+        };
+        DOM.overlay.addEventListener('wheel', handleWheel, { passive: true }); // passive true for better performance if no preventDefault
+
+        let startY = 0;
+        const handleTouch = (e) => {
+            if (e.type === 'touchstart') startY = e.touches[0].clientY;
+            else if (e.type === 'touchend' && startY - e.changedTouches[0].clientY > 50) {
+                ['touchstart', 'touchmove', 'touchend'].forEach(ev => DOM.overlay.removeEventListener(ev, handleTouch));
+                closeIntro();
+            }
+        };
+        ['touchstart', 'touchmove', 'touchend'].forEach(ev => DOM.overlay.addEventListener(ev, handleTouch, { passive: true }));
+      }
+    }
+
+    initIntro();
+    document.addEventListener('astro:page-load', initIntro);
+  })();
+</script>

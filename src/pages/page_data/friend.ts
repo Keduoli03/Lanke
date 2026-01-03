@@ -155,6 +155,13 @@ export const items = [
 imgurl: 'https://www.kaca.life/usr/uploads/2025/12/2411141244.jpg',
 desc: '文字记录者，生活观察家。 在平凡的日子里打捞诗意的碎片。 这里存放着我的思考、阅读与沿途光影。',
 siteurl: 'https://www.kaca.life/'
-	}
+	},
+	{
+		title: '懋和道人',
+		imgurl: 'https://cn.cravatar.com/avatar/37d41e2b550633a30f5d41de61c1aa92?s=400&r=G&d=mp&ver=1754413756',
+		desc: '李懋和，俗名李栋梁。书法、国画爱好者，互联网安全与前端建设者。',
+		siteurl: 'https://www.dao.js.cn/',
+		tags: ['友链'],
+	},
 
 ];
