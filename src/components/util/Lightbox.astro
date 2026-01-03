@@ -449,10 +449,11 @@ function initLightbox() {
 
     candidates.forEach(el => {
         // Exclude specific areas
-        if (el.closest('#comment-section') || el.closest('.artalk') || 
+        if (el.closest('#comment-section') || el.closest('.artalk') || el.closest('.atk-layer-wrap') || el.closest('.atk-layer-dialog-wrap') ||
             el.closest('#sidebar') || el.closest('.sidebar-header') || 
             el.closest('.mobile-nav') || el.closest('#mobile-navbar') || 
-            el.closest('.md-lightbox-exclude')) return;
+            el.closest('.md-lightbox-exclude') || 
+            el.classList.contains('atk-captcha-img')) return;
         
         // Skip if already processed (e.g. img inside a)
         if (seen.has(el)) return;
