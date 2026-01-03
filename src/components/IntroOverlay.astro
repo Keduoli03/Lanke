@@ -1,0 +1,168 @@
+---
+import { Icon } from "astro-icon/components";
+import { siteConfig } from "../config";
+
+const theme = siteConfig.introStyle?.theme || 'dark';
+const hasBackground = !!siteConfig.introBackground;
+
+let textColor, subTextColor, borderColor;
+
+if (hasBackground) {
+    if (theme === 'light') {
+        textColor = '!text-gray-900';
+        subTextColor = '!text-gray-700';
+        borderColor = '!border-transparent';
+    } else {
+        // dark theme (default)
+        textColor = '!text-white';
+        subTextColor = '!text-gray-200';
+        borderColor = '!border-white';
+    }
+} else {
+    // No background image, use system dark mode adaptation
+    textColor = 'text-gray-800 dark:text-white';
+    subTextColor = 'text-gray-600 dark:text-gray-300';
+    borderColor = 'border-white dark:border-gray-800';
+}
+---
+
+<script>
+  import { siteConfig } from "../config";
+  const STORAGE_KEY = 'intro-seen-v1';
+  // 调试模式：强制显示
+  const DEBUG_ALWAYS_SHOW = false; 
+
+  function initIntro() {
+    const overlay = document.getElementById('intro-overlay');
+    const content = overlay?.querySelector('.intro-content');
+    const btn = document.getElementById('enter-btn');
+    
+    if (!overlay) return;
+
+    let shouldShow = true;
+    
+    if (!DEBUG_ALWAYS_SHOW) {
+      try {
+        const seenData = localStorage.getItem(STORAGE_KEY);
+        if (seenData) {
+          const { timestamp } = JSON.parse(seenData);
+          const EXPIRATION_DAYS = siteConfig.introDisplayDays || 7;
+          const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+          const now = Date.now();
+          if (now - timestamp < EXPIRATION_DAYS * ONE_DAY_MS) {
+            shouldShow = false;
+          }
+        }
+      } catch (e) {
+        // error
+      }
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+      document.documentElement.classList.remove('intro-seen');
+    }
+
+    if (!shouldShow) {
+      document.documentElement.classList.add('intro-seen');
+      return;
+    }
+
+    document.documentElement.classList.remove('intro-seen');
+
+    document.body.style.overflow = 'hidden';
+
+    requestAnimationFrame(() => {
+        if(content instanceof HTMLElement) {
+            content.classList.remove('opacity-0', 'translate-y-8');
+        }
+    });
+
+    const closeIntro = () => {
+      overlay.style.opacity = '0';
+
+      if(content instanceof HTMLElement) {
+          content.style.transform = 'translateY(-20px)';
+          content.style.opacity = '0';
+      }
+      
+      const now = Date.now();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ timestamp: now }));
+      
+      setTimeout(() => {
+          document.documentElement.classList.add('intro-seen'); 
+          document.body.style.overflow = ''; 
+      }, 700);
+    };
+
+    if(btn) {
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode?.replaceChild(newBtn, btn);
+      newBtn.addEventListener('click', closeIntro);
+    }
+  }
+
+  document.addEventListener('astro:page-load', initIntro);
+  if (document.readyState === 'complete') {
+    initIntro()
+  }
+</script>
+
+<style is:global>
+  html.intro-seen #intro-overlay {
+    display: none !important;
+  }
+</style>
+
+<div id="intro-overlay" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white dark:bg-[#1a1a1a] transition-opacity duration-700 overflow-hidden" style="opacity: 0; animation: fadeInOverlay 0.5s ease-out forwards;">
+  
+  {/* 背景图层 */}
+  {siteConfig.introBackground && (
+    <div class="absolute inset-0 z-0">
+      <img 
+        src={siteConfig.introBackground} 
+        alt="Background" 
+        class="w-full h-full object-cover scale-105"
+        style={`
+          filter: blur(${siteConfig.introStyle?.blur || '0px'});
+        `}
+      />
+      <div 
+        class={`absolute inset-0 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}
+        style={`opacity: ${siteConfig.introStyle?.opacity || '0.5'}`}
+      ></div>
+    </div>
+  )}
+
+  <div class="intro-content relative z-10 flex flex-col items-center justify-center h-full w-full space-y-8 opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-300">
+    <div class="flex-1 flex flex-col items-center justify-center space-y-8">
+      <div class="relative inline-block">
+          <img 
+              src={siteConfig.avatar || "/logo.png"} 
+              alt="Avatar" 
+              class={`w-32 h-32 md:w-40 md:h-40 rounded-full border-4 shadow-xl object-cover ${borderColor}`}
+          />
+      </div>
+      
+      <div class="space-y-4 px-4 text-center">
+          <h1 class={`text-4xl md:text-5xl font-bold tracking-tight drop-shadow-md ${textColor}`}>
+              {siteConfig.title}
+          </h1>
+          <p class={`text-xl max-w-lg mx-auto leading-relaxed drop-shadow-sm ${subTextColor}`}>
+              {siteConfig.description}
+          </p>
+      </div>
+    </div>
+
+    <div class="absolute bottom-8 pb-0">
+      <button id="enter-btn" class={`group relative inline-flex items-center justify-center p-4 transition-colors duration-300 focus:outline-none cursor-pointer ${textColor} hover:text-blue-500`} aria-label="Enter Blog">
+        <Icon name="material-symbols:keyboard-arrow-down-rounded" class="w-12 h-12 relative z-10 animate-bounce drop-shadow-lg" />
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeInOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+</style>

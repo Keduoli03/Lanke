@@ -13,6 +13,14 @@ export interface SiteConfig {
 	url: string;
 	favicon: string;
 	logo: string;
+	avatar?: string; // 新增：个人头像
+	introBackground?: string; // 新增：个人介绍页背景图
+	introDisplayDays?: number; // 新增：介绍页显示周期（天）
+	introStyle?: {
+		opacity: string;
+		blur: string;
+		theme?: 'light' | 'dark'; // 新增：内容主题色
+	};
 	image: {
 		src: string;
 		alt: string;
@@ -24,15 +32,15 @@ export interface SiteConfig {
 	pageWidth: string;
 	sidebarWidth: string;
 	sidebarExtendWidth: string;
-	tocWidth: string; // 新增：目录宽度
-	tocMaxDepth: number; // 新增：目录最大深度
-	contentRailGap?: string; // 新增：正文与右侧栏间距
-	tabletMaxWidth?: string; // 新增：平板横屏最大宽度断点
-	tabletSidebarWidth?: string; // 新增：平板横屏侧栏窄宽
-	tabletSidebarExtendWidth?: string; // 新增：平板横屏侧栏展开宽度
+	tocWidth: string; 
+	tocMaxDepth: number; 
+	contentRailGap?: string; 
+	tabletMaxWidth?: string; 
+	tabletSidebarWidth?: string; 
+	tabletSidebarExtendWidth?: string; 
 
-	contentLeftMarginBase?: string; // 新增：主容器左外边距（桌面）
-	contentLeftMarginTablet?: string; // 新增：主容器左外边距（平板横屏）
+	contentLeftMarginBase?: string; 
+	contentLeftMarginTablet?: string; 
 
 	// Live2D 配置
 	live2d?: {

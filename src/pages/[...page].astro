@@ -5,6 +5,7 @@ import PostLayout from '../layouts/PostLayout.astro';
 import PostPage from '../components/post/PostPage.astro';
 import { getSortedPosts } from '../utils/content-utils';
 import { PAGE_SIZE, siteConfig } from '../config';
+import IntroOverlay from '../components/IntroOverlay.astro';
 
 export const prerender = true; // <--- 添加此行
 
@@ -25,6 +26,7 @@ const pageTitle = isFirstPage ? siteConfig.title : `文章列表 - 第 ${page.cu
 <PostLayout 
   title={pageTitle}
   description="文章列表页面"
+  showIntro={isFirstPage}
 >
   <PostPage page={page} showTitle={false} />
 </PostLayout>
