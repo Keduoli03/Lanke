@@ -16,7 +16,7 @@ export const siteConfig: SiteConfig = {
   logo: "./logo.png",
   avatar: "https://gcore.jsdelivr.net/gh/Keduoli03/My_img@img/img/%E5%A4%B4%E5%83%8F.jpg",
   introBackground: "https://gcore.jsdelivr.net/gh/Keduoli03/My_img@main/image/%E6%99%AE%E6%8B%89%E5%A8%9C-%E7%A2%A7%E8%93%9D%E6%A1%A3%E6%A1%88.webp", // 示例背景图
-  introDisplayDays: 2, // 介绍页显示周期，单位：天
+  introDisplayDays: 0, // 介绍页显示周期，单位：天
   introStyle: {
 	opacity: "0.4", // 遮罩层不透明度 (0-1)，越小越亮
 	blur: "0px",    // 背景模糊度，px

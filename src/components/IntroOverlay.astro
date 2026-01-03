@@ -13,13 +13,11 @@ if (hasBackground) {
         subTextColor = '!text-gray-700';
         borderColor = '!border-transparent';
     } else {
-        // dark theme (default)
         textColor = '!text-white';
         subTextColor = '!text-gray-200';
         borderColor = '!border-white';
     }
 } else {
-    // No background image, use system dark mode adaptation
     textColor = 'text-gray-800 dark:text-white';
     subTextColor = 'text-gray-600 dark:text-gray-300';
     borderColor = 'border-white dark:border-gray-800';
@@ -27,20 +25,25 @@ if (hasBackground) {
 ---
 
 <script is:inline>
-  // 使用内联脚本在页面加载的最早阶段运行，防止闪烁
   (function() {
     const STORAGE_KEY = 'intro-seen-v1';
-    // 尝试从 data 属性读取配置，如果读取不到则使用默认值 3
-    const EXPIRATION_DAYS = 3; 
-    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+    const SESSION_KEY = 'intro-seen-session';
     
     try {
+      if (sessionStorage.getItem(SESSION_KEY)) {
+        document.documentElement.classList.add('intro-seen');
+        return;
+      }
+
+      // 检查持久存储 (对应设置为 >0 的情况)
       const seenData = localStorage.getItem(STORAGE_KEY);
       if (seenData) {
-        const { timestamp } = JSON.parse(seenData);
+        const { timestamp, days } = JSON.parse(seenData);
+        const expirationDays = days || 3; 
+        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
         const now = Date.now();
-        // 如果未过期，直接在 html 标签上添加类，配合 CSS 隐藏组件
-        if (now - timestamp < EXPIRATION_DAYS * ONE_DAY_MS) {
+        
+        if (now - timestamp < expirationDays * ONE_DAY_MS) {
           document.documentElement.classList.add('intro-seen');
         }
       }
@@ -53,8 +56,7 @@ if (hasBackground) {
 <script>
   import { siteConfig } from "../config";
   const STORAGE_KEY = 'intro-seen-v1';
-  // 调试模式：强制显示
-  const DEBUG_ALWAYS_SHOW = false; 
+  const SESSION_KEY = 'intro-seen-session';
 
   function initIntro() {
     const overlay = document.getElementById('intro-overlay');
@@ -63,26 +65,30 @@ if (hasBackground) {
     
     if (!overlay) return;
 
+    const configDays = siteConfig.introDisplayDays ?? 7;
+
     let shouldShow = true;
     
-    if (!DEBUG_ALWAYS_SHOW) {
-      try {
+    try {
+      if (configDays === 0) {
+        // 模式 0: 会话级别，刷新不显示，关闭浏览器后重置
+        if (sessionStorage.getItem(SESSION_KEY)) {
+          shouldShow = false;
+        }
+      } else {
+        // 模式 >0: 时间间隔级别
         const seenData = localStorage.getItem(STORAGE_KEY);
         if (seenData) {
           const { timestamp } = JSON.parse(seenData);
-          const EXPIRATION_DAYS = siteConfig.introDisplayDays || 7;
           const ONE_DAY_MS = 24 * 60 * 60 * 1000;
           const now = Date.now();
-          if (now - timestamp < EXPIRATION_DAYS * ONE_DAY_MS) {
+          if (now - timestamp < configDays * ONE_DAY_MS) {
             shouldShow = false;
           }
         }
-      } catch (e) {
-        // error
       }
-    } else {
-      localStorage.removeItem(STORAGE_KEY);
-      document.documentElement.classList.remove('intro-seen');
+    } catch (e) {
+      // error
     }
 
     if (!shouldShow) {
@@ -90,10 +96,7 @@ if (hasBackground) {
       return;
     }
 
-    // 显示：设置不透明度为1，移除opacity:0的样式
     overlay.style.opacity = '1';
-    
-    // 如果应该显示，移除类并启动动画
     document.documentElement.classList.remove('intro-seen');
     document.body.style.overflow = 'hidden';
 
@@ -111,8 +114,14 @@ if (hasBackground) {
           content.style.opacity = '0';
       }
       
-      const now = Date.now();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ timestamp: now }));
+      // 根据配置写入存储
+      if (configDays === 0) {
+        sessionStorage.setItem(SESSION_KEY, 'true');
+      } else {
+        const now = Date.now();
+        // 将 days 也存进去，方便内联脚本读取
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ timestamp: now, days: configDays }));
+      }
       
       setTimeout(() => {
           document.documentElement.classList.add('intro-seen'); 
@@ -125,6 +134,32 @@ if (hasBackground) {
       btn.parentNode?.replaceChild(newBtn, btn);
       newBtn.addEventListener('click', closeIntro);
     }
+
+    // 鼠标滚轮滑动关闭
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY > 0) {
+        overlay.removeEventListener('wheel', handleWheel);
+        closeIntro();
+      }
+    };
+    overlay.addEventListener('wheel', handleWheel, { passive: true });
+
+    // 触摸滑动关闭
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+    const handleTouchEnd = (e: TouchEvent) => {
+      const touchEndY = e.changedTouches[0].clientY;
+      // 向上滑动（手指上移，查看下方内容）
+      if (touchStartY - touchEndY > 50) {
+        overlay.removeEventListener('touchstart', handleTouchStart);
+        overlay.removeEventListener('touchend', handleTouchEnd);
+        closeIntro();
+      }
+    };
+    overlay.addEventListener('touchstart', handleTouchStart, { passive: true });
+    overlay.addEventListener('touchend', handleTouchEnd, { passive: true });
   }
 
   document.addEventListener('astro:page-load', initIntro);
