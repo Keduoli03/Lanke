@@ -26,6 +26,30 @@ if (hasBackground) {
 }
 ---
 
+<script is:inline>
+  // 使用内联脚本在页面加载的最早阶段运行，防止闪烁
+  (function() {
+    const STORAGE_KEY = 'intro-seen-v1';
+    // 尝试从 data 属性读取配置，如果读取不到则使用默认值 3
+    const EXPIRATION_DAYS = 3; 
+    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+    
+    try {
+      const seenData = localStorage.getItem(STORAGE_KEY);
+      if (seenData) {
+        const { timestamp } = JSON.parse(seenData);
+        const now = Date.now();
+        // 如果未过期，直接在 html 标签上添加类，配合 CSS 隐藏组件
+        if (now - timestamp < EXPIRATION_DAYS * ONE_DAY_MS) {
+          document.documentElement.classList.add('intro-seen');
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  })();
+</script>
+
 <script>
   import { siteConfig } from "../config";
   const STORAGE_KEY = 'intro-seen-v1';
@@ -66,8 +90,11 @@ if (hasBackground) {
       return;
     }
 
+    // 显示：设置不透明度为1，移除opacity:0的样式
+    overlay.style.opacity = '1';
+    
+    // 如果应该显示，移除类并启动动画
     document.documentElement.classList.remove('intro-seen');
-
     document.body.style.overflow = 'hidden';
 
     requestAnimationFrame(() => {
@@ -101,9 +128,7 @@ if (hasBackground) {
   }
 
   document.addEventListener('astro:page-load', initIntro);
-  if (document.readyState === 'complete') {
-    initIntro()
-  }
+  // 删除空代码段，避免混淆
 </script>
 
 <style is:global>
@@ -112,7 +137,12 @@ if (hasBackground) {
   }
 </style>
 
-<div id="intro-overlay" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white dark:bg-[#1a1a1a] transition-opacity duration-700 overflow-hidden" style="opacity: 0; animation: fadeInOverlay 0.5s ease-out forwards;">
+<div 
+  id="intro-overlay" 
+  class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white dark:bg-[#1a1a1a] transition-opacity duration-700 overflow-hidden" 
+  style="opacity: 0;"
+  data-days={siteConfig.introDisplayDays || 7}
+>
   
   {/* 背景图层 */}
   {siteConfig.introBackground && (
