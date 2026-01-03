@@ -55,7 +55,7 @@ const {
   --tablet-sidebar-width: ${siteConfig.tabletSidebarWidth};
   --tablet-sidebar-extend-width: ${siteConfig.tabletSidebarExtendWidth};
 `}>
-
+  {showIntro && <IntroOverlay />}
   <ClientRouter />
   <Live2D transition:persist transition:name="live2d" />
   <div class="layout-container">
@@ -86,7 +86,6 @@ const {
   <Footer />
   <SearchDialog />
   <LightboxDialog />
-  {showIntro && <IntroOverlay />}
 
   <style is:global>
     * {

@@ -95,8 +95,6 @@ if (hasBackground) {
       document.documentElement.classList.add('intro-seen');
       return;
     }
-
-    overlay.style.opacity = '1';
     document.documentElement.classList.remove('intro-seen');
     document.body.style.overflow = 'hidden';
 
@@ -175,7 +173,6 @@ if (hasBackground) {
 <div 
   id="intro-overlay" 
   class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white dark:bg-[#1a1a1a] transition-opacity duration-700 overflow-hidden" 
-  style="opacity: 0;"
   data-days={siteConfig.introDisplayDays || 7}
 >
   
