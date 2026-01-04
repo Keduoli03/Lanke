@@ -12,15 +12,37 @@ const today = new Date();
 
  
   <div class="footer-middle">
-    <a 
-      href="https://icp.gov.moe/?keyword=20250012" 
-      target="_blank" 
-      rel="noopener noreferrer" 
-      class="footer-link icp-link"
-      title="萌ICP备案查询"
-    >
-      萌ICP备20250012号
-    </a>
+    <div class="org-links">
+      <a 
+        href="https://www.travellings.cn/" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="footer-link"
+        title="开往 - 友链接力"
+      >
+        开往
+      </a>
+      <span class="link-separator">|</span>
+      <a 
+        href="https://blogscn.fun/" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="footer-link"
+        title="笔墨迹 - 致敬还在写博客的我们"
+      >
+        笔墨迹
+      </a>
+      <span class="link-separator">|</span>
+      <a 
+        href="https://www.boyouquan.com/home" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="footer-link"
+        title="博友圈 - 博客人的朋友圈"
+      >
+        博友圈
+      </a>
+    </div>
     <div class="middle-links">
       <a 
         href={siteConfig.url + '/rss.xml'}  
@@ -68,7 +90,7 @@ const today = new Date();
   }
 
   footer {
-    padding: 2em 2em 3.5em;
+    padding: 2em 2em 1.5em;
     background: linear-gradient(180deg, rgba(var(--gray-light), 0.5) 0%, rgba(var(--gray-light), 0) 100%);
     color: rgb(var(--gray));
     display: flex;

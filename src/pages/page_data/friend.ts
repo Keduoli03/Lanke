@@ -7,35 +7,6 @@ export const items = [
 		tags: ["框架"],
 	},
 	{
-		title: "Fuwari",
-		imgurl:
-			"https://gcore.jsdelivr.net/gh/Keduoli03/My_img@img/demo-avatar.png",
-		desc: "基于 Astro 开发的静态博客模板",
-		siteurl: "https://github.com/saicaca/fuwari",
-		tags: ["主题"],
-	},
-	{
-		title: "开往",
-		imgurl: "https://www.travellings.cn/assets/travelling.png",
-		desc: "让传统友链“活跃”，让网页相互接力，让流量相互流动，让网络开放起来",
-		siteurl: "https://www.travellings.cn/",
-		tags: ["组织"],
-	},
-	{
-		title: "笔墨迹",
-		imgurl: "https://gcore.jsdelivr.net/gh/Keduoli03/My_img@img/bimoji.webp",
-		desc: "致敬还在写博客的我们！",
-		siteurl: "https://blogscn.fun/",
-		tags: ["组织"],
-	},
-	{
-		title: "博友圈",
-		imgurl: "https://www.boyouquan.com/assets/images/sites/logo/logo-small.png",
-		desc: "博客人的朋友圈，博客收录与文章 RSS 聚合网站",
-		siteurl: "https://www.boyouquan.com/home",
-		tags: ["组织"],
-	},
-	{
 		title: "天影大侠的小站",
 		imgurl:
 			"https://weavatar.com/avatar/7388ea4765a319d5f83fea61c3236384?s=1000",
