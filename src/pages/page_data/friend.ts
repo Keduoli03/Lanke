@@ -4,6 +4,7 @@ export const items = [
 		imgurl: "https://avatars.githubusercontent.com/u/44914786?s=48&v=4",
 		desc: "一个现代化的静态站点生成框架",
 		siteurl: "https://github.com/withastro/astro",
+		
 		tags: ["框架"],
 	},
 	{
@@ -12,6 +13,7 @@ export const items = [
 			"https://weavatar.com/avatar/7388ea4765a319d5f83fea61c3236384?s=1000",
 		desc: "The Blog of SkyShadowHero!",
 		siteurl: "https://blog.skyshadow.fun/",
+		rss:"https://blog.skyshadow.fun/rss.xml",
 		tags: ["友链"],
 	},
 	{
@@ -19,6 +21,7 @@ export const items = [
 		imgurl: "https://ikamusume7.org/avatar.webp",
 		desc: "又菜又爱学",
 		siteurl: "https://ikamusume7.org",
+		rss:"https://ikamusume7.org/rss.xml",
 		tags: ["友链"],
 	},
 	{
@@ -34,6 +37,7 @@ export const items = [
 		imgurl: "https://avatars0.githubusercontent.com/u/17966333",
 		desc: "Mayx’s Home Page",
 		siteurl: "https://mayx.gitlab.io/",
+		rss:"https://mayx.gitlab.io/atom.xml",
 		tags: ["友链"],
 	},
 	{
@@ -42,6 +46,7 @@ export const items = [
 			"https://gravatar.ltya.top/avatar/5af06b461740fb2bd7467b8561399703?s=500",
 		desc: "一只鸽子住在这里~",
 		siteurl: "https://blog.ltya.top/",
+		rss:"https://blog.ltya.top/atom.xml",
 		tags: ["友链"],
 	},
 	{
@@ -49,6 +54,7 @@ export const items = [
 		imgurl: "https://linexic.top/avatar.webp",
 		desc: "难离难舍，想抱紧些",
 		siteurl: "https://www.linexic.top/",
+		rss:"https://www.linexic.top/rss.xml",
 		tags: ["友链"],
 	},
 	{
@@ -56,6 +62,7 @@ export const items = [
 		imgurl: "https://img1.ccgxk.com/ccgxk-oss/2025/05/202505191037317NTuR1.jpg",
 		desc: "月光刚好，你在仰望，我们一起仰望",
 		siteurl: "https://www.ccgxk.com",
+		rss:"https://www.ccgxk.com/rss.php",
 		tags: ["友链"],
 	},
 	{
@@ -63,6 +70,7 @@ export const items = [
 		imgurl: "https://ttio.cc/favicon.svg",
 		desc: "于记忆之川，泛思绪之舟",
 		siteurl: "https://ttio.cc",
+		rss:"https://ttio.cc/feed.xml",
 		tags: ["友链"],
 	},
 	{
@@ -70,6 +78,7 @@ export const items = [
 		imgurl: "https://cdn.liuyue.net/assets/img/avatar.jpg",
 		desc: "且听风吟，静待花开",
 		siteurl: "https://blog.flowmoon.cn/",
+		rss:"https://blog.flowmoon.cn/rss.xml",
 		tags: ["友链"],
 	},
 	{
@@ -77,6 +86,7 @@ export const items = [
 		imgurl: "https://pinpe.top/head.jpg",
 		desc: "	一个属于自己的云朵。",
 		siteurl: "https://pinpe.top/",
+		rss:"https://pinpe.top/rss.xml",
 		tags: ["友链"],
 	},
 	{
@@ -92,6 +102,7 @@ export const items = [
 			"https://cdn.jsdmirror.com/gh/huang233893/blog-image-bed/top/huang233893/imgs/blog/userfb6a1018b84ce485.jpg",
 		desc: "有朝一日，寻见梦中人✨",
 		siteurl: "https://www.sumi233.top/",
+		rss:"https://www.sumi233.top/rss.xml",
 		tags: ["友链"],
 	},
 	{
@@ -99,6 +110,7 @@ export const items = [
 		imgurl: "https://suus.me/avatar.webp",
 		desc: "在数字的海洋中，寻找属于自己的星辰。",
 		siteurl: "https://suus.me/",
+		rss:"https://suus.me/rss.xml",
 		tags: ["友链"],
 	},
 	{
@@ -106,6 +118,7 @@ export const items = [
 		imgurl: "https://blog.yujiay.wang/images/site/BlogHsvg.png",
 		desc: "爱 Coding 爱生活",
 		siteurl: "https://blog.yujiay.wang/",
+		rss:"https://blog.yujiay.wang/atom.xml",
 		tags: ["友链"],
 	},
 	{
@@ -122,16 +135,11 @@ export const items = [
 		tags: ['友链'],
 	},
 	{
-		title: '半巷栀子',
-imgurl: 'https://www.kaca.life/usr/uploads/2025/12/2411141244.jpg',
-desc: '文字记录者，生活观察家。 在平凡的日子里打捞诗意的碎片。 这里存放着我的思考、阅读与沿途光影。',
-siteurl: 'https://www.kaca.life/'
-	},
-	{
 		title: '懋和道人',
 		imgurl: 'https://cn.cravatar.com/avatar/37d41e2b550633a30f5d41de61c1aa92?s=400&r=G&d=mp&ver=1754413756',
 		desc: '李懋和，俗名李栋梁。书法、国画爱好者，互联网安全与前端建设者。',
 		siteurl: 'https://www.dao.js.cn/',
+		rss:"https://www.dao.js.cn/feed.php",
 		tags: ['友链'],
 	},
 
