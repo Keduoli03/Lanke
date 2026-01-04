@@ -96,12 +96,7 @@ function initialize_fc_lite() {
         globalStats = data.statistical_data;
 
         // 处理统计数据
-        statsContainer.innerHTML = `
-            <div>Powered by: <a href="https://github.com/willow-god/Friend-Circle-Lite" target="_blank">FriendCircleLite</a><br></div>
-            <div>Designed By: <a href="https://www.liushen.fun/" target="_blank">LiuShen</a><br></div>
-            <div>订阅:${globalStats.friends_num}   活跃:${globalStats.active_num}   总文章数:${globalStats.article_num}<br></div>
-            <div>更新时间:${globalStats.last_updated_time}</div>
-        `;
+        statsContainer.innerHTML = '';
 
         displayRandomArticle(); // 显示随机友链卡片
 
@@ -172,6 +167,10 @@ function initialize_fc_lite() {
                 <div class="random-container-title">随机钓鱼</div>
                 <div class="random-title">${randomArticle.title}</div>
                 <div class="random-author">作者: ${randomArticle.author}</div>
+            </div>
+            <div class="random-stats">
+                订阅:${globalStats.friends_num}   活跃:${globalStats.active_num}   总文章数:${globalStats.article_num}<br>
+                更新时间:${globalStats.last_updated_time}
             </div>
             <div class="random-button-container">
                 <a href="#" id="refresh-random-article">刷新</a>

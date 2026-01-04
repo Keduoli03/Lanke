@@ -57,15 +57,17 @@ html.dark {
     background-color: var(--container-bg-color);
     border-radius: 10px;
     border:1px solid var(--border-color);
-    height: 210px;
+    min-height: 120px;
+    height: auto;
     transition: border 0.3s;
 }
 
 .random-container {
     position: relative;
-    margin: 20px;
+    margin: 15px 20px;
     width: 90%;
-    height: 170px;
+    height: auto;
+    padding-bottom: 5px;
 }
 
 .random-container:hover .random-title {
@@ -78,15 +80,25 @@ html.dark {
     margin-bottom: 10px;
 }
 
+.random-stats {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 12px;
+    color: var(--author-color);
+    line-height: 1.5;
+    text-align: right;
+}
+
 .random-container-title {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
     margin-bottom: 20px;
 }
 
 .random-title {
     margin-bottom: 10px;
-    font-size: 30px;
+    font-size: 24px;
     transition: font-size 0.3s ease-in-out;
     white-space: nowrap;
     overflow: hidden;
@@ -95,7 +107,7 @@ html.dark {
 
 .random-button-container {
     position: absolute;
-    bottom: 20px;
+    bottom: 12px;
     right: 20px;
     border: none;
     border-radius: 20px;
