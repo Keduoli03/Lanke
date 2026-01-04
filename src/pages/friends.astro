@@ -7,6 +7,11 @@ import { render } from 'astro:content';
 import PageHeader from '@/components/page/PageHeader.astro';
 import { Icon } from 'astro-icon/components';
 import PostLayout from '@/layouts/PostLayout.astro';
+import Toc from '@/components/post/Toc.astro';
+import ScrollToTop from '@/components/util/ScrollToTop.astro';
+import ScrollToComment from '@/components/util/ScrollToComment.astro';
+import fs from 'node:fs';
+import '@/styles/cycle.css';
 
 const title = "友链";
 const description = "一些朋友们的网站";
@@ -15,16 +20,32 @@ if (!friendPost) {
   throw new Error('Friend page not found');
 }
 const { Content } = await render(friendPost);
+
+const tocItems = [
+  { depth: 2, slug: "friend-links", text: "友情链接" },
+  { depth: 2, slug: "friend-circle-lite-root", text: "朋友圈" },
+  { depth: 2, slug: "add-friend-instructions", text: "申请友链" },
+  { depth: 2, slug: "comments-title", text: "评论" },
+];
+
+const cycleJsContent = fs.readFileSync('src/utils/cycle.js', 'utf-8');
 ---
 
 <PostLayout title={title}>
+  <div slot="rail">
+    <Toc items={tocItems} />
+    <div class="rail-actions">
+      <ScrollToTop />
+      <ScrollToComment />
+    </div>
+  </div>
+
   <div class="friend-container">
     <PageHeader title={title} subtitle={description}>
       <Icon slot="icon" name="material-symbols:handshake-outline-rounded" class="w-11 h-11" />
     </PageHeader>
 
-    <!-- 修复核心：网格容器添加 max-w-full 和 px-2 限制宽度，防止溢出 -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-5">
+    <div id="friend-links" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-5">
       {friends.map((friend, index) => (
         <a 
           href={friend.siteurl}
@@ -71,14 +92,31 @@ const { Content } = await render(friendPost);
         </a>
       ))}
     </div>
+    <div id="friend-circle-lite-root" class="section-gap">与主机通讯中……</div>
 
-    <div class="friend-notes-separator"></div>
+<script is:inline>
+    var UserConfig = {
+        // 你的 hexo-circle-of-friends 后端 API 地址（需先部署后端）
+        private_api_url: 'https://circle-of-friends-iota.vercel.app/',
+        // 每次点击“加载更多”时加载的文章数量，默认 24
+        page_turning_number: 24,
+        // 头像加载失败时的默认图片
+        error_img: 'https://fastly.jsdelivr.net/gh/Rock-Candy-Tea/Friend-Circle-Frontend/logo.png',
+    }
+</script>
 
-    <Markdown>
-      <Content />
-    </Markdown>
+<!-- 朋友圈脚本 (本地化) -->
+<script is:inline set:html={cycleJsContent}></script>
+
+
+    <div id="add-friend-instructions" class="section-gap">
+      <div class="section-title mb-6">申请友链</div>
+      <Markdown>
+        <Content />
+      </Markdown>
+    </div>
     
-    <section class="comments-section" aria-labelledby="comments-title">
+    <section class="comments-section section-gap" aria-labelledby="comments-title">
       <h2 id="comments-title" class="comments-title">评论</h2>
       <div id="comment-section">
         <Artalk />
@@ -93,37 +131,37 @@ const { Content } = await render(friendPost);
       margin-right: 1rem;
     }
 
-    .comments-section {
-      margin-top: 2.5rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--line-divider);
+    /* 通用分节样式 */
+    .section-gap {
+      margin-top: 4rem;
+      padding-top: 2.5rem;
+      border-top: 1px dashed var(--line-divider);
+      scroll-margin-top: 5rem; /* 确保跳转后不被头部遮挡 */
+    }
+
+    #friend-links {
+      scroll-margin-top: 5rem;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
     }
 
     .comments-title {
       text-align: center;
-      font-size: 1.25rem;
-      font-weight: 600;
+      font-size: 1.5rem;
+      font-weight: 700;
       color: var(--text-primary);
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
 
     #comment-section {
       max-width: var(--page-width);
       margin: 0 auto;
-    }
-
-    .link-requirements {
-      margin-top: 2rem;
-      padding-top: 1.25rem;
-      border-top: 1px solid var(--line-divider);
-    }
-
-    .section-title {
-      text-align: center;
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 0.75rem;
     }
 
     .requirements-code {
@@ -160,9 +198,9 @@ const { Content } = await render(friendPost);
       .grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
-      .link-requirements, .comments-section {
-        margin-top: 1.5rem;
-        padding-top: 1rem;
+      .section-gap {
+        margin-top: 3rem;
+        padding-top: 1.5rem;
       }
       .friend-notes-separator {
         margin-top: 1.25rem;
@@ -211,6 +249,19 @@ const { Content } = await render(friendPost);
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+    }
+
+    .rail-actions {
+      margin-top: auto;
+      margin-left: 1rem;
+      padding-top: 16rem;
+    }
+
+    @media (min-width: 1024px) and (max-width: 1440px) {
+      .rail-actions {
+        margin-left: 1rem;
+        padding-top: 6rem; 
+      }
     }
   </style>
 </PostLayout>
