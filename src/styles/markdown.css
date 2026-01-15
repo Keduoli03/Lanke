@@ -59,8 +59,6 @@ code::before,
 code::after {
   content: none !important;
 }
-
-/* 或者更具体地针对您的使用场景 */
 .prose code::before,
 .prose code::after {
   content: "" !important;
@@ -82,6 +80,17 @@ code::after {
 .dark .prose :not(pre) > code {
   background-color: hsl(var(--primary-hue), 40%, 15%);
   color: hsl(var(--primary-hue), 60%, 70%);
+}
+
+/* 
+  Mark 标签 (高亮)
+  ==========================================================================
+  移除默认的黄色背景，改为主题色文字，并允许内联样式覆盖
+*/
+.prose mark {
+  background-color: transparent;
+  color: var(--theme-color);
+  font-weight: 500;
 }
 
 
@@ -133,9 +142,8 @@ code::after {
 }
 
 /*
-  2. 标题悬浮提示
+  2. 标题样式：左侧竖条 + 悬浮提示
   ==========================================================================
-  目标：鼠标悬停在标题上时，在左侧显示其等级（H1, H2, ...）。
 */
 .prose h1,
 .prose h2,
@@ -147,32 +155,52 @@ code::after {
   overflow-wrap: normal;
   word-break: normal;
   white-space: normal;
+  padding-left: 1rem;
 }
 
+/* 左侧竖条 (Theme Color Bar) */
 .prose h1::before,
 .prose h2::before,
 .prose h3::before,
 .prose h4::before,
 .prose h5::before,
 .prose h6::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 1.2em;
+  background-color: var(--theme-color);
+  border-radius: 2px;
+}
+
+/* 标题悬浮提示 (moved to ::after) */
+.prose h1::after,
+.prose h2::after,
+.prose h3::after,
+.prose h4::after,
+.prose h5::after,
+.prose h6::after {
   @apply absolute right-full top-1/2 -translate-y-1/2 mr-2 text-sm font-normal text-gray-400 opacity-0 transition-opacity duration-200 dark:text-gray-500;
 }
 
-.prose h1:hover::before,
-.prose h2:hover::before,
-.prose h3:hover::before,
-.prose h4:hover::before,
-.prose h5:hover::before,
-.prose h6:hover::before {
+.prose h1:hover::after,
+.prose h2:hover::after,
+.prose h3:hover::after,
+.prose h4:hover::after,
+.prose h5:hover::after,
+.prose h6:hover::after {
   @apply opacity-100;
 }
 
-.prose h1::before { content: 'H1'; }
-.prose h2::before { content: 'H2'; }
-.prose h3::before { content: 'H3'; }
-.prose h4::before { content: 'H4'; }
-.prose h5::before { content: 'H5'; }
-.prose h6::before { content: 'H6'; }
+.prose h1::after { content: 'H1'; }
+.prose h2::after { content: 'H2'; }
+.prose h3::after { content: 'H3'; }
+.prose h4::after { content: 'H4'; }
+.prose h5::after { content: 'H5'; }
+.prose h6::after { content: 'H6'; }
 
 /* 
   表格样式

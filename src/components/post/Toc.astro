@@ -56,7 +56,7 @@ const filteredItems = items.filter(item => item.depth >= 2 && item.depth <= site
   .toc-card {
     background: var(--content-pane-bg);
     border-radius: 0.75rem;
-    padding: 1.25rem;
+    padding: 1rem;
     border: 1px solid transparent;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   }
@@ -161,10 +161,18 @@ const filteredItems = items.filter(item => item.depth >= 2 && item.depth <= site
   .toc-chevron {
     flex-shrink: 0;
     margin-left: 0.5rem;
-    width: 0.9em;
-    height: 0.9em;
-    transition: transform 0.2s ease-in-out;
+    width: 1.25em; /* 增大图标尺寸 */
+    height: 1.25em;
+    padding: 0.15em; /* 增加点击区域 */
+    border-radius: 0.25rem;
+    transition: transform 0.2s ease-in-out, background-color 0.2s;
     transform: rotate(-90deg); /* 默认折叠 */
+    cursor: pointer; /* 明确提示可点击 */
+  }
+
+  .toc-chevron:hover {
+    background-color: var(--sidebar-icon-bg); /* 悬停反馈 */
+    color: var(--theme-color);
   }
 
   .toc-item.is-expanded > .toc-link .toc-chevron {
@@ -210,9 +218,11 @@ const filteredItems = items.filter(item => item.depth >= 2 && item.depth <= site
           // 默认折叠所有子项
           children.forEach(child => (child.style.display = 'none'));
 
-          link.addEventListener('click', (e) => {
-            // 阻止点击标题时页面跳转，只处理折叠
+          // 1. 箭头点击：只负责折叠/展开（无延迟，不跳转）
+          chevron.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation(); // 阻止事件冒泡到 link，防止跳转
+            
             const isExpanded = item.classList.toggle('is-expanded');
             children.forEach(child => {
               child.style.display = isExpanded ? 'list-item' : 'none';
@@ -220,6 +230,17 @@ const filteredItems = items.filter(item => item.depth >= 2 && item.depth <= site
                 child.classList.remove('is-expanded');
               }
             });
+          });
+
+          // 2. 标题点击：跳转 + 自动展开（无延迟）
+          link.addEventListener('click', (e) => {
+            // 允许默认跳转行为 (不调用 e.preventDefault)
+            
+            // 点击标题跳转时，自动展开子菜单，方便用户查看该章节下的内容
+            if (!item.classList.contains('is-expanded')) {
+              item.classList.add('is-expanded');
+              children.forEach(child => (child.style.display = 'list-item'));
+            }
           });
         } else {
           // 如果没有子项，隐藏V形图标

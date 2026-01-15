@@ -32,7 +32,7 @@ export const siteConfig: SiteConfig = {
   pageWidth: "60rem", // 内容区域最大宽度
   sidebarWidth: "4rem", // 侧边栏默认宽度
   sidebarExtendWidth: "8rem", // 侧边栏展开宽度
-  tocWidth: "12rem", // 目录宽度 (224px)
+  tocWidth: "16rem", // 目录宽度 (256px)
   tocMaxDepth: 3, // 目录最大显示深度
   // 新增：全局变量便于统一管理
   contentRailGap: "1.5rem", // 正文与右侧栏间距

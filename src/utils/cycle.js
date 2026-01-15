@@ -1,11 +1,13 @@
 function initialize_fc_lite() {
+    // Define UserConfig safely
+    var UserConfig = window.UserConfig || {};
     UserConfig = {
-        private_api_url: UserConfig?.private_api_url || "",
-        page_turning_number: UserConfig?.page_turning_number || 24,
-        error_img: UserConfig?.error_img || "https://fastly.jsdelivr.net/gh/Rock-Candy-Tea/Friend-Circle-Frontend/logo.png"
+        private_api_url: UserConfig.private_api_url || "",
+        page_turning_number: UserConfig.page_turning_number || 20,
+        error_img: UserConfig.error_img || "https://fastly.jsdelivr.net/gh/Rock-Candy-Tea/Friend-Circle-Frontend/logo.png"
     };
 
-    const PUBLIC_API_URL = 'https://fc-example.430070.xyz';
+    const PUBLIC_API_URL = 'https://circle-of-friends-iota.vercel.app/';
 
     const root = document.getElementById('friend-circle-lite-root');
     if (!root) return;
@@ -50,7 +52,16 @@ function initialize_fc_lite() {
     }
 
     function getApiUrl() {
-        return getDataSource() === 'public' ? PUBLIC_API_URL : UserConfig.private_api_url;
+        // 如果配置了私有 API，优先使用私有 API
+        if (UserConfig.private_api_url) {
+             return UserConfig.private_api_url;
+        }
+        
+        var source = getDataSource();
+        if (source === 'private' && !UserConfig.private_api_url) {
+            return PUBLIC_API_URL;
+        }
+        return source === 'public' ? PUBLIC_API_URL : UserConfig.private_api_url;
     }
 
     function clearCache() {
@@ -260,4 +271,5 @@ function whenDOMReady() {
 }
 
 whenDOMReady();
+document.addEventListener("astro:page-load", initialize_fc_lite);
 document.addEventListener("pjax:complete", initialize_fc_lite);

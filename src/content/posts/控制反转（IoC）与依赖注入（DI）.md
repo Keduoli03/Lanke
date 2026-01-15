@@ -12,7 +12,7 @@ status: true
 pinned: false
 aiSummary: true
 date: 2026-01-15 19:27
-updated: 2026-01-15 22:57
+updated: 2026-01-15 23:46
 slug: "230976"
 ---
 > [!tip] 观前提示
@@ -22,7 +22,7 @@ slug: "230976"
 
 在Java企业级开发领域，Spring框架无疑是基石般的存在。而谈及Spring，<mark style="color:#d08770">控制反转</mark>[^1] 与<mark style="color:#d08770">依赖注入</mark>[^2]是两个无法绕开的核心理念。它们不仅是Spring框架的基石，更是现代软件设计思想的重要体现。
 
-## 一、核心理念：什么是IoC与DI？
+## 一、什么是IoC与DI？
 
 简单来说：
 
@@ -83,7 +83,7 @@ public class TestWithoutIOC {
 2. **谁负责根据依赖关系组装组件？**
 3. **销毁时如何确保依赖顺序正确？**
 
-## 二、Spring的解决方案：IoC容器
+## 二、IoC容器
 
 Spring通过IoC容器解决了上述问题。在IoC模式下，控制权发生了反转：从应用程序转移到了IoC容器。所有组件不再由应用程序创建和配置，而是由IoC容器负责管理。
 
@@ -141,7 +141,7 @@ public class SpringIocApp {
 
 Spring提供了三种主要的依赖注入方式，各有适用场景。
 
-### 1. 字段注入（Field Injection）
+### 1. 字段注入
 
 直接在字段上使用`@Autowired`注解，是最简洁的方式。
 
@@ -165,7 +165,7 @@ public class UserService {
 - 缺点：不支持final字段、测试困难、可能隐藏过度依赖问题
 - 适用场景：快速原型开发，简单业务场景
 
-### 2. Setter方法注入（Setter Injection）
+### 2. Setter方法注入
 
 通过Setter方法注入依赖，提供更好的灵活性。
 
@@ -193,7 +193,7 @@ public class UserService {
 - 缺点：代码较繁琐、存在线程安全风险
 - 适用场景：配置类中的可选组件，需要动态切换实现的场景
 
-### 3. 构造器注入（Constructor Injection）
+### 3. 构造器注入
 
 **Spring官方推荐的首选方式**，尤其在Spring 4.3+版本后，单一构造器可省略`@Autowired`。
 
@@ -259,10 +259,6 @@ public class UserService {
 控制反转（IoC）和依赖注入（DI）是Spring框架的基石，理解它们的本质和实践方式对于编写可维护、可测试的Spring应用至关重要。构造器注入作为Spring官方推荐的首选方式，应成为我们开发中的默认选择。它不仅保证了代码的健壮性和可测试性，更通过清晰的依赖声明推动了更合理的软件设计。
 
 记住：**优秀的框架不仅提供便利，更引导良好的设计习惯**。掌握IoC与DI，不仅是学习Spring的使用，更是培养面向对象设计的重要思维方式。
-
----
-
-**注**：
 
 [^1]: IoC：Inversion of Control，控制反转
 [^2]: DI：Dependency Injection，依赖注入

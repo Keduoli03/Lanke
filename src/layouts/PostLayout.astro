@@ -155,8 +155,7 @@ const {
       flex-direction: column;
       gap: 2rem;
       height: calc(100vh - 4rem);
-      overflow-y: auto;
-      scrollbar-width: thin;
+      overflow: hidden;
     }
 
     .rail-actions {
@@ -208,6 +207,39 @@ const {
     @media (min-width: 1024px) and (max-width: 1440px) {
       :root { --rail-width: 18rem; --content-rail-gap: 1rem; }
       .rail-sticky { gap: 1rem; }
+    }
+  </style>
+
+  <style is:global>
+    /* 统一的侧边栏样式 */
+    .rail-wrapper {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .toc-wrapper {
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .toc-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    .rail-actions {
+      flex-shrink: 0;
+      margin-top: 1rem;
+      margin-left: 1rem;
+      margin-bottom: 8rem; /* 统一调高底部距离 */
+    }
+
+    @media (min-width: 1024px) and (max-width: 1440px) {
+      .rail-actions {
+        margin-left: 1rem;
+      }
     }
   </style>
 </body>

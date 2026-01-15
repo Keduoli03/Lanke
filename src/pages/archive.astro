@@ -32,7 +32,7 @@ const {
     showSidebar={true}
   />
   </div>
-  <div slot="rail">
+  <div slot="rail" style="height: 100%; overflow-y: auto;">
     {showSidebar && (
       <aside class="archive-sidebar">
           <ArchiveFilters defaultExpanded={true}/>

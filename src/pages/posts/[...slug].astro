@@ -79,9 +79,10 @@ const filteredHeadings = headings.filter(h => h.slug !== 'footnote-label' && h.t
   </div>
 
 
-  <div slot="rail">
-    
-    <Toc items={filteredHeadings} />
+  <div slot="rail" class="rail-wrapper">
+    <div class="toc-wrapper">
+      <Toc items={filteredHeadings} />
+    </div>
     <div class="rail-actions">
       <ScrollToTop />
       <ScrollToComment />
@@ -89,16 +90,5 @@ const filteredHeadings = headings.filter(h => h.slug !== 'footnote-label' && h.t
   </div>
 </PostLayout>
 <style>
-  .rail-actions{
-    margin-top: auto;
-    margin-left: 1rem;
-    padding-top: 16rem;
-  }
 
-  @media (min-width: 1024px) and (max-width: 1440px) {
-    .rail-actions {
-      margin-left: 1rem;
-      padding-top: 6rem; 
-    }
-  }
 </style>
