@@ -10,7 +10,7 @@ column: 博客
 cover:
 status: true
 date: 2025-04-23 00:47
-updated: 2026-01-15 23:58
+updated: 2026-01-15 23:59
 slug: "303355"
 pinned: true
 ---
@@ -148,12 +148,12 @@ print(a+b)
 根据 remark 写的卡片，支持外部音乐链接。没有使用 meetingjs，因为我不相信国内的音乐平台，还有很多的歌曲需要版权，索性使用自己的云盘咯
 
 ```text 
-:: music{title="晴天" author="周杰伦" url=" https://openlist.blueke.top/d/115%E7%BD%91%E7%9B%98/%E9%9F%B3%E4%B9%90/%E5%91%A8%E6%9D%B0%E4%BC%A6/03.%20%E6%99%B4%E5%A4%A9.flac?sign=pCKUnc6dsm61PHHHVdBEGJtTaf57h3B_SUwtqCKRADY=:0" }
+::music{title="晴天" author="周杰伦" url=" https://openlist.blueke.top/d/115%E7%BD%91%E7%9B%98/%E9%9F%B3%E4%B9%90/%E5%91%A8%E6%9D%B0%E4%BC%A6/03.%20%E6%99%B4%E5%A4%A9.flac?sign=pCKUnc6dsm61PHHHVdBEGJtTaf57h3B_SUwtqCKRADY=:0" }
 ```
 
 示例：
 
-::: music{title="晴天" author="周杰伦" url=" https://openlist.blueke.top/d/115%E7%BD%91%E7%9B%98/%E9%9F%B3%E4%B9%90/%E5%91%A8%E6%9D%B0%E4%BC%A6/03.%20%E6%99%B4%E5%A4%A9.flac?sign=pCKUnc6dsm61PHHHVdBEGJtTaf57h3B_SUwtqCKRADY=:0"}
+:::music{title="晴天" author="周杰伦" url=" https://openlist.blueke.top/d/115%E7%BD%91%E7%9B%98/%E9%9F%B3%E4%B9%90/%E5%91%A8%E6%9D%B0%E4%BC%A6/03.%20%E6%99%B4%E5%A4%A9.flac?sign=pCKUnc6dsm61PHHHVdBEGJtTaf57h3B_SUwtqCKRADY=:0"}
 
 ## 不同尺寸的插图
 
