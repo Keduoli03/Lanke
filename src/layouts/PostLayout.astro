@@ -87,53 +87,10 @@ const {
   <LightboxDialog />
 
   <style is:global>
-    * {
-      box-sizing: border-box;
-    }
-
-    .layout-container {
-      display: flex;
-      min-height: 100vh;
-    }
-
-    .main-content {
-      flex: 1;
-      background-color: var(--page-bg);
-      min-height: 100vh;
-      padding: 2rem 1rem;
-      /* 给侧边栏留空间，避免右侧溢出屏幕 */
-      padding-right: calc(var(--rail-width) + var(--content-rail-gap) + 1rem);
-    }
-
-    /* 主内容容器：仅限制主内容宽度，确保主内容居中 */
-    .page-outer-container {
-      max-width: var(--page-width); /* 仅主内容宽度，不包含侧边栏 */
-      margin: 0 auto; /* 主内容单独居中 */
-      width: 100%;
-      position: relative; /* 作为侧边栏的定位参考 */
-    }
-
     .post-main-container {
       display: flex;
       align-items: flex-start;
       width: 100%;
-    }
-
-    /* 主内容区：宽度固定，居中显示 */
-    .content-pane {
-      width: 100%;
-      max-width: var(--page-width);
-      background-color: var(--content-pane-bg);
-      border-radius: 0.75rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.08);
-      padding: 2rem;
-      flex-shrink: 0;
-    }
-
-    html.dark .content-pane {
-      background-color: var(--content-pane-bg);
-      border: 1px solid var(--line-divider);
-      box-shadow: none;
     }
 
     .post-rail {
@@ -163,48 +120,19 @@ const {
       gap: 1rem;
     }
 
-    /* 大屏幕适配：显示侧边栏 */
     @media (min-width: 1024px) {
-      .main-content { padding: 2rem; margin-left: var(--content-left-margin-base); }
-      .content-pane { padding: 2rem; }
+      .main-content { margin-left: 0; padding-right: 2rem; }
       .post-rail { display: block; }
     }
 
-    @media (min-width: 1024px) and (max-width: 1440px) {
-      .main-content { margin-left: var(--content-left-margin-tablet); }
-    }
-
     @media (max-width: 1023px) {
-      .main-content {
-        margin-left: 0 !important; 
-        padding: 1rem; 
-        padding-top: 4rem; 
-        overflow-x: hidden;
-      }
-      .page-outer-container {
-        max-width: 100%;
-      }
-      .post-main-container {
-        overflow-x: hidden;
-      }
-      .content-pane {
-        padding: 1rem; 
-        max-width: 100%; 
-        min-width: 0;
-        flex-shrink: 1;
-        overflow-x: hidden;
-      }
+      .post-main-container { overflow-x: hidden; }
+      .content-pane { min-width: 0; flex-shrink: 1; overflow-x: hidden; }
     }
 
-    @media (min-width: 640px) and (max-width: 1023px) {
-      .page-outer-container { max-width: calc(100% - 1rem); }
-      .content-pane { padding: 1.25rem; }
-    }
-
-    /* 桌面端窄屏（例如 1280–1440px）：收缩主内容宽度为“视口减去侧边栏与目录宽度”以留出右侧栏空间 */
-    
     @media (min-width: 1024px) and (max-width: 1440px) {
       :root { --rail-width: 18rem; --content-rail-gap: 1rem; }
+      .main-content { margin-left: 0; padding-right: 2rem; }
       .rail-sticky { gap: 1rem; }
     }
   </style>

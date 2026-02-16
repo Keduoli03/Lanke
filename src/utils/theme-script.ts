@@ -29,15 +29,6 @@ function applyThemeAndHue() {
   document.documentElement.style.setProperty("--primary-hue", hue.toString());
 }
 
-function applySidebarOpen() {
-  try {
-    var s = localStorage.getItem('sidebarOpen');
-    document.documentElement.setAttribute('data-sidebar-open', s === 'true' ? 'true' : 'false');
-  } catch(e) {
-    document.documentElement.setAttribute('data-sidebar-open','false');
-  }
-}
-
 function setNoSidebarTransition(on) {
   try {
     document.documentElement.classList.toggle('no-sidebar-transition', !!on);
@@ -87,31 +78,6 @@ function freezeSidebarVars() {
       btn.style.transition = 'none';
       btn.style.transform = csb.transform;
     }
-    var icons = sb.querySelectorAll('.icon-container');
-    icons.forEach(function(el){
-      var cse = getComputedStyle(el);
-      el.style.backgroundColor = cse.backgroundColor;
-      el.style.boxShadow = cse.boxShadow;
-      el.style.borderColor = cse.borderColor;
-      el.style.borderWidth = cse.borderWidth;
-      el.style.transition = 'none';
-    });
-    var links = sb.querySelectorAll('.nav-link');
-    links.forEach(function(el){
-      var cse = getComputedStyle(el);
-      el.style.backgroundColor = cse.backgroundColor;
-      el.style.transition = 'none';
-    });
-    var bcs = getComputedStyle(document.body);
-    document.body.style.backgroundColor = bcs.backgroundColor;
-    document.body.style.transition = 'none';
-    var panes = document.querySelectorAll('.content-pane');
-    panes.forEach(function(el){
-      var cse = getComputedStyle(el);
-      el.style.backgroundColor = cse.backgroundColor;
-      el.style.transition = 'none';
-    });
-
   } catch(e) {}
 }
 
@@ -123,27 +89,7 @@ function unfreezeSidebarVars() {
       sb.style.transition = '';
       var vars = ['--sidebar-bg','--sidebar-icon-bg','--sidebar-icon-symbol','--theme-color','--theme-color-light','--text-secondary','--text-primary','--line-divider'];
       for (var i=0;i<vars.length;i++) { sb.style.removeProperty(vars[i]); }
-      var icons = sb.querySelectorAll('.icon-container');
-      icons.forEach(function(el){
-        el.style.backgroundColor = '';
-        el.style.boxShadow = '';
-        el.style.borderColor = '';
-        el.style.borderWidth = '';
-        el.style.transition = '';
-      });
-      var links = sb.querySelectorAll('.nav-link');
-      links.forEach(function(el){
-        el.style.backgroundColor = '';
-        el.style.transition = '';
-      });
     }
-    document.body.style.backgroundColor = '';
-    document.body.style.transition = '';
-    var panes = document.querySelectorAll('.content-pane');
-    panes.forEach(function(el){
-      el.style.backgroundColor = '';
-      el.style.transition = '';
-    });
     var btn = document.getElementById('sidebar-toggle');
     if (btn) {
       btn.style.transition = '';
@@ -153,7 +99,6 @@ function unfreezeSidebarVars() {
 }
 
 window.applyThemeAndHue = applyThemeAndHue;
-window.applySidebarOpen = applySidebarOpen;
 window.setNoSidebarTransition = setNoSidebarTransition;
 window.freezeRootVars = freezeRootVars;
 window.unfreezeRootVars = unfreezeRootVars;
@@ -163,7 +108,6 @@ window.unfreezeSidebarVars = unfreezeSidebarVars;
 // 首次加载：禁用侧边栏过渡，应用状态后在下一帧恢复
 setNoSidebarTransition(true);
 applyThemeAndHue();
-applySidebarOpen();
 
 // 移除旧的 Astro 事件监听器，这些将在 swup-init.ts 中通过 Swup 事件处理
 // document.addEventListener('astro:before-swap', ...);

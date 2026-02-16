@@ -20,11 +20,10 @@ const extendedLinks: ExtendedLink[] = [...links];
     class="relative h-full bg-[var(--sidebar-bg)] flex-col transition-all duration-300 ease lg:flex hidden"
     style={`--sidebar-width-narrow: ${siteConfig.sidebarWidth}; --sidebar-width-wide: ${siteConfig.sidebarExtendWidth};`}
   >
-  <!-- 顶部Logo + 展开收起按钮：重点修改布局逻辑 -->
   <div class="sidebar-header p-2 border-b border-[var(--line-divider)] flex items-center justify-center relative">
     <!-- Logo容器：折叠/展开时都保持居中对齐 -->
     <a href={url("/")} class="hover:opacity-80 transition-opacity flex items-center justify-center" data-no-lightbox="true">
-      <img src="/favicon-192.png" alt={siteConfig.title} class="sidebar-logo w-10 h-10" data-no-lightbox="true" />
+      <img src="/favicon-192.png" alt={siteConfig.title} class="sidebar-logo w-10 h-10" data-no-lightbox="true" loading="eager" decoding="async" fetchpriority="high" />
       <span class="text-sm font-semibold text-[var(--text-primary)] sidebar-text">
         {siteConfig.title}
       </span>
@@ -412,6 +411,9 @@ const extendedLinks: ExtendedLink[] = [...links];
     };
     updateActiveLinks();
 
+    if ((window as any).__sidebarInitBound) return;
+    (window as any).__sidebarInitBound = true;
+
     try {
       const savedState = localStorage.getItem('sidebarOpen');
       if (savedState === 'true' || savedState === 'false') {
@@ -479,5 +481,6 @@ const extendedLinks: ExtendedLink[] = [...links];
     } catch {}
   }
 
-  document.addEventListener('astro:page-load', initSidebar);
+  (window as any).__initSidebar = initSidebar;
+  initSidebar();
 </script>

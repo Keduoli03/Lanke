@@ -14,7 +14,8 @@ interface Window {
   freezeRootVars: () => void;
   freezeSidebarVars: () => void;
   applyThemeAndHue: () => void;
-  applySidebarOpen: () => void;
   unfreezeRootVars: () => void;
   unfreezeSidebarVars: () => void;
+  __initSidebar?: () => void;
+  __initMobileNav?: () => void;
 }
