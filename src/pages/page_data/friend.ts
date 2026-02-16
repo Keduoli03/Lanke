@@ -41,12 +41,11 @@ export const items = [
 		tags: ["友链"],
 	},
 	{
-		title: "岚天小窝",
-		imgurl:
-			"https://gravatar.ltya.top/avatar/5af06b461740fb2bd7467b8561399703?s=500",
-		desc: "一只鸽子住在这里~",
-		siteurl: "https://blog.ltya.top/",
-		rss:"https://blog.ltya.top/atom.xml",
+		title: "小岚的杂物间",
+		imgurl: "https://avatar.guirlan.de/avatar/172530293dcfb25d871a72ccb39b21c2/256",
+		desc: "这里储存着各种稀奇古怪事物~",
+		siteurl: "https://www.guirlan.de",
+		rss:"https://www.guirlan.de/atom.xml",
 		tags: ["友链"],
 	},
 	{
