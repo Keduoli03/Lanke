@@ -307,7 +307,7 @@ const title = '说说';
         }
       });
 
-      document.addEventListener('astro:page-load', () => {
+      function initMemos() {
         memoGrid = document.querySelector(CONFIG.dom.gridContainer);
         memoTemplate = document.querySelector(CONFIG.dom.template);
         loadMoreContainer = document.querySelector(CONFIG.dom.loadMore);
@@ -319,7 +319,10 @@ const title = '说说';
         if (c1) { c1.classList.add('d-none'); c1.innerHTML = ''; c1.removeAttribute('data-current-id'); }
         window.__memosCommentId = null;
         getFirstPageMemos();
-      });
+      }
+
+      window.__initMemos = initMemos;
+      initMemos();
 
 
     </script>
