@@ -1,12 +1,10 @@
 ---
-import { ClientRouter } from 'astro:transitions';
 import { siteConfig } from '../config';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Sidebar from '../components/Sidebar.astro';
 import MobileNav from '../components/MobileNav.astro';
 import themeScript from '../utils/theme-script.ts?raw';
-import pageTransitionScript from '../utils/page-transition.ts?raw';
 import LightboxDialog from '../components/util/Lightbox.astro';
 import SearchDialog from '@/components/search/SearchDialog.astro';
 import Live2D from '@/components/util/Live2D.astro';
@@ -42,7 +40,9 @@ const {
   </script>
   <BaseHead title={title} description={description} />
   <script is:inline set:html={themeScript} />
-  <script is:inline set:html={pageTransitionScript} />
+  <script>
+    import "../utils/swup-init";
+  </script>
 </head>
 <body class="bg-page text-primary" style={`
   --primary-hue: ${siteConfig.themeColor.hue};
@@ -56,15 +56,14 @@ const {
   --tablet-sidebar-extend-width: ${siteConfig.tabletSidebarExtendWidth};
 `}>
   {showIntro && <IntroOverlay />}
-  <ClientRouter />
-  <Live2D transition:persist transition:name="live2d" />
+  <Live2D />
   <div class="layout-container">
     <div class="hidden lg:block">
-		<Sidebar transition:persist />
+		<Sidebar />
 	</div>
-    <MobileNav transition:persist class="mobile-nav" />
+    <MobileNav class="mobile-nav" />
     
-    <main class="main-content">
+    <main id="swup" class="main-content swup-transition-fade">
       <!-- 主内容区容器：仅包裹主内容，保持居中 -->
       <div class="page-outer-container">
         <div class="post-main-container">

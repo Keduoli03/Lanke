@@ -50,6 +50,15 @@ importers:
       '@jcayzac/astro-rehype-frontmatter-reading-stats':
         specifier: ^0.1.0
         version: 0.1.0
+      '@swup/head-plugin':
+        specifier: ^2.3.1
+        version: 2.3.1(swup@4.8.2)
+      '@swup/preload-plugin':
+        specifier: ^3.2.11
+        version: 3.2.11(swup@4.8.2)
+      '@swup/scripts-plugin':
+        specifier: ^2.1.0
+        version: 2.1.0(swup@4.8.2)
       '@tailwindcss/vite':
         specifier: ^4.1.13
         version: 4.1.13(vite@6.4.1(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0))
@@ -107,6 +116,9 @@ importers:
       svelte:
         specifier: ^5.38.10
         version: 5.38.10
+      swup:
+        specifier: ^4.8.2
+        version: 4.8.2
       tailwindcss:
         specifier: ^4.1.13
         version: 4.1.13
@@ -816,6 +828,24 @@ packages:
   '@swc/helpers@0.5.17':
     resolution: {integrity: sha512-5IKx/Y13RsYd+sauPb2x+U/xZikHjolzfuDgTAl/Tdf3Q8rslRvC19NKDLgAJQ6wsqADk10ntlv08nPFw/gO/A==}
 
+  '@swup/head-plugin@2.3.1':
+    resolution: {integrity: sha512-kdv60fO9c0/3+K40f7Fj/uV34nSuuPeCsld83J5uVVFizOmoovA737C5M1Iqac5Spf2GLU7q+mhN6AbohSIBjA==}
+    peerDependencies:
+      swup: ^4.6.0
+
+  '@swup/plugin@4.0.0':
+    resolution: {integrity: sha512-3Kq31BJxnzoPg643YxGoWQggoU6VPKZpdE5CqqmP7wwkpCYTzkRmrfcQ29mGhsSS7xfS7D33iZoBiwY+wPoo2A==}
+
+  '@swup/preload-plugin@3.2.11':
+    resolution: {integrity: sha512-dq50u+d8L+63/pU6dUDnypuBoF49ubjRzRJqitGem2K7wRn7xccxRSvdyeGKdA2vNvzGDAmLfwVTZdSotvvDrw==}
+    peerDependencies:
+      swup: ^4.0.0
+
+  '@swup/scripts-plugin@2.1.0':
+    resolution: {integrity: sha512-JSMFsFCN9gn4q3m1Ccv0gq3gwRoZl6UGALOQO3OeQ8wOIq9vPC5dcUD3CMBuaPanksjR4GC8ZoukIjHrlT52fg==}
+    peerDependencies:
+      swup: ^4.2.0
+
   '@tailwindcss/node@4.1.13':
     resolution: {integrity: sha512-eq3ouolC1oEFOAvOMOBAmfCIqZBJuvWvvYWh5h5iOYfe1HFC6+GZ6EIL0JdM3/niGRJmnrOc+8gl9/HGUaaptw==}
 
@@ -1387,6 +1417,9 @@ packages:
   delayed-stream@1.0.0:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
+
+  delegate-it@6.3.0:
+    resolution: {integrity: sha512-WAa6cA61M5mfDR31PBgMNQQ3LY1q++TxnZzcm7E9XV8ODBPxDutxH0toTR/BXqIkLaVuU7ntFe1uOqDllhA22A==}
 
   dequal@2.0.3:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
@@ -2227,6 +2260,10 @@ packages:
   oniguruma-to-es@4.3.4:
     resolution: {integrity: sha512-3VhUGN3w2eYxnTzHn+ikMI+fp/96KoRSVK9/kMTcFqj1NRDh2IhQCKvYxDnWePKRXY/AqH+Fuiyb7VHSzBjHfA==}
 
+  opencollective-postinstall@2.0.3:
+    resolution: {integrity: sha512-8AV/sCtuzUeTo8gQK5qDZzARrulB3egtLzFgteqB2tcT4Mw7B8Kt7JcDHmltjz6FOAHsvTevk70gZEbhM4ZS9Q==}
+    hasBin: true
+
   p-limit@6.2.0:
     resolution: {integrity: sha512-kuUqqHNUqoIWp/c467RI4X6mmyuojY5jGutNU0wVTmEOOfcuwLqyMVoAi9MKi2Ak+5i9+nhmrK4ufZE8069kHA==}
     engines: {node: '>=18'}
@@ -2612,6 +2649,9 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
+  swup@4.8.2:
+    resolution: {integrity: sha512-Art2vB4idZ7EFZQhhA47ZifkmZMPgcAwE6z28BhorbTYCO8jcovcc5MasX49GGdXYJWO43DTut7iZb5yrQdEfA==}
+
   tailwindcss@4.1.13:
     resolution: {integrity: sha512-i+zidfmTqtwquj4hMEwdjshYYgMbOrPzb9a0M3ZgNa0JMoZeFC6bxZvO8yr8ozS6ix2SDz0+mvryPeBs2TFE+w==}
 
@@ -2675,6 +2715,9 @@ packages:
   type-fest@4.41.0:
     resolution: {integrity: sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA==}
     engines: {node: '>=16'}
+
+  typed-query-selector@2.12.0:
+    resolution: {integrity: sha512-SbklCd1F0EiZOyPiW192rrHZzZ5sBijB6xM+cpmrwDqObvdtunOHHIk9fCGsoK5JVIYXoyEp4iEdE3upFH3PAg==}
 
   typescript@5.9.3:
     resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
@@ -3669,6 +3712,25 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
+  '@swup/head-plugin@2.3.1(swup@4.8.2)':
+    dependencies:
+      '@swup/plugin': 4.0.0
+      swup: 4.8.2
+
+  '@swup/plugin@4.0.0':
+    dependencies:
+      swup: 4.8.2
+
+  '@swup/preload-plugin@3.2.11(swup@4.8.2)':
+    dependencies:
+      '@swup/plugin': 4.0.0
+      swup: 4.8.2
+
+  '@swup/scripts-plugin@2.1.0(swup@4.8.2)':
+    dependencies:
+      '@swup/plugin': 4.0.0
+      swup: 4.8.2
+
   '@tailwindcss/node@4.1.13':
     dependencies:
       '@jridgewell/remapping': 2.3.5
@@ -4321,6 +4383,10 @@ snapshots:
   defu@6.1.4: {}
 
   delayed-stream@1.0.0: {}
+
+  delegate-it@6.3.0:
+    dependencies:
+      typed-query-selector: 2.12.0
 
   dequal@2.0.3: {}
 
@@ -5560,6 +5626,8 @@ snapshots:
       regex: 6.0.1
       regex-recursion: 6.0.2
 
+  opencollective-postinstall@2.0.3: {}
+
   p-limit@6.2.0:
     dependencies:
       yocto-queue: 1.2.1
@@ -6129,6 +6197,12 @@ snapshots:
       picocolors: 1.1.1
       sax: 1.4.1
 
+  swup@4.8.2:
+    dependencies:
+      delegate-it: 6.3.0
+      opencollective-postinstall: 2.0.3
+      path-to-regexp: 6.3.0
+
   tailwindcss@4.1.13: {}
 
   tapable@2.2.3: {}
@@ -6185,6 +6259,8 @@ snapshots:
   tslib@2.8.1: {}
 
   type-fest@4.41.0: {}
+
+  typed-query-selector@2.12.0: {}
 
   typescript@5.9.3: {}
 

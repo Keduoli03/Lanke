@@ -28,7 +28,7 @@ import { pluginAutoTitleSetup, pluginAutoTitleCleanup } from './src/plugins/expr
 // https://astro.build/config
 export default defineConfig({
   site: siteConfig.url,
-  prefetch: true,
+  // prefetch: true, // Removed for Swup
   image: {
     // 尝试关闭响应式样式
     // @ts-ignore

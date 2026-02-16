@@ -50,12 +50,11 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
                 const isExternal = !!l.external || /^https?:\/\//.test(l.url);
                 const linkPath = isExternal ? l.url : url(l.url);
                 return (
-                    <li transition:name={`mobile-link-${l.url}`}>
+                    <li >
                     <a
                         href={linkPath}
                         target={isExternal ? '_blank' : '_self'}
                         rel={isExternal ? 'noopener noreferrer' : ''}
-                        data-astro-prefetch={isExternal ? "false" : "load"}
                         class="transition-all group nav-link flex flex-row items-center p-2 w-full rounded-lg"
                         data-navigation-link
                     >
@@ -83,6 +82,9 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
 <script>
     function initMobileNavScripts() {
         const menuToggle = document.getElementById('mobile-menu-toggle');
+        // 防止重复初始化
+        if (menuToggle && menuToggle.hasAttribute('data-init')) return;
+
         const panel = document.getElementById('mobile-nav-panel');
         const iconOpen = document.getElementById('mobile-menu-icon-open');
         const iconClose = document.getElementById('mobile-menu-icon-close');
@@ -92,6 +94,9 @@ let links: NavBarLink[] = Object.values(navBarConfig.links);
         if (!menuToggle || !panel || !iconOpen || !iconClose) {
             return;
         }
+        
+        // 标记已初始化
+        menuToggle.setAttribute('data-init', 'true');
 
         const openPanel = () => {
             panel.classList.remove('translate-x-full', 'opacity-0');

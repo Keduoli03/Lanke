@@ -152,20 +152,22 @@ function unfreezeSidebarVars() {
   } catch(e) {}
 }
 
+window.applyThemeAndHue = applyThemeAndHue;
+window.applySidebarOpen = applySidebarOpen;
+window.setNoSidebarTransition = setNoSidebarTransition;
+window.freezeRootVars = freezeRootVars;
+window.unfreezeRootVars = unfreezeRootVars;
+window.freezeSidebarVars = freezeSidebarVars;
+window.unfreezeSidebarVars = unfreezeSidebarVars;
+
 // 首次加载：禁用侧边栏过渡，应用状态后在下一帧恢复
 setNoSidebarTransition(true);
 applyThemeAndHue();
 applySidebarOpen();
 
-// 客户端路由切换：在切换前禁用过渡并冻结变量，切换后应用状态并解冻
-document.addEventListener('astro:before-swap', () => { setNoSidebarTransition(true); freezeRootVars(); freezeSidebarVars(); });
-document.addEventListener('astro:after-swap', function(){
-  applyThemeAndHue();
-  applySidebarOpen();
-  unfreezeRootVars();
-  unfreezeSidebarVars();
-  setNoSidebarTransition(true);
-});
+// 移除旧的 Astro 事件监听器，这些将在 swup-init.ts 中通过 Swup 事件处理
+// document.addEventListener('astro:before-swap', ...);
+// document.addEventListener('astro:after-swap', ...);
 
 // 预先拦截内部链接的点击/按下，尽早冻结，避免首帧闪白
 function isInternalAnchor(el){

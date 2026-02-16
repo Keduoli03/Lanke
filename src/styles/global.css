@@ -182,6 +182,7 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 
 /* --- 主题切换动画 --- */
 /* 基础设置：规范混合模式，不再全局禁用动画 */
+/*
 ::view-transition-old(root),
 ::view-transition-new(root) {
   mix-blend-mode: normal;
@@ -198,6 +199,17 @@ html:not(.to-dark):not(.to-light) ::view-transition-new(page) {
 html:not(.to-dark):not(.to-light) ::view-transition-old(page) { 
   animation: page-rise-out 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both; 
   transform-origin: 50% 50%;
+}
+*/
+
+/* Swup Transitions */
+.swup-transition-fade {
+  transition: opacity 0.3s ease-in-out;
+  opacity: 1;
+}
+
+html.is-changing .swup-transition-fade {
+  opacity: 0;
 }
 
 @keyframes page-rise-in {

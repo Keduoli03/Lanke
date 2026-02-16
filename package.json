@@ -23,6 +23,9 @@
     "@iconify-json/mdi": "^1.2.3",
     "@iconify-json/ri": "^1.2.6",
     "@jcayzac/astro-rehype-frontmatter-reading-stats": "^0.1.0",
+    "@swup/head-plugin": "^2.3.1",
+    "@swup/preload-plugin": "^3.2.11",
+    "@swup/scripts-plugin": "^2.1.0",
     "@tailwindcss/vite": "^4.1.13",
     "@xt0rted/expressive-code-file-icons": "^1.0.0",
     "astro": "^5.16.6",
@@ -42,6 +45,7 @@
     "remark-toc": "^9.0.0",
     "sharp": "^0.34.3",
     "svelte": "^5.38.10",
+    "swup": "^4.8.2",
     "tailwindcss": "^4.1.13",
     "unist-util-visit": "^5.0.0"
   },

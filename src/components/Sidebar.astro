@@ -21,7 +21,7 @@ const extendedLinks: ExtendedLink[] = [...links];
     style={`--sidebar-width-narrow: ${siteConfig.sidebarWidth}; --sidebar-width-wide: ${siteConfig.sidebarExtendWidth};`}
   >
   <!-- 顶部Logo + 展开收起按钮：重点修改布局逻辑 -->
-  <div class="sidebar-header p-2 border-b border-[var(--line-divider)] flex items-center justify-center relative" transition:persist="sidebar-logo">
+  <div class="sidebar-header p-2 border-b border-[var(--line-divider)] flex items-center justify-center relative">
     <!-- Logo容器：折叠/展开时都保持居中对齐 -->
     <a href={url("/")} class="hover:opacity-80 transition-opacity flex items-center justify-center" data-no-lightbox="true">
       <img src="/favicon-192.png" alt={siteConfig.title} class="sidebar-logo w-10 h-10" data-no-lightbox="true" />
@@ -50,7 +50,6 @@ const extendedLinks: ExtendedLink[] = [...links];
               href={linkPath}
               target={isExternal ? "_blank" : "_self"}
               rel={isExternal ? "noopener noreferrer" : ""}
-              data-astro-prefetch={isExternal ? "false" : "hover"}
               class:list={[
                 "group flex items-center p-1 nav-link rounded-lg transition-all duration-300",
                 { "is-active": isActive },
@@ -85,7 +84,7 @@ const extendedLinks: ExtendedLink[] = [...links];
       </button>
       <div id="theme-mode-item" class="w-full flex items-center p-1 nav-link rounded-lg">
         <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center relative shadow-md" style="background-color: var(--sidebar-icon-bg)">
-          <LightDarkSwitch client:load transition:persist>
+          <LightDarkSwitch client:load>
             <Icon slot="dark-icon" name="material-symbols:dark-mode-outline" class="icon h-5 w-5 cursor-pointer" />
             <Icon slot="light-icon" name="material-symbols:light-mode-outline" class="icon h-5 w-5 cursor-pointer" />
           </LightDarkSwitch>
@@ -94,7 +93,7 @@ const extendedLinks: ExtendedLink[] = [...links];
       </div>
       <div id="theme-color-item" class="w-full flex items-center p-1 nav-link rounded-lg">
         <div class="icon-container w-8 h-8 rounded-lg flex items-center justify-center relative shadow-md" style="background-color: var(--sidebar-icon-bg)">
-          <ThemeSwitch client:load transition:persist isMobile={false}>
+          <ThemeSwitch client:load isMobile={false}>
             <Icon slot="palette-icon" name="material-symbols:palette-outline" class="icon h-5 w-5 cursor-pointer" />
             <Icon slot="reset-icon" name="fa6-solid:arrow-rotate-left" class="text-xs" />
           </ThemeSwitch>
